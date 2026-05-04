@@ -106,12 +106,15 @@ export default function CallScreen({ callData, onReset }: Props) {
           <div className="options-label">Lead responds:</div>
           <div className="options-grid">
             {node.options.map(opt => {
-              const isDanger = opt.next.startsWith('end_not')
-              const isWarn = opt.next.startsWith('obj_')
+              const cls =
+                opt.type === 'end' ? ' btn-option--danger'
+                : opt.type === 'objection' ? ' btn-option--warn'
+                : opt.type === 'positive' ? ' btn-option--positive'
+                : ''
               return (
                 <button
                   key={opt.next}
-                  className={`btn-option${isDanger ? ' btn-option--danger' : isWarn ? ' btn-option--warn' : ''}`}
+                  className={`btn-option${cls}`}
                   onClick={() => goTo(opt)}
                 >
                   {opt.label}

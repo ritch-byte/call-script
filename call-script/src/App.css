@@ -328,6 +328,17 @@ body {
   color: #1d4ed8;
 }
 
+.btn-option--positive {
+  border-color: #bbf7d0;
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.btn-option--positive:hover {
+  background: #dcfce7;
+  border-color: #4ade80;
+}
+
 .btn-option--warn {
   border-color: #fed7aa;
   color: #c2410c;
