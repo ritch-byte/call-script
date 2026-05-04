@@ -77,7 +77,7 @@ export const flow: Record<string, FlowNode> = {
     tip: "SPIN: If they share real frustration, deepen it — \"When hiring takes longer than expected, what does that cost you in the meantime — project delays, or your team absorbing extra workload?\" A bigger gap = more urgency for the solution.",
     options: [
       { label: "It's challenging / could be better", next: 'discovery_q3', type: 'positive' },
-      { label: "It's going well / no issues", next: 'obj_doing_fine', type: 'objection' },
+      { label: "It's going well / no issues", next: 'discovery_q3', type: 'positive' },
     ],
   },
 
@@ -86,7 +86,7 @@ export const flow: Record<string, FlowNode> = {
   discovery_q3: {
     id: 'discovery_q3',
     title: 'Discovery Q3: Talent Type',
-    script: "I see, and what type of talents does your team prioritize most?",
+    script: "That's great to hear! And out of curiosity, what type of talents does your team normally prioritize?",
     waitForAnswer: true,
     options: [
       { label: 'They share a role or answer', next: 'value_prop', type: 'positive' },
