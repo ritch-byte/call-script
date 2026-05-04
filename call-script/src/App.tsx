@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import SetupScreen from './components/SetupScreen'
 import CallScreen from './components/CallScreen'
 
 export interface CallData {
@@ -8,16 +6,16 @@ export interface CallData {
   geminiResearch: string
 }
 
-export default function App() {
-  const [callData, setCallData] = useState<CallData | null>(null)
+const DEFAULT_CALL_DATA: CallData = {
+  leadName: '',
+  yourName: '',
+  geminiResearch: '',
+}
 
+export default function App() {
   return (
     <div className="app">
-      {!callData ? (
-        <SetupScreen onStart={setCallData} />
-      ) : (
-        <CallScreen callData={callData} onReset={() => setCallData(null)} />
-      )}
+      <CallScreen callData={DEFAULT_CALL_DATA} onReset={() => window.location.reload()} />
     </div>
   )
 }

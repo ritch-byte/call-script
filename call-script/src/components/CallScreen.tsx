@@ -10,19 +10,22 @@ interface Props {
 
 type Context = Record<string, string>
 
-function interpolate(text: string, callData: CallData, ctx: Context): string {
+function interpolate(text: string, leadName: string, geminiResearch: string, ctx: Context): string {
   return text
-    .replace(/{leadName}/g, callData.leadName)
-    .replace(/{yourName}/g, callData.yourName)
-    .replace(/{geminiResearch}/g, callData.geminiResearch || '[No research added — paste it on the setup screen next time]')
+    .replace(/{leadName}/g, leadName || 'there')
+    .replace(/{yourName}/g, 'I')
+    .replace(/{geminiResearch}/g, geminiResearch || '[No research added]')
     .replace(/{hiringSetup}/g, ctx.hiringSetup ?? 'team')
 }
 
-export default function CallScreen({ callData, onReset }: Props) {
+export default function CallScreen({ onReset }: Props) {
   const [currentId, setCurrentId] = useState('opening')
   const [history, setHistory] = useState<string[]>([])
   const [context, setContext] = useState<Context>({})
   const [showObjections, setShowObjections] = useState(false)
+  const [leadName, setLeadName] = useState('')
+  const [geminiResearch, setGeminiResearch] = useState('')
+  const [showResearch, setShowResearch] = useState(false)
 
   const node = flow[currentId]
 
@@ -40,7 +43,7 @@ export default function CallScreen({ callData, onReset }: Props) {
     setShowObjections(false)
   }
 
-  const script = interpolate(node.script, callData, context)
+  const script = interpolate(node.script, leadName, geminiResearch, context)
   const breadcrumbPath = [...history, currentId]
 
   const cardClass = [
@@ -62,13 +65,39 @@ export default function CallScreen({ callData, onReset }: Props) {
     <div className="call-screen">
       <div className="call-header">
         <div className="call-info">
-          <span className="call-lead">{callData.leadName}</span>
+          <input
+            className="lead-name-input"
+            type="text"
+            placeholder="Lead's name..."
+            value={leadName}
+            onChange={e => setLeadName(e.target.value)}
+          />
           <span className="call-step">Step {history.length + 1}</span>
         </div>
-        <button className="btn-header-ghost" onClick={onReset}>
-          End Call
-        </button>
+        <div className="header-actions">
+          <button
+            className="btn-header-ghost"
+            onClick={() => setShowResearch(v => !v)}
+          >
+            Research
+          </button>
+          <button className="btn-header-ghost" onClick={onReset}>
+            Reset
+          </button>
+        </div>
       </div>
+
+      {showResearch && (
+        <div className="research-bar">
+          <textarea
+            className="research-input"
+            placeholder="Paste Gemini research here before the value prop..."
+            value={geminiResearch}
+            onChange={e => setGeminiResearch(e.target.value)}
+            rows={4}
+          />
+        </div>
+      )}
 
       <div className="breadcrumb">
         {breadcrumbPath.map((id, i) => (
