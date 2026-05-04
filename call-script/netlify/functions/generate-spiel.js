@@ -12,24 +12,23 @@ exports.handler = async (event) => {
     }
   }
 
-  let company, jobTitle, website
+  let rawInput
   try {
-    ;({ company, jobTitle, website } = JSON.parse(event.body))
+    ;({ rawInput } = JSON.parse(event.body))
   } catch {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid request body' }) }
   }
 
-  if (!company || !jobTitle) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Company and Job Title are required' }) }
+  if (!rawInput) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Input is required' }) }
   }
 
   const prompt = `Role: You are an expert B2B Sales Development Representative specializing in offshore staffing solutions.
 
 Goal: Write a short, hyper-personalized outreach message based on a prospect's Job Title and Company.
 
-Inputs:
-Company: ${company}
-Job Title: ${jobTitle}${website ? `\nWebsite: ${website}` : ''}
+The following is raw information about the prospect (may include job title, company name, website, or other details in any format):
+${rawInput}
 
 Instructions & Guidelines:
 Analyze the Company: Briefly infer their industry and verify their prestige (e.g., "leader in...").

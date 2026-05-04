@@ -27,9 +27,7 @@ export default function CallScreen({ onReset }: Props) {
   const [showResearch, setShowResearch] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
-  const [company, setCompany] = useState('')
-  const [jobTitle, setJobTitle] = useState('')
-  const [website, setWebsite] = useState('')
+  const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
 
@@ -40,7 +38,7 @@ export default function CallScreen({ onReset }: Props) {
       const res = await fetch('/.netlify/functions/generate-spiel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ company: company.trim(), jobTitle: jobTitle.trim(), website: website.trim() }),
+        body: JSON.stringify({ rawInput: rawInput.trim() }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Generation failed')
@@ -161,28 +159,14 @@ export default function CallScreen({ onReset }: Props) {
               <input
                 className="gen-input"
                 type="text"
-                placeholder="Company name *"
-                value={company}
-                onChange={e => setCompany(e.target.value)}
-              />
-              <input
-                className="gen-input"
-                type="text"
-                placeholder="Job title *"
-                value={jobTitle}
-                onChange={e => setJobTitle(e.target.value)}
-              />
-              <input
-                className="gen-input"
-                type="text"
-                placeholder="Website (optional)"
-                value={website}
-                onChange={e => setWebsite(e.target.value)}
+                placeholder="e.g. CEO, Acme Corp, acme.com"
+                value={rawInput}
+                onChange={e => setRawInput(e.target.value)}
               />
               <button
                 className="btn-generate"
                 onClick={generateSpiel}
-                disabled={isGenerating || !company.trim() || !jobTitle.trim()}
+                disabled={isGenerating || !rawInput.trim()}
               >
                 {isGenerating ? 'Generating...' : 'Generate'}
               </button>
