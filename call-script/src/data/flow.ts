@@ -3,6 +3,7 @@ export interface FlowNode {
   title: string
   script: string
   waitForAnswer?: boolean
+  tip?: string
   options: FlowOption[]
   isObjection?: boolean
   isEnd?: boolean
@@ -14,6 +15,28 @@ export interface FlowOption {
   capture?: Record<string, string>
   type?: 'positive' | 'objection' | 'end'
 }
+
+export interface SalaryRow {
+  role: string
+  us: string
+  offshore: string
+  savings: string
+}
+
+export const SALARY_TABLE: SalaryRow[] = [
+  { role: 'Customer Service Rep',    us: '$40–55K', offshore: '$8–14K',  savings: '~75%' },
+  { role: 'Virtual Assistant / EA',  us: '$45–60K', offshore: '$7–12K',  savings: '~80%' },
+  { role: 'Bookkeeper / Accounting', us: '$50–65K', offshore: '$10–18K', savings: '~72%' },
+  { role: 'Data Entry / Admin',      us: '$35–45K', offshore: '$6–10K',  savings: '~80%' },
+  { role: 'Digital Marketer',        us: '$55–80K', offshore: '$12–22K', savings: '~75%' },
+  { role: 'Graphic Designer',        us: '$50–70K', offshore: '$10–20K', savings: '~72%' },
+  { role: 'Software Developer',      us: '$90–130K',offshore: '$20–45K', savings: '~65%' },
+  { role: 'IT Support / Helpdesk',   us: '$45–65K', offshore: '$10–18K', savings: '~72%' },
+  { role: 'Sales Support / SDR',     us: '$50–70K', offshore: '$10–18K', savings: '~75%' },
+  { role: 'Content Writer',          us: '$45–65K', offshore: '$8–16K',  savings: '~75%' },
+  { role: 'HR Coordinator',          us: '$50–65K', offshore: '$10–16K', savings: '~75%' },
+  { role: 'Project Coordinator',     us: '$55–75K', offshore: '$12–20K', savings: '~72%' },
+]
 
 export const flow: Record<string, FlowNode> = {
 
@@ -51,6 +74,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Discovery Q2: Finding Talents',
     script: "Awesome! And how is your team doing so far in terms of finding great talents?",
     waitForAnswer: true,
+    tip: "SPIN: If they share real frustration, deepen it — \"When hiring takes longer than expected, what does that cost you in the meantime — project delays, or your team absorbing extra workload?\" A bigger gap = more urgency for the solution.",
     options: [
       { label: "It's challenging / could be better", next: 'discovery_q3', type: 'positive' },
       { label: "It's going well / no issues", next: 'obj_doing_fine', type: 'objection' },
@@ -76,6 +100,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'value_prop',
     title: 'Value Prop + Research',
     script: "The reason I asked you is because we help business leaders like you cut salary costs by up to 80% using world-class global talent. And before calling you, I actually did some research...\n\n{geminiResearch}",
+    tip: "Make savings specific and multiplied — it lands harder than a percentage. \"If you have 3 of those roles at $55K each locally, that's $165K/yr vs roughly $42K offshore — over $120K saved per year on just those three.\"",
     options: [
       { label: 'Lead is engaged / curious', next: 'booking', type: 'positive' },
       { label: 'Already outsourcing / need to think', next: 'obj_already_outsourcing', type: 'objection' },
@@ -120,7 +145,7 @@ export const flow: Record<string, FlowNode> = {
     options: [],
   },
 
-  // ── OBJECTION HANDLERS ───────────────────────────────────────────────────
+  // ── COMMON OBJECTION HANDLERS ─────────────────────────────────────────────
 
   obj_timing: {
     id: 'obj_timing',
@@ -150,8 +175,9 @@ export const flow: Record<string, FlowNode> = {
     script: "Totally understand! Can I ask — is your concern more about the cost, the process, or have you tried offshore talent before and it didn't work out?\n\nI ask because depending on your situation, we might approach this differently — and I'd hate to waste your time if we're not the right fit.",
     isObjection: true,
     options: [
-      { label: 'Cost concern / tried before', next: 'obj_budget', type: 'objection' },
-      { label: "They're open again", next: 'discovery_q2', type: 'positive' },
+      { label: 'Cost concern', next: 'obj_budget', type: 'objection' },
+      { label: 'Tried offshore before', next: 'obj_tried_before', type: 'objection' },
+      { label: "They're open again / other", next: 'discovery_q2', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -244,6 +270,97 @@ export const flow: Record<string, FlowNode> = {
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
+
+  // ── OFFSHORE-SPECIFIC OBJECTION HANDLERS ─────────────────────────────────
+
+  obj_quality: {
+    id: 'obj_quality',
+    title: "Objection: Quality Won't Be as Good",
+    script: "That's the most common concern I hear — and it's a fair one. The reason we vet our partners so carefully is exactly because of this. Our partners are assessed on English proficiency, skill testing, infrastructure, and track record. We only work with partners who have proven quality placements.\n\nCan I ask — what does 'quality' mean for your specific role? Is it technical skill, communication, reliability, or something else? Because once I know your standard, I can tell you whether we can match it.",
+    isObjection: true,
+    options: [
+      { label: 'They define their standard — sounds achievable', next: 'value_prop', type: 'positive' },
+      { label: 'Still not convinced', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_language: {
+    id: 'obj_language',
+    title: 'Objection: Language / Communication Barrier',
+    script: "That's a very common assumption — and it surprises most people when they see the reality. The Philippines in particular is the third-largest English-speaking country in the world. Our partners specifically hire for strong English communication skills, and most talent has been educated in English from primary school.\n\nIs your concern about internal communication, or is this for a customer-facing role? Because if it's customer-facing, we'd focus your search specifically on partners who specialise in that.",
+    isObjection: true,
+    options: [
+      { label: "They're reassured / want to explore", next: 'value_prop', type: 'positive' },
+      { label: 'Still a concern', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_timezone: {
+    id: 'obj_timezone',
+    title: 'Objection: Time Zone Issues',
+    script: "Time zones are a real consideration — you're right to flag it. A few things that work well in practice: many of our partner staff in the Philippines work US hours by choice — they're used to it and prefer it. And for roles that are more process-based, a lot of clients find that async work actually increases output because there's less interruption.\n\nWhat does collaboration look like for this role day-to-day? Is it constant real-time communication, or is it more task-based?",
+    isObjection: true,
+    options: [
+      { label: "Mostly task-based / they're open", next: 'value_prop', type: 'positive' },
+      { label: 'Needs real-time — not open to it', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_tried_before: {
+    id: 'obj_tried_before',
+    title: 'Objection: Tried Outsourcing Before',
+    script: "I'm really glad you told me that — it actually changes how I'd approach this. Can I ask what went wrong? Was it the quality of the talent, the communication with the agency, the management overhead, or something else?\n\n[Listen carefully, then:] What you're describing is a problem we see with unvetted offshore agencies — which is exactly why we built our vetting process. The partners we work with are assessed specifically to avoid that. Would it be worth a 15-minute call where our sourcing team walks you through exactly how we'd approach your situation differently?",
+    isObjection: true,
+    options: [
+      { label: "They're open to trying again", next: 'booking', type: 'positive' },
+      { label: 'Not willing to try again', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_confidential: {
+    id: 'obj_confidential',
+    title: 'Objection: Work Too Sensitive / Confidential',
+    script: "Completely understandable — and it's one we take seriously. All of our partners operate with strict NDAs and data security protocols. The talent works on your systems, under your processes, with your security policies. They're a dedicated employee of yours in practice — just employed through the partner.\n\nWhat specifically would be the sensitive aspect — is it customer data, proprietary IP, or financial information?",
+    isObjection: true,
+    options: [
+      { label: "They're reassured / want to explore", next: 'booking', type: 'positive' },
+      { label: 'Not comfortable — needs more info', next: 'end_callback', type: 'positive' },
+      { label: 'Hard no', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_need_inoffice: {
+    id: 'obj_need_inoffice',
+    title: 'Objection: Need Someone In-Office',
+    script: "That's fair — can I ask what specifically needs to happen in-office? Is it the physical location, the management style, or is there a task that genuinely requires being on-site?\n\nA lot of our clients felt the same before they tried it. Remote management is genuinely different — it requires clear SOPs and communication rhythms. Our partners actually help with that onboarding. Would it change your view if there was structured support for managing remotely?",
+    isObjection: true,
+    options: [
+      { label: "It's a management preference — they're open", next: 'booking', type: 'positive' },
+      { label: 'Genuinely needs physical presence', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_how_manage: {
+    id: 'obj_how_manage',
+    title: 'Objection: How Do I Manage Someone Overseas?',
+    script: "That's a really common concern — and it's one our sourcing partners address directly in the consultation. They walk you through exactly how the setup works: onboarding, communication tools, performance management, and escalation if there are issues.\n\nMost clients say it's much simpler than they expected — once the systems are set up in the first 30 days, it runs like managing any remote employee. Have you ever managed a remote team before?",
+    isObjection: true,
+    options: [
+      { label: "Yes / they're reassured", next: 'booking', type: 'positive' },
+      { label: 'No / still not confident', next: 'end_callback', type: 'positive' },
+    ],
+  },
+
+  obj_legal: {
+    id: 'obj_legal',
+    title: 'Objection: Is This Even Legal?',
+    script: "Great question — and the answer is yes, completely legal and very common. The way it works: the talent is employed by our local partner in their country, not directly by you. So you're entering into a service contract with a registered business entity — there's no payroll tax complexity on your end, no visa issues, no local employment law complications. Those are all handled by the partner.\n\nDoes that help clarify it, or is there a specific legal concern you'd want to have your legal team look at?",
+    isObjection: true,
+    options: [
+      { label: "They're reassured", next: 'booking', type: 'positive' },
+      { label: 'Need legal review first — follow up', next: 'end_callback', type: 'positive' },
+    ],
+  },
 }
 
 export const QUICK_OBJECTIONS: FlowOption[] = [
@@ -252,4 +369,15 @@ export const QUICK_OBJECTIONS: FlowOption[] = [
   { label: 'Budget concern', next: 'obj_budget', type: 'objection' },
   { label: 'Already outsourcing', next: 'obj_already_outsourcing', type: 'objection' },
   { label: 'Not hiring right now', next: 'obj_not_hiring', type: 'objection' },
+]
+
+export const DEEP_OBJECTIONS: FlowOption[] = [
+  { label: '"Quality won\'t be as good"', next: 'obj_quality', type: 'objection' },
+  { label: '"Language / communication issues"', next: 'obj_language', type: 'objection' },
+  { label: '"Time zone difference is a problem"', next: 'obj_timezone', type: 'objection' },
+  { label: '"We tried outsourcing before"', next: 'obj_tried_before', type: 'objection' },
+  { label: '"Our work is too sensitive"', next: 'obj_confidential', type: 'objection' },
+  { label: '"I need someone in the office"', next: 'obj_need_inoffice', type: 'objection' },
+  { label: '"How do I manage someone overseas?"', next: 'obj_how_manage', type: 'objection' },
+  { label: '"Is this even legal?"', next: 'obj_legal', type: 'objection' },
 ]

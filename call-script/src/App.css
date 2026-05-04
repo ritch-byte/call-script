@@ -168,11 +168,76 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
-.research-bar {
+.reference-bar {
   background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
   padding: 12px 20px;
   flex-shrink: 0;
+}
+
+.reference-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.reference-bar-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.btn-ref-close {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.btn-ref-close:hover {
+  color: #475569;
+}
+
+.salary-table-wrap {
+  overflow-x: auto;
+}
+
+.salary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.salary-table th {
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.salary-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.salary-table tr:last-child td {
+  border-bottom: none;
+}
+
+.savings-cell {
+  color: #15803d;
+  font-weight: 700;
 }
 
 .research-input {
@@ -222,6 +287,12 @@ body {
 .btn-header-ghost:hover {
   color: white;
   border-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-header-active {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: white;
 }
 
 /* ── Breadcrumb ── */
@@ -491,6 +562,8 @@ body {
   padding: 24px;
   width: 100%;
   max-width: 720px;
+  max-height: 75vh;
+  overflow-y: auto;
 }
 
 .objections-header {
@@ -545,4 +618,54 @@ body {
 .btn-objection-item:hover {
   background: #ffedd5;
   border-color: #fb923c;
+}
+
+.btn-objection-item--deep {
+  background: #fafafa;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+.btn-objection-item--deep:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+.objections-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+
+.objections-section-label--deep {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* ── Coach Tip ── */
+
+.coach-tip {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1e40af;
+  line-height: 1.6;
+}
+
+.coach-tip-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3b82f6;
+  margin-bottom: 5px;
 }
