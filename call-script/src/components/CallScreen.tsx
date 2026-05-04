@@ -27,6 +27,30 @@ export default function CallScreen({ onReset }: Props) {
   const [showResearch, setShowResearch] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
+  const [company, setCompany] = useState('')
+  const [jobTitle, setJobTitle] = useState('')
+  const [website, setWebsite] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [genError, setGenError] = useState('')
+
+  const generateSpiel = async () => {
+    setIsGenerating(true)
+    setGenError('')
+    try {
+      const res = await fetch('/.netlify/functions/generate-spiel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company: company.trim(), jobTitle: jobTitle.trim(), website: website.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Generation failed')
+      setGeminiResearch(data.spiel)
+    } catch (err) {
+      setGenError(err instanceof Error ? err.message : 'Generation failed — check API key is set in Netlify')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
 
   const node = flow[currentId]
 
@@ -129,12 +153,45 @@ export default function CallScreen({ onReset }: Props) {
       {showResearch && (
         <div className="reference-bar">
           <div className="reference-bar-header">
-            <span className="reference-bar-title">Gemini Research</span>
+            <span className="reference-bar-title">Research Generator</span>
             <button className="btn-ref-close" onClick={() => setShowResearch(false)}>Close</button>
+          </div>
+          <div className="generator-form">
+            <div className="gen-row">
+              <input
+                className="gen-input"
+                type="text"
+                placeholder="Company name *"
+                value={company}
+                onChange={e => setCompany(e.target.value)}
+              />
+              <input
+                className="gen-input"
+                type="text"
+                placeholder="Job title *"
+                value={jobTitle}
+                onChange={e => setJobTitle(e.target.value)}
+              />
+              <input
+                className="gen-input"
+                type="text"
+                placeholder="Website (optional)"
+                value={website}
+                onChange={e => setWebsite(e.target.value)}
+              />
+              <button
+                className="btn-generate"
+                onClick={generateSpiel}
+                disabled={isGenerating || !company.trim() || !jobTitle.trim()}
+              >
+                {isGenerating ? 'Generating...' : 'Generate'}
+              </button>
+            </div>
+            {genError && <div className="gen-error">{genError}</div>}
           </div>
           <textarea
             className="research-input"
-            placeholder="Paste research about this lead / their company here — it appears in the Value Prop step..."
+            placeholder="Generated spiel appears here — or paste your own research..."
             value={geminiResearch}
             onChange={e => setGeminiResearch(e.target.value)}
             rows={4}

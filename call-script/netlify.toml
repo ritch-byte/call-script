@@ -2,3 +2,6 @@
   base = "call-script"
   command = "node node_modules/vite/bin/vite.js build"
   publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
