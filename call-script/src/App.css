@@ -247,6 +247,13 @@ body {
 
 .generator-form { margin-bottom: 10px; }
 
+.gen-fields {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* legacy */
 .gen-row {
   display: flex;
   gap: 8px;
