@@ -45,7 +45,8 @@ export const flow: Record<string, FlowNode> = {
   opening: {
     id: 'opening',
     title: 'Opening',
-    script: "Hey {leadName}? Oh hey, {leadName}, it's {yourName} over at Outsource Accelerator. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not?",
+    script: "Hey {leadName}? Oh hey — it's {yourName} over at Outsource Accelerator. I know I caught you out of the blue — mind if I grab just 30 seconds? Then you can tell me straight if it's relevant or not.",
+    tip: "Fanatical Prospecting: the first 7 seconds determine the call. Stay upbeat and confident — not apologetic. 'I know I caught you out of the blue' disarms the reflex rejection before it fires. Pause briefly after 'relevant or not' — let them say yes.",
     options: [
       { label: 'Yes, go ahead', next: 'pitch_q1', type: 'positive' },
       { label: 'Not a good time / who are you?', next: 'obj_timing', type: 'objection' },
@@ -58,8 +59,9 @@ export const flow: Record<string, FlowNode> = {
   pitch_q1: {
     id: 'pitch_q1',
     title: 'Pitch + Discovery Q1',
-    script: "Appreciate that {leadName}, yeah I'm just reaching out because the salary costs for specialized talents in your industry have been increasing and I work with a team that focuses on helping leaders like you handle their growth without increasing their expenses — usually by connecting you with global talent networks that provide world-class talent at 80% less than local hiring.\n\nSo just out of curiosity... regarding your hiring setup right now, do you do it full in-house, or do you ever work with external partners for anything?",
+    script: "Appreciate it, {leadName}. So the pattern we keep seeing across businesses like yours is that most teams are spending 60 to 80 percent more than they need to on specialized talent — purely because they're only hiring locally. Most leaders don't realize that until they see the numbers side by side.\n\nWe're Outsource Accelerator — the world's leading marketplace for offshore staffing. We connect businesses with world-class, pre-vetted talent at typically 50 to 80 percent less than a local hire — dedicated full-time staff, not freelancers.\n\nJust a quick question to see if this is even relevant — for your team right now, do you handle hiring fully in-house, or do you ever work with external partners for any roles?",
     waitForAnswer: true,
+    tip: "Challenger Sale: lead with the commercial insight — 'spending 60-80% more than they need to' — before you introduce OA. This creates a moment of 'wait, is that us?' before you pitch. Don't rush past it. Then the product introduction lands as a solution to a problem they already feel.",
     options: [
       { label: 'They answer (in-house / external / mix)', next: 'discovery_q2', type: 'positive' },
       { label: 'Not interested / budget concern', next: 'obj_not_interested_pitch', type: 'objection' },
@@ -71,12 +73,13 @@ export const flow: Record<string, FlowNode> = {
 
   discovery_q2: {
     id: 'discovery_q2',
-    title: 'Discovery Q2: Finding Talents',
-    script: "Awesome! And how is your team doing so far in terms of finding great talents?",
+    title: 'Discovery Q2: Hiring Friction',
+    script: "Got it. And how is the team finding it when it comes to sourcing good people — does that run pretty smoothly, or do you hit friction anywhere?",
     waitForAnswer: true,
-    tip: "SPIN: If they share real frustration, deepen it — \"When hiring takes longer than expected, what does that cost you in the meantime — project delays, or your team absorbing extra workload?\" A bigger gap = more urgency for the solution.",
+    tip: "SPIN — Implication: if they share any friction, multiply it before moving on. Try: 'When a key role sits open longer than expected, what does that cost you in practice — project delays, the team absorbing extra load, or lost revenue?' Get them to say the cost out loud. A gap they can quantify is a gap worth closing.",
     options: [
-      { label: 'They answer — proceed to next question', next: 'discovery_q3', type: 'positive' },
+      { label: 'They share friction / challenges', next: 'discovery_q3', type: 'positive' },
+      { label: 'Team is doing fine / no real issues', next: 'obj_doing_fine', type: 'objection' },
     ],
   },
 
@@ -84,9 +87,10 @@ export const flow: Record<string, FlowNode> = {
 
   discovery_q3: {
     id: 'discovery_q3',
-    title: 'Discovery Q3: Talent Type',
-    script: "And out of curiosity, what type of talents does your team normally prioritize?",
+    title: 'Discovery Q3: Role + Need-Payoff',
+    script: "That makes sense. And what type of roles does your team typically prioritize — is it more technical, operations, customer-facing, or something else?",
     waitForAnswer: true,
+    tip: "SPIN — Need-Payoff: after they name a role, use this bridge before moving to the pitch: 'So if you could bring on a great [role they named] at 70 to 80 percent less cost — dedicated full-time, not a freelancer — is that a conversation worth having?' Get the yes before you pitch. It pre-commits them to the value.",
     options: [
       { label: 'They share a role or answer', next: 'value_prop', type: 'positive' },
       { label: "We don't really hire externally", next: 'obj_no_external', type: 'objection' },
@@ -98,8 +102,8 @@ export const flow: Record<string, FlowNode> = {
   value_prop: {
     id: 'value_prop',
     title: 'Value Prop + Research',
-    script: "The reason I asked you is because we help business leaders like you cut salary costs by up to 80% using world-class global talent. And before calling you, I actually did some research...\n\n{geminiResearch}",
-    tip: "Make savings specific and multiplied — it lands harder than a percentage. \"If you have 3 of those roles at $55K each locally, that's $165K/yr vs roughly $42K offshore — over $120K saved per year on just those three.\"",
+    script: "Perfect — and that's exactly the scenario we help with every day.\n\nHere's what most business leaders don't realize: the roles they're hiring locally are available at world-class quality offshore — dedicated, full-time staff — at 50 to 80 percent of the cost. Not freelancers, not shared resources. One person, fully committed to your business, your hours, your systems.\n\nAnd before I called, I did some research on your company specifically...\n\n{geminiResearch}",
+    tip: "Gap Selling: tie this directly to what they just shared. 'You mentioned hiring [role] takes time and costs are high — here's exactly what that looks like differently.' Then make savings concrete: 'If you're paying $60K locally for that role, offshore that's typically $12–18K. Three of those roles? You're saving over $100K a year.' Numbers they can picture beat percentages every time.",
     options: [
       { label: 'Lead is engaged / curious', next: 'booking', type: 'positive' },
       { label: 'Already outsourcing / need to think', next: 'obj_already_outsourcing', type: 'objection' },
@@ -112,7 +116,9 @@ export const flow: Record<string, FlowNode> = {
   booking: {
     id: 'booking',
     title: 'Booking',
-    script: "That's perfect! We can dive deeper with our sourcing partners for a brief consultation — they'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours 80% on salary costs. Plus, as a thank you for your time, we'll send you a $100 Amazon voucher right after the call.\n\nHow's your calendar look in the next 3 days?",
+    script: "What I'd love to do is get you a quick 15-minute call with our sourcing team — they'll pull together actual CVs and a real pricing breakdown for the specific roles you're looking at, so you can see the exact numbers for your situation. Zero commitment, just real data.\n\nAnd as a thank you for your time, we'll send you a $100 Amazon voucher right after the call.\n\nI've got availability on [Tuesday] or [Thursday] this week — does morning or afternoon work better for you?",
+    waitForAnswer: true,
+    tip: "Schiffman: NEVER ask 'when are you free?' — always offer two specific options. It shifts the question from 'should I meet?' to 'which time works?' Then pin it down: 'How does Tuesday at 10am sound?' Reference the specific role they mentioned — 'we'll pull CVs for [their role]' — it makes the ask feel tailored, not templated.",
     options: [
       { label: 'Books a slot', next: 'booking_recap', type: 'positive' },
       { label: 'Not sure / need to think', next: 'obj_think_about_it', type: 'objection' },
@@ -124,10 +130,11 @@ export const flow: Record<string, FlowNode> = {
 
   booking_recap: {
     id: 'booking_recap',
-    title: 'Booking Recap',
-    script: "Great chatting with you, {leadName}. Just to recap quickly:\n\n\"We're looking at [NUMBER] full-time, dedicated [ROLE]s, right?\" (wait for confirmation)\n\n\"And as the decision-maker, you'd be open to an offshore model for that 1-to-2-month hiring need if the meeting goes well, right?\" (wait for confirmation)\n\n\"Perfect. That discovery call is set for [DAY, DATE] at [TIME] [TIMEZONE]. And since we're tailoring this entirely to your business needs, can I get your full commitment to attend?\" (wait for confirmation)\n\n\"Fantastic. I'm sending the invite now. Once you accept, we'll send a $10 Amazon voucher, then your $100 voucher right after we meet on [DATE]. See you then!\"",
+    title: 'Booking Recap + Commitment Lock',
+    script: "Brilliant — let me lock that in properly so we're both set.\n\n\"So we're looking at [NUMBER] full-time [ROLE]s — is that right?\" (confirm)\n\n\"And as the decision-maker, if the sourcing team shows you the right talent at the right price, you'd be in a position to move forward — is that fair to say?\" (confirm — if they say 'maybe' or 'it depends', ask: \"I just want to make sure the call is worth your time — if the fit is right, is there anything that would hold you back?\")\n\n\"The call is locked for [DAY, DATE] at [TIME] [TIMEZONE]. Can I count on you to be there?\"\n\n\"Perfect — sending the invite now. Once you accept, your $10 voucher is on the way, and the full $100 lands right after we meet on [DATE]. Looking forward to it, {leadName}!\"",
+    tip: "QA data: soft commitments = no-shows. You need three hard yeses before you hang up: (1) role and headcount confirmed, (2) decision-maker will move if the fit is right — re-ask if they give a conditional, (3) personal attendance locked. 'Probably' and 'should be fine' are not yeses. A soft yes here is a no-show on the day.",
     options: [
-      { label: 'Confirmed — all good', next: 'end_booked', type: 'positive' },
+      { label: 'All three confirmed — solid booking', next: 'end_booked', type: 'positive' },
     ],
   },
 
@@ -136,21 +143,21 @@ export const flow: Record<string, FlowNode> = {
   end_booked: {
     id: 'end_booked',
     title: 'Booked!',
-    script: "Invite sent! Talk soon, {leadName}.",
+    script: "Invite sent! Speak soon, {leadName}.",
     isEnd: true,
     options: [],
   },
   end_callback: {
     id: 'end_callback',
     title: 'Callback Scheduled',
-    script: "Perfect! I'll reach out then. Have a great day, {leadName}!",
+    script: "Perfect — I'll reach out then. Have a great day, {leadName}!",
     isEnd: true,
     options: [],
   },
   end_not_interested: {
     id: 'end_not_interested',
     title: 'Call Ended',
-    script: "Totally understood! I appreciate your time, {leadName}. If things ever change, feel free to reach out. Have a great day!",
+    script: "Totally understood — I appreciate your time, {leadName}. If things ever change, feel free to reach out. Have a great day!",
     isEnd: true,
     options: [],
   },
@@ -160,10 +167,11 @@ export const flow: Record<string, FlowNode> = {
   obj_timing: {
     id: 'obj_timing',
     title: 'Objection: Timing / Who Are You',
-    script: "No worries at all — I only need 30 seconds and if it's not relevant, I won't bother you again.\n\nI'm {yourName} from Outsource Accelerator — we help businesses cut hiring costs by up to 80% with world-class offshore talent. Does that sound like something that could be relevant to you?",
+    script: "No worries at all — I only need 30 seconds, and if it's not relevant I won't waste another minute of your time.\n\nI'm {yourName} from Outsource Accelerator — we help businesses cut their hiring costs by 50 to 80 percent using world-class offshore talent. Is that even something on your radar right now?",
     isObjection: true,
+    tip: "Smart Calling: answer the 'who are you' cleanly and fast — name, company, one-line value prop. Then re-qualify with a soft question. Don't re-pitch. If they give you 30 seconds, move straight to pitch_q1.",
     options: [
-      { label: 'Yes, tell me more / give me a better time', next: 'pitch_q1', type: 'positive' },
+      { label: 'Yes, go ahead / give me a better time', next: 'pitch_q1', type: 'positive' },
       { label: 'Not interested', next: 'obj_not_interested_opening', type: 'objection' },
     ],
   },
@@ -171,10 +179,11 @@ export const flow: Record<string, FlowNode> = {
   obj_not_interested_opening: {
     id: 'obj_not_interested_opening',
     title: 'Objection: Not Interested (Opening)',
-    script: "That's completely fair! Can I ask — is it because you're already happy with how you hire, or is it more of a timing thing?\n\nMost leaders I speak with say the same thing at first — until they realize how much they're overspending on talent.",
+    script: "That's completely fair — and I appreciate you being straight with me.\n\nCan I ask — is it more that you're already happy with how you hire, or is it just not a priority right now?\n\nThe reason I ask: most leaders say the same thing at first, until they realize how much they're overspending on talent without knowing it. I'm not asking you to change anything — just 30 seconds to see if the numbers even make sense for your situation.",
     isObjection: true,
+    tip: "Psychology of Selling — Law of Indirect Effort: don't push harder, pull back. 'I'm not asking you to change anything' removes the threat. Curiosity is your goal — not persuasion. If they're still a hard no after this, let them go with grace.",
     options: [
-      { label: "They're curious / it's just timing", next: 'pitch_q1', type: 'positive' },
+      { label: "They're curious / it's timing", next: 'pitch_q1', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -182,10 +191,11 @@ export const flow: Record<string, FlowNode> = {
   obj_not_interested_pitch: {
     id: 'obj_not_interested_pitch',
     title: 'Objection: Not Interested (After Pitch)',
-    script: "Totally understand! Can I ask — is your concern more about the cost, the process, or have you tried offshore talent before and it didn't work out?\n\nI ask because depending on your situation, we might approach this differently — and I'd hate to waste your time if we're not the right fit.",
+    script: "Totally understand — and I'd rather find out now than waste your time.\n\nCan I ask what's driving that — is it more about the cost, the process, or have you tried offshore talent before and it didn't go the way you hoped?\n\nDepending on your situation, we might approach this completely differently — and I'd hate to lose you if we're actually the right fit.",
     isObjection: true,
+    tip: "Diagnose before you defend. The three paths are different conversations: budget concern → obj_budget, tried before → obj_tried_before, just not a priority → find out when it would be and set a callback. Don't defend OA until you know what you're defending against.",
     options: [
-      { label: 'Cost concern', next: 'obj_budget', type: 'objection' },
+      { label: 'Cost / budget concern', next: 'obj_budget', type: 'objection' },
       { label: 'Tried offshore before', next: 'obj_tried_before', type: 'objection' },
       { label: "They're open again / other", next: 'discovery_q2', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
@@ -195,21 +205,23 @@ export const flow: Record<string, FlowNode> = {
   obj_not_hiring: {
     id: 'obj_not_hiring',
     title: "Objection: Not Hiring Right Now",
-    script: "That makes total sense! Actually, that's often the best time to explore this — so when you do need to hire, you're not scrambling and overpaying.\n\nJust out of curiosity, what roles do you typically hire for when business picks up?",
+    script: "That makes total sense — and honestly, that's often the best time to look at this. When you're not under pressure to fill a role is exactly when you can evaluate properly, rather than scrambling and overpaying.\n\nJust out of curiosity — what roles do you typically bring on when business picks back up?",
     isObjection: true,
+    tip: "New Sales Simplified: future-pace the pipeline. They're not a dead lead — they're a future one. Get the role name, then route to discovery. The goal is a callback with a specific trigger: 'When you do go to hire for [role], that's when we'd save you the most.'",
     options: [
-      { label: 'They share a role', next: 'discovery_q2', type: 'positive' },
-      { label: 'Not relevant', next: 'end_not_interested', type: 'end' },
+      { label: 'They share a role / future plan', next: 'discovery_q2', type: 'positive' },
+      { label: 'Nothing planned / not relevant', next: 'end_not_interested', type: 'end' },
     ],
   },
 
   obj_budget: {
     id: 'obj_budget',
     title: 'Objection: Budget / Cost',
-    script: "I hear you — and honestly, that's exactly why I'm calling. We're not adding to your costs, we're cutting them by up to 80%.\n\nWhat's your biggest role that you're currently spending the most on salary-wise? It might be worth just comparing numbers.",
+    script: "I hear you — and that's actually exactly why I'm calling, because we're not adding to your costs, we're cutting them.\n\nLet me make it concrete: what's your biggest role right now in terms of salary spend? Because if you're paying $60K locally, the same role offshore typically runs $12 to 18K. If you've got two or three of those, you're looking at over $100K a year back in your business.\n\nWould it be worth 15 minutes just to see what the numbers look like for your specific roles?",
     isObjection: true,
+    tip: "Gap Selling: budget objections die when you quantify the gap. Don't say '80% savings' — say '$100K a year back in your business.' Get them to name their highest-cost role, then do the math out loud with them. A number they can picture is worth ten percentages.",
     options: [
-      { label: "They're open to hearing more", next: 'discovery_q2', type: 'positive' },
+      { label: "They're open to hearing the numbers", next: 'discovery_q2', type: 'positive' },
       { label: 'Still not interested', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -217,32 +229,35 @@ export const flow: Record<string, FlowNode> = {
   obj_doing_fine: {
     id: 'obj_doing_fine',
     title: "Objection: Team is Doing Fine",
-    script: "That's great to hear! Most of our clients were in the same position — things were working, but they didn't realize how much they could save until they saw the numbers.\n\nJust out of curiosity, what's your biggest challenge when a key role opens up — is it more about speed, cost, or finding the right skill set?",
+    script: "That's great to hear — and I'm not suggesting anything is broken.\n\nBut here's what surprises most leaders: 'doing fine' on hiring and 'doing it at the optimal cost' are often two very different things. Most teams are running well — they're just spending 60 to 80 percent more than they need to on the same quality of talent.\n\nJust out of curiosity — when a key role opens up, what's the bigger headache: the time it takes, the cost, or finding the right skill set?",
     isObjection: true,
+    tip: "Challenger Sale: don't validate the status quo — challenge it gently. 'Doing fine' is not the same as 'doing it optimally.' Reframe the conversation from 'is anything broken?' to 'are you leaving savings on the table?' Then get them to name their hiring friction point.",
     options: [
-      { label: 'They mention a challenge', next: 'discovery_q3', type: 'positive' },
-      { label: 'No real challenges', next: 'obj_no_challenges', type: 'objection' },
+      { label: 'They mention a challenge (time / cost / skill)', next: 'discovery_q3', type: 'positive' },
+      { label: 'Genuinely no challenges', next: 'obj_no_challenges', type: 'objection' },
     ],
   },
 
   obj_no_challenges: {
     id: 'obj_no_challenges',
     title: 'Objection: No Hiring Challenges',
-    script: "That's amazing — you've clearly built a great team! I'd still love to show you what we do, just so you have it as an option when the time comes.\n\nWould you be open to just a 15-minute benchmarking call? No commitment — and we'll send you a $100 Amazon voucher just for your time.",
+    script: "That's impressive — sounds like you've built a solid team and process.\n\nI'd still love to show you what we do, purely as a benchmarking exercise. Even if you're not looking to change anything, seeing the real cost comparison for your specific roles takes 15 minutes and gives you useful data either way.\n\nNo commitment at all — and we'll send a $100 Amazon voucher just for your time. Worth a quick look?",
     isObjection: true,
+    tip: "Reciprocity (Psychology of Selling): frame the consultation as giving them something useful regardless of outcome — real salary benchmarking data. Lower the stakes completely: 'even if you don't change anything, you'll know your number.' The voucher is social proof of zero risk.",
     options: [
       { label: "They're open to it", next: 'booking', type: 'positive' },
-      { label: 'Not relevant', next: 'end_not_interested', type: 'end' },
+      { label: 'Not relevant / hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
 
   obj_no_external: {
     id: 'obj_no_external',
     title: "Objection: Don't Hire Externally",
-    script: "Totally makes sense — a lot of leaders feel that way at first. But if the quality was the same or better and the cost was 80% lower, would that change the conversation at all?\n\nWhat kind of roles would you consider if the savings were significant enough?",
+    script: "Totally makes sense — a lot of leaders feel the same way initially.\n\nLet me ask it differently: if the quality was identical or better, and the cost was 70 to 80 percent lower than what you're paying now — would that change the conversation at all?\n\nBecause that's the actual scenario for most of the roles we place. What kind of role would you consider if the savings were significant enough to make it worth looking at?",
     isObjection: true,
+    tip: "Gap Selling: the objection 'we don't hire externally' is a current state, not a final answer. The hypothetical — 'if the quality was the same at 80% less cost' — is a Need-Payoff question that opens the door. Get them to name a role they'd consider. That's the gap.",
     options: [
-      { label: 'They mention a role', next: 'value_prop', type: 'positive' },
+      { label: 'They mention a role to consider', next: 'value_prop', type: 'positive' },
       { label: 'Not open to it', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -250,21 +265,23 @@ export const flow: Record<string, FlowNode> = {
   obj_already_outsourcing: {
     id: 'obj_already_outsourcing',
     title: 'Objection: Already Outsourcing / Need to Think',
-    script: "That's great — you already know the value! Can I ask, are you happy with both the quality and the cost of your current setup?\n\nMost clients who come to us were already outsourcing but found we could offer better talent at a significantly lower cost. Would you be open to a quick 15-minute benchmarking call — no commitment, plus a $100 Amazon voucher just for your time?",
+    script: "That's great — you already know the model works. Can I ask: are you happy with both the quality and the cost of your current setup, or is there room for improvement on either?\n\nThe reason I ask is most clients who come to us were already outsourcing — they just found our partners offered better talent at a lower cost. It's a quick benchmarking call, no commitment, and you'll know in 15 minutes whether there's an upgrade on the table.\n\nPlus the $100 Amazon voucher just for showing up.",
     isObjection: true,
+    tip: "Smart Calling: they're already sold on the concept — that's the hard part done. Your only job here is to make them curious about whether their current setup is optimal. 'Are you happy with both quality AND cost?' is a double-gate question — most people are happy with one but not both.",
     options: [
-      { label: "They're open to a call", next: 'booking', type: 'positive' },
-      { label: 'Not interested', next: 'end_not_interested', type: 'end' },
+      { label: "They're open to a comparison call", next: 'booking', type: 'positive' },
+      { label: 'Happy with current setup / not interested', next: 'end_not_interested', type: 'end' },
     ],
   },
 
   obj_not_interested_late: {
     id: 'obj_not_interested_late',
     title: 'Objection: Not Interested (Late Stage)',
-    script: "That's completely fair — I appreciate you giving me your time! Is it more that the timing isn't right, or is it that this just isn't something you'd ever consider?\n\nI only ask so I know whether it's worth a follow-up down the road.",
+    script: "That's completely fair — I appreciate you giving me your time.\n\nIs it more that the timing isn't right, or is it that this just genuinely isn't something you'd consider?\n\nI only ask because if it's timing, I'd rather call you back when it makes more sense than waste both our time now.",
     isObjection: true,
+    tip: "Separate timing from a hard no — they have very different follow-up paths. A timing issue is a future pipeline entry. A hard no is a closed door. Don't chase a hard no. Do lock in a specific callback date if it's timing: 'When would be the right time to circle back — Q3, end of year?'",
     options: [
-      { label: 'Timing issue — follow up later', next: 'end_callback', type: 'positive' },
+      { label: 'Timing issue — set a callback', next: 'end_callback', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -272,11 +289,12 @@ export const flow: Record<string, FlowNode> = {
   obj_think_about_it: {
     id: 'obj_think_about_it',
     title: 'Objection: Need to Think About It',
-    script: "Of course — I totally respect that! I'd just hate for you to miss out on the Amazon voucher, and honestly the consultation is zero commitment.\n\nOur sourcing partners will just walk you through real CVs and pricing for your specific roles — you'll have all the info you need to decide. Does 15 minutes this week or next work for you?",
+    script: "Of course — and I completely respect that. Can I ask what specifically you'd need to think through? Is it the timing, whether it's the right fit, or something else?\n\nThe reason I ask: our sourcing partners actually answer most of those questions in the consultation itself — they'll show you real CVs and real pricing for your specific roles. It's 15 minutes of data, not a sales pitch. And you walk away with useful benchmarking whether you move forward or not.\n\nDoes [Tuesday] or [Thursday] this week work to at least get that information in front of you?",
     isObjection: true,
+    tip: "Schiffman + SPIN: diagnose what they're thinking about before re-pitching. Then reframe the consultation as information-gathering, not a sales meeting — 'it answers the questions you're thinking through.' Offer two specific days again. The voucher is the safety net — mention it if they're still hesitant.",
     options: [
-      { label: 'Yes, books a time', next: 'end_booked', type: 'positive' },
-      { label: 'Wants a follow-up / not ready', next: 'end_callback', type: 'positive' },
+      { label: 'Yes, books a time', next: 'booking_recap', type: 'positive' },
+      { label: 'Wants a follow-up / not ready yet', next: 'end_callback', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -286,41 +304,45 @@ export const flow: Record<string, FlowNode> = {
   obj_quality: {
     id: 'obj_quality',
     title: "Objection: Quality Won't Be as Good",
-    script: "That's the most common concern I hear — and it's a fair one. The reason we vet our partners so carefully is exactly because of this. Our partners are assessed on English proficiency, skill testing, infrastructure, and track record. We only work with partners who have proven quality placements.\n\nCan I ask — what does 'quality' mean for your specific role? Is it technical skill, communication, reliability, or something else? Because once I know your standard, I can tell you whether we can match it.",
+    script: "That's the most common concern I hear — and it's a fair one to raise.\n\nOur partners go through a rigorous vetting process: English proficiency, skill testing, infrastructure checks, and track record review. We only work with partners who have proven quality placements across multiple clients.\n\nCan I ask — what does 'quality' mean for your specific role? Is it technical skill, communication, reliability, or output speed? Because once I know your standard, I can tell you directly whether we can match it — and if we can't, I'll say so.",
     isObjection: true,
+    tip: "SPIN — Problem Question: 'What does quality mean for this role?' gets them to define their own standard. Once they define it, you can address it specifically — or agree it's not a fit. Vague objections can't be answered; specific standards can. Ask the question, then listen.",
     options: [
-      { label: 'They define their standard — sounds achievable', next: 'value_prop', type: 'positive' },
-      { label: 'Still not convinced', next: 'end_not_interested', type: 'end' },
+      { label: 'They define their standard — sounds achievable', next: 'booking', type: 'positive' },
+      { label: 'Still unconvinced / hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
 
   obj_language: {
     id: 'obj_language',
     title: 'Objection: Language / Communication Barrier',
-    script: "That's a very common assumption — and it surprises most people when they see the reality. The Philippines in particular is the third-largest English-speaking country in the world. Our partners specifically hire for strong English communication skills, and most talent has been educated in English from primary school.\n\nIs your concern about internal communication, or is this for a customer-facing role? Because if it's customer-facing, we'd focus your search specifically on partners who specialise in that.",
+    script: "That's a very common assumption — and it surprises most people when they see the reality.\n\nThe Philippines is the third-largest English-speaking country in the world. Our partners specifically hire for strong English communication, and most professionals have been educated in English from primary school through university.\n\nCan I ask — is your concern about internal team communication, or is this for a customer-facing role? Because if it's customer-facing, we'd focus your search specifically on partners who specialise in that and have proven track records.",
     isObjection: true,
+    tip: "Smart Calling: answer with a fact that surprises — 'third-largest English-speaking country' lands because they didn't expect it. Then narrow the concern: internal vs. customer-facing are different problems with different solutions. Don't defend generically; get specific.",
     options: [
-      { label: "They're reassured / want to explore", next: 'value_prop', type: 'positive' },
-      { label: 'Still a concern', next: 'end_not_interested', type: 'end' },
+      { label: "They're reassured / want to explore", next: 'booking', type: 'positive' },
+      { label: 'Still a concern — not convinced', next: 'end_not_interested', type: 'end' },
     ],
   },
 
   obj_timezone: {
     id: 'obj_timezone',
     title: 'Objection: Time Zone Issues',
-    script: "Time zones are a real consideration — you're right to flag it. A few things that work well in practice: many of our partner staff in the Philippines work US hours by choice — they're used to it and prefer it. And for roles that are more process-based, a lot of clients find that async work actually increases output because there's less interruption.\n\nWhat does collaboration look like for this role day-to-day? Is it constant real-time communication, or is it more task-based?",
+    script: "Time zones are a real consideration — you're right to flag it.\n\nA few things that work well in practice: most of our partner staff in the Philippines work US business hours by choice — they're used to it and many prefer it. And for roles that are more process-based, a lot of clients find async actually increases output because there's less interruption during their own day.\n\nWhat does collaboration look like day-to-day for this role — is it constant real-time communication, or is it more task and output based?",
     isObjection: true,
+    tip: "Diagnose before defending. Real-time vs. async are completely different scenarios. Task-based roles (finance, admin, design, development) work excellently async. High-communication roles need a different conversation about US-hours partners. Ask first.",
     options: [
-      { label: "Mostly task-based / they're open", next: 'value_prop', type: 'positive' },
-      { label: 'Needs real-time — not open to it', next: 'end_not_interested', type: 'end' },
+      { label: "Mostly task-based / they're open to it", next: 'booking', type: 'positive' },
+      { label: 'Needs constant real-time — not open', next: 'end_not_interested', type: 'end' },
     ],
   },
 
   obj_tried_before: {
     id: 'obj_tried_before',
     title: 'Objection: Tried Outsourcing Before',
-    script: "I'm really glad you told me that — it actually changes how I'd approach this. Can I ask what went wrong? Was it the quality of the talent, the communication with the agency, the management overhead, or something else?\n\n[Listen carefully, then:] What you're describing is a problem we see with unvetted offshore agencies — which is exactly why we built our vetting process. The partners we work with are assessed specifically to avoid that. Would it be worth a 15-minute call where our sourcing team walks you through exactly how we'd approach your situation differently?",
+    script: "I'm really glad you told me that — it actually changes how I'd approach this.\n\nCan I ask what went wrong? Was it the quality of the talent, the communication with the agency, management overhead, or something else?\n\n[Listen, then:] What you're describing is almost always a vetting problem — unvetted agencies placing whoever's available, not who's right. Our entire model is built around solving that. Our partners are assessed specifically to avoid the failure modes you experienced.\n\nWould it be worth a 15-minute call where our sourcing team walks you through exactly how we'd approach your situation differently — and you can decide from there?",
     isObjection: true,
+    tip: "Sales Development Playbook: 'tried before' is your best lead — they've already validated the concept, they just had a bad experience. Your job is to diagnose what broke, then differentiate OA's vetting model as the specific fix. Listen more than you talk in this one.",
     options: [
       { label: "They're open to trying again", next: 'booking', type: 'positive' },
       { label: 'Not willing to try again', next: 'end_not_interested', type: 'end' },
@@ -330,11 +352,12 @@ export const flow: Record<string, FlowNode> = {
   obj_confidential: {
     id: 'obj_confidential',
     title: 'Objection: Work Too Sensitive / Confidential',
-    script: "Completely understandable — and it's one we take seriously. All of our partners operate with strict NDAs and data security protocols. The talent works on your systems, under your processes, with your security policies. They're a dedicated employee of yours in practice — just employed through the partner.\n\nWhat specifically would be the sensitive aspect — is it customer data, proprietary IP, or financial information?",
+    script: "Completely understandable — and it's one we take seriously.\n\nAll of our partners operate with strict NDAs and data security protocols. The talent works on your systems, under your processes, with your security policies applied. In practice, they function as a dedicated employee — they're just employed through the partner entity locally.\n\nWhat specifically is the sensitive aspect — is it customer data, proprietary IP, or financial information? Because depending on the answer, there are partners in our network who specialise in exactly that compliance requirement.",
     isObjection: true,
+    tip: "Narrow the concern — 'confidential' means different things. Customer data (SOC2 partners), IP (NDA-first workflows), financial data (finance-specialist partners) all have different solutions. The specific answer tells you which partner to match them with. Don't defend generically.",
     options: [
       { label: "They're reassured / want to explore", next: 'booking', type: 'positive' },
-      { label: 'Not comfortable — needs more info', next: 'end_callback', type: 'positive' },
+      { label: 'Needs more info — set a follow-up', next: 'end_callback', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -342,33 +365,36 @@ export const flow: Record<string, FlowNode> = {
   obj_need_inoffice: {
     id: 'obj_need_inoffice',
     title: 'Objection: Need Someone In-Office',
-    script: "That's fair — can I ask what specifically needs to happen in-office? Is it the physical location, the management style, or is there a task that genuinely requires being on-site?\n\nA lot of our clients felt the same before they tried it. Remote management is genuinely different — it requires clear SOPs and communication rhythms. Our partners actually help with that onboarding. Would it change your view if there was structured support for managing remotely?",
+    script: "That's fair — can I ask what specifically needs to happen in-office? Is it a physical task, a management preference, or is there a genuine on-site requirement?\n\nA lot of our clients felt the same before they tried it. The honest answer is: remote management is different — it needs clear SOPs and communication rhythms. Our partners actually help set that up in the first 30 days.\n\nWould it change your view if there was structured onboarding support specifically for managing the role remotely?",
     isObjection: true,
+    tip: "SPIN — Situation Question: 'What specifically needs to happen in-office?' often reveals it's a management preference, not a genuine physical requirement. Most roles that 'need' to be in-office don't actually need to be. Get them to describe the actual task — then test it.",
     options: [
-      { label: "It's a management preference — they're open", next: 'booking', type: 'positive' },
-      { label: 'Genuinely needs physical presence', next: 'end_not_interested', type: 'end' },
+      { label: "It's a preference — they're open to exploring", next: 'booking', type: 'positive' },
+      { label: 'Genuinely requires physical presence', next: 'end_not_interested', type: 'end' },
     ],
   },
 
   obj_how_manage: {
     id: 'obj_how_manage',
     title: 'Objection: How Do I Manage Someone Overseas?',
-    script: "That's a really common concern — and it's one our sourcing partners address directly in the consultation. They walk you through exactly how the setup works: onboarding, communication tools, performance management, and escalation if there are issues.\n\nMost clients say it's much simpler than they expected — once the systems are set up in the first 30 days, it runs like managing any remote employee. Have you ever managed a remote team before?",
+    script: "That's one of the most common questions — and it's one our sourcing partners address directly in the consultation.\n\nThey walk you through the full setup: onboarding process, communication tools, performance management, and what happens if there are issues. Most clients say it's much simpler than they expected — once the first 30 days are set up, it runs like managing any remote employee.\n\nHave you managed a remote team before, even locally?",
     isObjection: true,
+    tip: "Psychology of Selling: fear of the unknown is the real objection. Reduce it by making the process visible and simple. If they've managed remote workers before — even locally — draw the parallel. The consultation is where this fear actually dissolves, so get them there.",
     options: [
-      { label: "Yes / they're reassured", next: 'booking', type: 'positive' },
-      { label: 'No / still not confident', next: 'end_callback', type: 'positive' },
+      { label: "Yes / they're reassured — open to a call", next: 'booking', type: 'positive' },
+      { label: 'No remote experience / still unsure', next: 'end_callback', type: 'positive' },
     ],
   },
 
   obj_legal: {
     id: 'obj_legal',
     title: 'Objection: Is This Even Legal?',
-    script: "Great question — and the answer is yes, completely legal and very common. The way it works: the talent is employed by our local partner in their country, not directly by you. So you're entering into a service contract with a registered business entity — there's no payroll tax complexity on your end, no visa issues, no local employment law complications. Those are all handled by the partner.\n\nDoes that help clarify it, or is there a specific legal concern you'd want to have your legal team look at?",
+    script: "Great question — and the short answer is yes, completely legal and very common.\n\nThe way it works: the talent is employed by our local partner in their country, not directly by you. You're entering a service contract with a registered business entity. There's no payroll tax complexity on your end, no visa issues, no local employment law complications — all of that is handled by the partner.\n\nDoes that help clarify it, or is there a specific legal area you'd want your team to look at before moving forward?",
     isObjection: true,
+    tip: "Answer directly and confidently — hesitation on legal questions destroys trust. The structure is simple: service contract, not employment. If they have a legal team to consult, offer to send information for review and set a follow-up. That's not a no — it's a slower yes.",
     options: [
-      { label: "They're reassured", next: 'booking', type: 'positive' },
-      { label: 'Need legal review first — follow up', next: 'end_callback', type: 'positive' },
+      { label: "They're reassured — open to a call", next: 'booking', type: 'positive' },
+      { label: 'Need legal review first — set follow-up', next: 'end_callback', type: 'positive' },
     ],
   },
 }
@@ -379,6 +405,8 @@ export const QUICK_OBJECTIONS: FlowOption[] = [
   { label: 'Budget concern', next: 'obj_budget', type: 'objection' },
   { label: 'Already outsourcing', next: 'obj_already_outsourcing', type: 'objection' },
   { label: 'Not hiring right now', next: 'obj_not_hiring', type: 'objection' },
+  { label: 'Team is doing fine', next: 'obj_doing_fine', type: 'objection' },
+  { label: 'Tried outsourcing before', next: 'obj_tried_before', type: 'objection' },
 ]
 
 export const DEEP_OBJECTIONS: FlowOption[] = [
