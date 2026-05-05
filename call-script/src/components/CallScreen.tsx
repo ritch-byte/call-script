@@ -10,10 +10,21 @@ interface Props {
 
 type Context = Record<string, string>
 
-type Step = {
+type StepEntry = {
   nodeId: string
   chosenLabel?: string
 }
+
+// The main positive call path — always pre-rendered so the caller can see the full script
+const MAIN_FLOW = [
+  'opening',
+  'pitch_q1',
+  'discovery_q2',
+  'discovery_q3',
+  'value_prop',
+  'booking',
+  'end_booked',
+]
 
 function interpolate(text: string, leadName: string, geminiResearch: string, ctx: Context): string {
   return text
@@ -24,7 +35,10 @@ function interpolate(text: string, leadName: string, geminiResearch: string, ctx
 }
 
 export default function CallScreen({ onReset }: Props) {
-  const [steps, setSteps] = useState<Step[]>([{ nodeId: 'opening' }])
+  const [steps, setSteps] = useState<StepEntry[]>(
+    MAIN_FLOW.map(id => ({ nodeId: id }))
+  )
+  const [activeIdx, setActiveIdx] = useState(0)
   const [context, setContext] = useState<Context>({})
   const [showObjections, setShowObjections] = useState(false)
   const [showRates, setShowRates] = useState(false)
@@ -34,10 +48,7 @@ export default function CallScreen({ onReset }: Props) {
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
-  const bottomRef = useRef<HTMLDivElement>(null)
-
-  const currentNodeId = steps[steps.length - 1].nodeId
-  const currentNode = flow[currentNodeId]
+  const activeRef = useRef<HTMLDivElement>(null)
 
   const generateSpiel = async () => {
     setIsGenerating(true)
@@ -60,30 +71,58 @@ export default function CallScreen({ onReset }: Props) {
 
   const goTo = (option: FlowOption) => {
     if (option.capture) setContext(prev => ({ ...prev, ...option.capture }))
-    setSteps(prev => {
-      const updated = [...prev]
-      updated[updated.length - 1] = { ...updated[updated.length - 1], chosenLabel: option.label }
-      return [...updated, { nodeId: option.next }]
-    })
+
+    const nextId = option.next
+    const updatedSteps = [...steps]
+
+    // Record the choice on the current step
+    updatedSteps[activeIdx] = { ...updatedSteps[activeIdx], chosenLabel: option.label }
+
+    // Is the next node already pre-rendered ahead of us?
+    const aheadIdx = updatedSteps.findIndex((s, i) => i > activeIdx && s.nodeId === nextId)
+
+    let nextActive: number
+    if (aheadIdx !== -1) {
+      // Jump to the pre-rendered step (positive flow advance)
+      nextActive = aheadIdx
+    } else {
+      // Inject new step right after current (objection handler or alternate branch)
+      updatedSteps.splice(activeIdx + 1, 0, { nodeId: nextId })
+      nextActive = activeIdx + 1
+    }
+
+    setSteps(updatedSteps)
+    setActiveIdx(nextActive)
     setShowObjections(false)
     setShowRates(false)
   }
 
   const goBack = () => {
-    if (steps.length <= 1) return
-    setSteps(prev => {
-      const withoutLast = prev.slice(0, -1)
-      const prevLast = { ...withoutLast[withoutLast.length - 1] }
-      delete prevLast.chosenLabel
-      return [...withoutLast.slice(0, -1), prevLast]
-    })
+    if (activeIdx <= 0) return
+
+    const updatedSteps = [...steps]
+
+    // If the current step was injected (not in the original main flow), remove it
+    const isInjected = !MAIN_FLOW.includes(updatedSteps[activeIdx].nodeId)
+    if (isInjected) {
+      updatedSteps.splice(activeIdx, 1)
+    }
+
+    // Clear the chosen label on the step we're returning to
+    const prevIdx = activeIdx - 1
+    updatedSteps[prevIdx] = { ...updatedSteps[prevIdx], chosenLabel: undefined }
+
+    setSteps(updatedSteps)
+    setActiveIdx(prevIdx)
     setShowObjections(false)
   }
 
-  // Scroll new step into view
+  // Scroll active step into view whenever it changes
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }, [steps.length])
+    activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [activeIdx])
+
+  const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
   return (
     <div className="call-screen">
@@ -131,12 +170,7 @@ export default function CallScreen({ onReset }: Props) {
           <div className="salary-table-wrap">
             <table className="salary-table">
               <thead>
-                <tr>
-                  <th>Role</th>
-                  <th>US/yr</th>
-                  <th>Offshore/yr</th>
-                  <th>Savings</th>
-                </tr>
+                <tr><th>Role</th><th>US/yr</th><th>Offshore/yr</th><th>Savings</th></tr>
               </thead>
               <tbody>
                 {SALARY_TABLE.map(row => (
@@ -189,38 +223,49 @@ export default function CallScreen({ onReset }: Props) {
         </div>
       )}
 
-      {/* ── Full Call Flow — all steps visible ── */}
+      {/* ── Full call script — all steps visible ── */}
       <div className="call-flow">
-        {steps.map((step, index) => {
+        {steps.map((step, idx) => {
           const node = flow[step.nodeId]
-          const isActive = index === steps.length - 1
-          const script = interpolate(node.script, leadName, geminiResearch, context)
+          if (!node) return null
+
+          const isDone     = idx < activeIdx
+          const isActive   = idx === activeIdx
+          const isUpcoming = idx > activeIdx
+          const script     = interpolate(node.script, leadName, geminiResearch, context)
 
           const stepEndLabel =
-            step.nodeId === 'end_booked' ? 'BOOKED'
-            : step.nodeId === 'end_callback' ? 'CALLBACK SET'
-            : 'CALL ENDED'
+            step.nodeId === 'end_booked'   ? 'BOOKED' :
+            step.nodeId === 'end_callback' ? 'CALLBACK SET' : 'CALL ENDED'
 
           const cardClass = [
             'step-card',
-            isActive ? 'step-card--active' : 'step-card--done',
+            isActive   ? 'step-card--active'   : '',
+            isDone     ? 'step-card--done'     : '',
+            isUpcoming ? 'step-card--upcoming' : '',
             node.isObjection ? 'step-card--objection' : '',
-            node.isEnd ? 'step-card--end' : '',
+            node.isEnd       ? 'step-card--end'       : '',
           ].filter(Boolean).join(' ')
 
           return (
-            <div key={index} className={cardClass} ref={isActive ? bottomRef : null}>
-
+            <div
+              key={`${step.nodeId}-${idx}`}
+              className={cardClass}
+              ref={isActive ? activeRef : null}
+            >
               {/* Step header */}
               <div className="step-header-row">
-                <span className="step-num">{index + 1}</span>
+                <span className="step-num">{idx + 1}</span>
                 <span className="step-label">
                   {node.isObjection ? 'OBJECTION HANDLER'
                     : node.isEnd ? stepEndLabel
                     : node.title}
                 </span>
-                {!isActive && step.chosenLabel && (
+                {isDone && step.chosenLabel && (
                   <span className="chosen-pill">{step.chosenLabel}</span>
+                )}
+                {isUpcoming && (
+                  <span className="upcoming-badge">UPCOMING</span>
                 )}
               </div>
 
@@ -232,14 +277,14 @@ export default function CallScreen({ onReset }: Props) {
                 </div>
               )}
 
-              {/* Script text */}
+              {/* Script text — always visible */}
               <div className="script-text">
                 {script.split('\n').map((line, i) =>
                   line ? <p key={i}>{line}</p> : <br key={i} />
                 )}
               </div>
 
-              {/* Coach tip (active only) */}
+              {/* Coach tip — active only */}
               {node.tip && isActive && (
                 <div className="coach-tip">
                   <div className="coach-tip-label">Coach Tip</div>
@@ -247,16 +292,16 @@ export default function CallScreen({ onReset }: Props) {
                 </div>
               )}
 
-              {/* Response buttons — only on active, non-end step */}
+              {/* Response buttons — active non-end steps only */}
               {isActive && !node.isEnd && (
                 <div className="options-section">
                   <div className="options-label">Lead responds:</div>
                   <div className="options-grid">
                     {node.options.map(opt => {
                       const cls =
-                        opt.type === 'end' ? ' btn-option--danger'
+                        opt.type === 'end'      ? ' btn-option--danger'
                         : opt.type === 'objection' ? ' btn-option--warn'
-                        : opt.type === 'positive' ? ' btn-option--positive'
+                        : opt.type === 'positive'  ? ' btn-option--positive'
                         : ''
                       return (
                         <button
@@ -287,7 +332,7 @@ export default function CallScreen({ onReset }: Props) {
 
       {/* ── Bottom Bar ── */}
       <div className="bottom-bar">
-        <button className="btn-back" onClick={goBack} disabled={steps.length <= 1}>
+        <button className="btn-back" onClick={goBack} disabled={activeIdx === 0}>
           ← Back
         </button>
         {!currentNode.isEnd && (
@@ -298,7 +343,7 @@ export default function CallScreen({ onReset }: Props) {
             Objections
           </button>
         )}
-        <span className="step-counter">Step {steps.length}</span>
+        <span className="step-counter">Step {activeIdx + 1} of {steps.length}</span>
       </div>
 
       {/* ── Objections Overlay ── */}
@@ -315,11 +360,7 @@ export default function CallScreen({ onReset }: Props) {
             <div className="objections-section-label">Common</div>
             <div className="objections-list">
               {QUICK_OBJECTIONS.map(obj => (
-                <button
-                  key={obj.next}
-                  className="btn-objection-item"
-                  onClick={() => goTo(obj)}
-                >
+                <button key={obj.next} className="btn-objection-item" onClick={() => goTo(obj)}>
                   {obj.label}
                 </button>
               ))}
@@ -328,11 +369,7 @@ export default function CallScreen({ onReset }: Props) {
             <div className="objections-section-label objections-section-label--deep">Offshore-Specific</div>
             <div className="objections-list">
               {DEEP_OBJECTIONS.map(obj => (
-                <button
-                  key={obj.next}
-                  className="btn-objection-item btn-objection-item--deep"
-                  onClick={() => goTo(obj)}
-                >
+                <button key={obj.next} className="btn-objection-item btn-objection-item--deep" onClick={() => goTo(obj)}>
                   {obj.label}
                 </button>
               ))}
