@@ -28,7 +28,7 @@ const MAIN_FLOW = [
 
 function interpolate(text: string, leadName: string, geminiResearch: string, ctx: Context): string {
   return text
-    .replace(/{leadName}/g, leadName || 'there')
+    .replace(/{leadName}/g, leadName || '[Lead Name]')
     .replace(/{yourName}/g, 'I')
     .replace(/{geminiResearch}/g, geminiResearch)
     .replace(/{hiringSetup}/g, ctx.hiringSetup ?? 'team')
