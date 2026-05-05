@@ -296,6 +296,24 @@ body {
 .btn-generate:hover:not(:disabled) { background: var(--blue-hover); }
 .btn-generate:disabled { background: var(--gray); cursor: not-allowed; }
 
+.gen-paste-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  resize: none;
+  line-height: 1.5;
+  background: var(--white);
+  transition: border-color 0.15s;
+}
+.gen-paste-input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
 .gen-error {
   margin-top: 6px;
   font-size: 12px;

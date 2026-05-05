@@ -46,9 +46,7 @@ export default function CallScreen({ onReset }: Props) {
   const [showResearch, setShowResearch] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
-  const [jobTitle, setJobTitle] = useState('')
-  const [companyName, setCompanyName] = useState('')
-  const [companyWebsite, setCompanyWebsite] = useState('')
+  const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
   const activeRef = useRef<HTMLDivElement>(null)
@@ -57,11 +55,10 @@ export default function CallScreen({ onReset }: Props) {
     setIsGenerating(true)
     setGenError('')
     try {
-      const rawInput = `Job Title: ${jobTitle.trim()}\nCompany: ${companyName.trim()}\nWebsite: ${companyWebsite.trim()}`
       const res = await fetch('/.netlify/functions/generate-spiel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rawInput }),
+        body: JSON.stringify({ rawInput: rawInput.trim() }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Generation failed')
@@ -200,31 +197,17 @@ export default function CallScreen({ onReset }: Props) {
           </div>
           <div className="generator-form">
             <div className="gen-fields">
-              <input
-                className="gen-input"
-                type="text"
-                placeholder="Job Title"
-                value={jobTitle}
-                onChange={e => setJobTitle(e.target.value)}
-              />
-              <input
-                className="gen-input"
-                type="text"
-                placeholder="Company Name"
-                value={companyName}
-                onChange={e => setCompanyName(e.target.value)}
-              />
-              <input
-                className="gen-input"
-                type="text"
-                placeholder="Company Website"
-                value={companyWebsite}
-                onChange={e => setCompanyWebsite(e.target.value)}
+              <textarea
+                className="gen-paste-input"
+                placeholder={"Paste lead info here — Job Title, Company Name, Website"}
+                value={rawInput}
+                onChange={e => setRawInput(e.target.value)}
+                rows={2}
               />
               <button
                 className="btn-generate"
                 onClick={generateSpiel}
-                disabled={isGenerating || !jobTitle.trim() || !companyName.trim() || !companyWebsite.trim()}
+                disabled={isGenerating || !rawInput.trim()}
               >
                 {isGenerating ? 'Generating...' : 'Generate'}
               </button>
@@ -307,33 +290,19 @@ export default function CallScreen({ onReset }: Props) {
                 <div className="inline-research-form">
                   {!geminiResearch ? (
                     <>
-                      <div className="inline-research-label">Add research to personalise this script:</div>
+                      <div className="inline-research-label">Paste lead info — Job Title, Company Name, Website:</div>
                       <div className="gen-fields">
-                        <input
-                          className="gen-input"
-                          type="text"
-                          placeholder="Job Title"
-                          value={jobTitle}
-                          onChange={e => setJobTitle(e.target.value)}
-                        />
-                        <input
-                          className="gen-input"
-                          type="text"
-                          placeholder="Company Name"
-                          value={companyName}
-                          onChange={e => setCompanyName(e.target.value)}
-                        />
-                        <input
-                          className="gen-input"
-                          type="text"
-                          placeholder="Company Website"
-                          value={companyWebsite}
-                          onChange={e => setCompanyWebsite(e.target.value)}
+                        <textarea
+                          className="gen-paste-input"
+                          placeholder={"e.g. Head of Sales · Acme Corp · acme.com"}
+                          value={rawInput}
+                          onChange={e => setRawInput(e.target.value)}
+                          rows={2}
                         />
                         <button
                           className="btn-generate"
                           onClick={generateSpiel}
-                          disabled={isGenerating || !jobTitle.trim() || !companyName.trim() || !companyWebsite.trim()}
+                          disabled={isGenerating || !rawInput.trim()}
                         >
                           {isGenerating ? 'Generating...' : 'Generate'}
                         </button>
