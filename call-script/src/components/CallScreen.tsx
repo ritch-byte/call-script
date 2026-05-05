@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
@@ -10,6 +10,11 @@ interface Props {
 
 type Context = Record<string, string>
 
+type Step = {
+  nodeId: string
+  chosenLabel?: string
+}
+
 function interpolate(text: string, leadName: string, geminiResearch: string, ctx: Context): string {
   return text
     .replace(/{leadName}/g, leadName || 'there')
@@ -19,8 +24,7 @@ function interpolate(text: string, leadName: string, geminiResearch: string, ctx
 }
 
 export default function CallScreen({ onReset }: Props) {
-  const [currentId, setCurrentId] = useState('opening')
-  const [history, setHistory] = useState<string[]>([])
+  const [steps, setSteps] = useState<Step[]>([{ nodeId: 'opening' }])
   const [context, setContext] = useState<Context>({})
   const [showObjections, setShowObjections] = useState(false)
   const [showRates, setShowRates] = useState(false)
@@ -30,6 +34,10 @@ export default function CallScreen({ onReset }: Props) {
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  const currentNodeId = steps[steps.length - 1].nodeId
+  const currentNode = flow[currentNodeId]
 
   const generateSpiel = async () => {
     setIsGenerating(true)
@@ -50,44 +58,41 @@ export default function CallScreen({ onReset }: Props) {
     }
   }
 
-  const node = flow[currentId]
-
   const goTo = (option: FlowOption) => {
-    setHistory(prev => [...prev, currentId])
     if (option.capture) setContext(prev => ({ ...prev, ...option.capture }))
-    setCurrentId(option.next)
+    setSteps(prev => {
+      const updated = [...prev]
+      updated[updated.length - 1] = { ...updated[updated.length - 1], chosenLabel: option.label }
+      return [...updated, { nodeId: option.next }]
+    })
     setShowObjections(false)
     setShowRates(false)
   }
 
   const goBack = () => {
-    if (history.length === 0) return
-    setCurrentId(history[history.length - 1])
-    setHistory(h => h.slice(0, -1))
+    if (steps.length <= 1) return
+    setSteps(prev => {
+      const withoutLast = prev.slice(0, -1)
+      const prevLast = { ...withoutLast[withoutLast.length - 1] }
+      delete prevLast.chosenLabel
+      return [...withoutLast.slice(0, -1), prevLast]
+    })
     setShowObjections(false)
   }
 
-  const script = interpolate(node.script, leadName, geminiResearch, context)
-  const breadcrumbPath = [...history, currentId]
-
-  const cardClass = [
-    'script-card',
-    node.isObjection ? 'script-card--objection' : '',
-    node.isEnd ? 'script-card--end' : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
-
-  const endLabel =
-    currentId === 'end_booked'
-      ? 'BOOKED'
-      : currentId === 'end_callback'
-      ? 'CALLBACK SET'
-      : 'CALL ENDED'
+  // Scroll new step into view
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [steps.length])
 
   return (
     <div className="call-screen">
+
+      {/* ── Header ── */}
       <div className="call-header">
+        <div className="header-brand">
+          <span className="brand-mark">OA</span>
+        </div>
         <div className="call-info">
           <input
             className="lead-name-input"
@@ -96,7 +101,6 @@ export default function CallScreen({ onReset }: Props) {
             value={leadName}
             onChange={e => setLeadName(e.target.value)}
           />
-          <span className="call-step">Step {history.length + 1}</span>
         </div>
         <div className="header-actions">
           <button
@@ -117,6 +121,7 @@ export default function CallScreen({ onReset }: Props) {
         </div>
       </div>
 
+      {/* ── Rates Panel ── */}
       {showRates && (
         <div className="reference-bar">
           <div className="reference-bar-header">
@@ -148,6 +153,7 @@ export default function CallScreen({ onReset }: Props) {
         </div>
       )}
 
+      {/* ── Research Panel ── */}
       {showResearch && (
         <div className="reference-bar">
           <div className="reference-bar-header">
@@ -183,81 +189,108 @@ export default function CallScreen({ onReset }: Props) {
         </div>
       )}
 
-      <div className="breadcrumb">
-        {breadcrumbPath.map((id, i) => (
-          <span key={i}>
-            {i > 0 && <span className="crumb-sep"> / </span>}
-            <span className={i === breadcrumbPath.length - 1 ? 'crumb crumb--active' : 'crumb'}>
-              {flow[id]?.title ?? id}
-            </span>
-          </span>
-        ))}
+      {/* ── Full Call Flow — all steps visible ── */}
+      <div className="call-flow">
+        {steps.map((step, index) => {
+          const node = flow[step.nodeId]
+          const isActive = index === steps.length - 1
+          const script = interpolate(node.script, leadName, geminiResearch, context)
+
+          const stepEndLabel =
+            step.nodeId === 'end_booked' ? 'BOOKED'
+            : step.nodeId === 'end_callback' ? 'CALLBACK SET'
+            : 'CALL ENDED'
+
+          const cardClass = [
+            'step-card',
+            isActive ? 'step-card--active' : 'step-card--done',
+            node.isObjection ? 'step-card--objection' : '',
+            node.isEnd ? 'step-card--end' : '',
+          ].filter(Boolean).join(' ')
+
+          return (
+            <div key={index} className={cardClass} ref={isActive ? bottomRef : null}>
+
+              {/* Step header */}
+              <div className="step-header-row">
+                <span className="step-num">{index + 1}</span>
+                <span className="step-label">
+                  {node.isObjection ? 'OBJECTION HANDLER'
+                    : node.isEnd ? stepEndLabel
+                    : node.title}
+                </span>
+                {!isActive && step.chosenLabel && (
+                  <span className="chosen-pill">{step.chosenLabel}</span>
+                )}
+              </div>
+
+              {/* Wait indicator */}
+              {node.waitForAnswer && isActive && (
+                <div className="wait-indicator">
+                  <span className="pulse" />
+                  Waiting for answer...
+                </div>
+              )}
+
+              {/* Script text */}
+              <div className="script-text">
+                {script.split('\n').map((line, i) =>
+                  line ? <p key={i}>{line}</p> : <br key={i} />
+                )}
+              </div>
+
+              {/* Coach tip (active only) */}
+              {node.tip && isActive && (
+                <div className="coach-tip">
+                  <div className="coach-tip-label">Coach Tip</div>
+                  {node.tip}
+                </div>
+              )}
+
+              {/* Response buttons — only on active, non-end step */}
+              {isActive && !node.isEnd && (
+                <div className="options-section">
+                  <div className="options-label">Lead responds:</div>
+                  <div className="options-grid">
+                    {node.options.map(opt => {
+                      const cls =
+                        opt.type === 'end' ? ' btn-option--danger'
+                        : opt.type === 'objection' ? ' btn-option--warn'
+                        : opt.type === 'positive' ? ' btn-option--positive'
+                        : ''
+                      return (
+                        <button
+                          key={opt.next}
+                          className={`btn-option${cls}`}
+                          onClick={() => goTo(opt)}
+                        >
+                          {opt.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* End state */}
+              {isActive && node.isEnd && (
+                <div className="end-actions">
+                  <button className="btn-primary" onClick={onReset}>
+                    Start New Call
+                  </button>
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
-      <div className={cardClass}>
-        {node.isObjection && (
-          <div className="card-tag card-tag--objection">OBJECTION HANDLER</div>
-        )}
-        {node.isEnd && <div className="card-tag card-tag--end">{endLabel}</div>}
-
-        {node.waitForAnswer && (
-          <div className="wait-indicator">
-            <span className="pulse" />
-            Waiting for answer...
-          </div>
-        )}
-
-        <div className="script-text">
-          {script.split('\n').map((line, i) =>
-            line ? <p key={i}>{line}</p> : <br key={i} />
-          )}
-        </div>
-
-        {node.tip && (
-          <div className="coach-tip">
-            <div className="coach-tip-label">Coach Tip</div>
-            {node.tip}
-          </div>
-        )}
-      </div>
-
-      {!node.isEnd && (
-        <div className="options-section">
-          <div className="options-label">Lead responds:</div>
-          <div className="options-grid">
-            {node.options.map(opt => {
-              const cls =
-                opt.type === 'end' ? ' btn-option--danger'
-                : opt.type === 'objection' ? ' btn-option--warn'
-                : opt.type === 'positive' ? ' btn-option--positive'
-                : ''
-              return (
-                <button
-                  key={opt.next}
-                  className={`btn-option${cls}`}
-                  onClick={() => goTo(opt)}
-                >
-                  {opt.label}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {node.isEnd && (
-        <div className="end-actions">
-          <button className="btn-primary" onClick={onReset}>
-            Start New Call
-          </button>
-        </div>
-      )}
-
+      {/* ── Bottom Bar ── */}
       <div className="bottom-bar">
-        <button className="btn-back" onClick={goBack} disabled={history.length === 0}>
-          Back
+        <button className="btn-back" onClick={goBack} disabled={steps.length <= 1}>
+          ← Back
         </button>
-        {!node.isEnd && (
+        {!currentNode.isEnd && (
           <button
             className={`btn-objections${showObjections ? ' btn-objections--active' : ''}`}
             onClick={() => setShowObjections(v => !v)}
@@ -265,8 +298,10 @@ export default function CallScreen({ onReset }: Props) {
             Objections
           </button>
         )}
+        <span className="step-counter">Step {steps.length}</span>
       </div>
 
+      {/* ── Objections Overlay ── */}
       {showObjections && (
         <div className="overlay" onClick={() => setShowObjections(false)}>
           <div className="objections-panel" onClick={e => e.stopPropagation()}>
