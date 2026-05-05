@@ -114,9 +114,20 @@ export const flow: Record<string, FlowNode> = {
     title: 'Booking',
     script: "That's perfect! We can dive deeper with our sourcing partners for a brief consultation — they'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours 80% on salary costs. Plus, as a thank you for your time, we'll send you a $100 Amazon voucher right after the call.\n\nHow's your calendar look in the next 3 days?",
     options: [
-      { label: 'Books a slot', next: 'end_booked', type: 'positive' },
+      { label: 'Books a slot', next: 'booking_recap', type: 'positive' },
       { label: 'Not sure / need to think', next: 'obj_think_about_it', type: 'objection' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
+    ],
+  },
+
+  // ── BOOKING RECAP ─────────────────────────────────────────────────────────
+
+  booking_recap: {
+    id: 'booking_recap',
+    title: 'Booking Recap',
+    script: "Great chatting with you, {leadName}. Just to recap quickly:\n\n\"We're looking at [NUMBER] full-time, dedicated [ROLE]s, right?\" (wait for confirmation)\n\n\"And as the decision-maker, you'd be open to an offshore model for that 1-to-2-month hiring need if the meeting goes well, right?\" (wait for confirmation)\n\n\"Perfect. That discovery call is set for [DAY, DATE] at [TIME] [TIMEZONE]. And since we're tailoring this entirely to your business needs, can I get your full commitment to attend?\" (wait for confirmation)\n\n\"Fantastic. I'm sending the invite now. Once you accept, we'll send a $10 Amazon voucher, then your $100 voucher right after we meet on [DATE]. See you then!\"",
+    options: [
+      { label: 'Confirmed — all good', next: 'end_booked', type: 'positive' },
     ],
   },
 
@@ -125,7 +136,7 @@ export const flow: Record<string, FlowNode> = {
   end_booked: {
     id: 'end_booked',
     title: 'Booked!',
-    script: "Fantastic! I'll send you a calendar invite right away. Talk soon, {leadName}!",
+    script: "Invite sent! Talk soon, {leadName}.",
     isEnd: true,
     options: [],
   },
