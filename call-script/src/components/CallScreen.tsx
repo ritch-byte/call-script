@@ -30,8 +30,9 @@ function interpolate(text: string, leadName: string, geminiResearch: string, ctx
   return text
     .replace(/{leadName}/g, leadName || 'there')
     .replace(/{yourName}/g, 'I')
-    .replace(/{geminiResearch}/g, geminiResearch || '[No research added — paste it via the Research button]')
+    .replace(/{geminiResearch}/g, geminiResearch)
     .replace(/{hiringSetup}/g, ctx.hiringSetup ?? 'team')
+    .trimEnd()
 }
 
 export default function CallScreen({ onReset }: Props) {
@@ -300,6 +301,55 @@ export default function CallScreen({ onReset }: Props) {
                   line ? <p key={i}>{line}</p> : <br key={i} />
                 )}
               </div>
+
+              {/* Inline research form — value_prop step, active only */}
+              {step.nodeId === 'value_prop' && isActive && (
+                <div className="inline-research-form">
+                  {!geminiResearch ? (
+                    <>
+                      <div className="inline-research-label">Add research to personalise this script:</div>
+                      <div className="gen-fields">
+                        <input
+                          className="gen-input"
+                          type="text"
+                          placeholder="Job Title"
+                          value={jobTitle}
+                          onChange={e => setJobTitle(e.target.value)}
+                        />
+                        <input
+                          className="gen-input"
+                          type="text"
+                          placeholder="Company Name"
+                          value={companyName}
+                          onChange={e => setCompanyName(e.target.value)}
+                        />
+                        <input
+                          className="gen-input"
+                          type="text"
+                          placeholder="Company Website"
+                          value={companyWebsite}
+                          onChange={e => setCompanyWebsite(e.target.value)}
+                        />
+                        <button
+                          className="btn-generate"
+                          onClick={generateSpiel}
+                          disabled={isGenerating || !jobTitle.trim() || !companyName.trim() || !companyWebsite.trim()}
+                        >
+                          {isGenerating ? 'Generating...' : 'Generate'}
+                        </button>
+                      </div>
+                      {genError && <div className="gen-error">{genError}</div>}
+                    </>
+                  ) : (
+                    <button
+                      className="btn-regenerate"
+                      onClick={() => setGeminiResearch('')}
+                    >
+                      Regenerate Research
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Coach tip — active only */}
               {node.tip && isActive && (

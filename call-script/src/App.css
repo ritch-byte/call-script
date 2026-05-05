@@ -302,6 +302,37 @@ body {
   color: #dc2626;
 }
 
+/* Inline research form inside step card */
+.inline-research-form {
+  margin: 16px 0 4px;
+  padding: 14px 16px;
+  background: var(--blue-soft);
+  border: 1.5px solid var(--blue-muted);
+  border-radius: 8px;
+}
+
+.inline-research-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 10px;
+}
+
+.btn-regenerate {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: none;
+  border: 1.5px solid var(--blue-muted);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-regenerate:hover { background: var(--blue-muted); }
+
 .research-input {
   width: 100%;
   padding: 10px 14px;
