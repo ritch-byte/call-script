@@ -106,8 +106,9 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Two quick questions before the pitch — they personalise everything that follows. If they say part-time or contract, don't drop it; note it and continue — it's still a valid lead. The experience answer gives you a concrete detail to reference in the pitch and the CTA.",
     options: [
-      { label: 'Full-time, gave experience level', next: 'value_prop', type: 'positive' },
-      { label: 'Part-time / contract / unsure', next: 'value_prop', type: 'positive' },
+      { label: 'Full-time, gave experience level', next: 'booking', type: 'positive' },
+      { label: 'Part-time / contract / unsure', next: 'booking', type: 'positive' },
+      { label: "Can't give a specific role", next: 'value_prop', type: 'positive' },
     ],
   },
 
