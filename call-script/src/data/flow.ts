@@ -92,8 +92,22 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "SPIN — Need-Payoff: after they name a role, use this bridge before moving to the pitch: 'So if you could bring on a great [role they named] at 70 to 80 percent less cost — dedicated full-time, not a freelancer — is that a conversation worth having?' Get the yes before you pitch. It pre-commits them to the value.",
     options: [
-      { label: 'They share a role or answer', next: 'value_prop', type: 'positive' },
+      { label: 'They share a role or answer', next: 'role_qualify', type: 'positive' },
       { label: "We don't really hire externally", next: 'obj_no_external', type: 'objection' },
+    ],
+  },
+
+  // ── ROLE QUALIFY ─────────────────────────────────────────────────────────
+
+  role_qualify: {
+    id: 'role_qualify',
+    title: 'Role Qualify',
+    script: "① Full-time check:\n\"Is this a full-time role you're looking to hire for?\"\n\n② Experience:\n\"And roughly how many years of experience are you looking for in that [role]?\"",
+    waitForAnswer: true,
+    tip: "Two quick questions before the pitch — they personalise everything that follows. If they say part-time or contract, don't drop it; note it and continue — it's still a valid lead. The experience answer gives you a concrete detail to reference in the pitch and the CTA.",
+    options: [
+      { label: 'Full-time, gave experience level', next: 'value_prop', type: 'positive' },
+      { label: 'Part-time / contract / unsure', next: 'value_prop', type: 'positive' },
     ],
   },
 
@@ -116,9 +130,9 @@ export const flow: Record<string, FlowNode> = {
   booking: {
     id: 'booking',
     title: 'Booking',
-    script: "① Qualify full-time:\n\"Is this a full-time role you're looking to hire for?\"\n\n② Role experience:\n\"And roughly how many years of experience are you looking for in that [role]?\"\n\n③ Close:\n\"That's perfect — especially since you're looking for that specific role. We can dive this deeper with our sourcing partners for a brief consultation. They'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours 80% on salary costs. Plus, as a thank-you for your time, we'll send you a $100 Amazon voucher right after the call. How's your calendar look in the next 3 days?\"",
+    script: "\"That's perfect — especially since you're looking for that specific role. We can dive this deeper with our sourcing partners for a brief consultation. They'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours 80% on salary costs. Plus, as a thank-you for your time, we'll send you a $100 Amazon voucher right after the call. How's your calendar look in the next 3 days?\"",
     waitForAnswer: true,
-    tip: "Run all three steps in order — don't skip to the close. Full-time check removes part-time leads early. The experience question personalises the pitch and builds urgency. Schiffman: after the CTA, stay silent — the next person to speak loses. If they ask 'morning or afternoon?', that's a yes. Pin down a specific date and time before hanging up.",
+    tip: "Schiffman: stay silent after the CTA — the next person to speak loses. If they ask 'morning or afternoon?', that's a yes. Pin down a specific date and time before hanging up. Reference the exact role and experience level they gave you earlier to make the ask feel personal.",
     options: [
       { label: 'Books a slot', next: 'booking_recap', type: 'positive' },
       { label: 'Not sure / need to think', next: 'obj_think_about_it', type: 'objection' },
