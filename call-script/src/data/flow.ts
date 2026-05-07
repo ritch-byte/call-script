@@ -116,9 +116,9 @@ export const flow: Record<string, FlowNode> = {
   booking: {
     id: 'booking',
     title: 'Booking',
-    script: "What I'd love to do is get you a quick 15-minute call with our sourcing team — they'll pull together actual CVs and a real pricing breakdown for the specific roles you're looking at, so you can see the exact numbers for your situation. Zero commitment, just real data.\n\nAnd as a thank you for your time, we'll send you a $100 Amazon voucher right after the call.\n\nI've got availability on [Tuesday] or [Thursday] this week — does morning or afternoon work better for you?",
+    script: "① Qualify full-time:\n\"Is this a full-time role you're looking to hire for?\"\n\n② Role experience:\n\"And roughly how many years of experience are you looking for in that [role]?\"\n\n③ Close:\n\"That's perfect — especially since you're looking for that specific role. We can dive this deeper with our sourcing partners for a brief consultation. They'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours 80% on salary costs. Plus, as a thank-you for your time, we'll send you a $100 Amazon voucher right after the call. How's your calendar look in the next 3 days?\"",
     waitForAnswer: true,
-    tip: "Schiffman: NEVER ask 'when are you free?' — always offer two specific options. It shifts the question from 'should I meet?' to 'which time works?' Then pin it down: 'How does Tuesday at 10am sound?' Reference the specific role they mentioned — 'we'll pull CVs for [their role]' — it makes the ask feel tailored, not templated.",
+    tip: "Run all three steps in order — don't skip to the close. Full-time check removes part-time leads early. The experience question personalises the pitch and builds urgency. Schiffman: after the CTA, stay silent — the next person to speak loses. If they ask 'morning or afternoon?', that's a yes. Pin down a specific date and time before hanging up.",
     options: [
       { label: 'Books a slot', next: 'booking_recap', type: 'positive' },
       { label: 'Not sure / need to think', next: 'obj_think_about_it', type: 'objection' },
