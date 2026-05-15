@@ -58,10 +58,10 @@ export const flow: Record<string, FlowNode> = {
 
   pitch_q1: {
     id: 'pitch_q1',
-    title: 'Pitch + Discovery Q1',
-    script: "Appreciate it, {leadName}. So the pattern we keep seeing across businesses like yours is that most teams are spending 60 to 80 percent more than they need to on specialized talent — purely because they're only hiring locally. Most leaders don't realize that until they see the numbers side by side.\n\nWe're Outsource Accelerator — the world's leading marketplace for offshore staffing. We connect businesses with world-class, pre-vetted talent at typically 50 to 80 percent less than a local hire — dedicated full-time staff, not freelancers.\n\nJust a quick question to see if this is even relevant — for your team right now, do you handle hiring fully in-house, or do you ever work with external partners for any roles?",
+    title: 'Value Pitch + Discovery Q1',
+    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah, we are just trying to reach out to all businesses across different industries mainly because salaries for specialized local talent is really getting expensive. Right?\n\nSo I work with a team that focuses on helping leaders like you handle their growth without increasing their expenses. Usually by connecting leaders like you with global talent networks that provide world-class talent at 80% less than local hiring.\n\nSo just out of curiosity... for any of your hiring, do you do it in-house, or do you work with external partners for anything?",
     waitForAnswer: true,
-    tip: "Challenger Sale: lead with the commercial insight — 'spending 60-80% more than they need to' — before you introduce OA. This creates a moment of 'wait, is that us?' before you pitch. Don't rush past it. Then the product introduction lands as a solution to a problem they already feel.",
+    tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms — it signals confidence, not desperation. Lead with the industry pain (rising local talent costs) before introducing OA. The discovery question at the end is binary — don't stack more questions on top of it.",
     options: [
       { label: 'They answer (in-house / external / mix)', next: 'discovery_q2', type: 'positive' },
       { label: 'Not interested / budget concern', next: 'obj_not_interested_pitch', type: 'objection' },
