@@ -45,12 +45,12 @@ export const flow: Record<string, FlowNode> = {
   opening: {
     id: 'opening',
     title: 'Opening',
-    script: "Hey {leadName}? Oh hey — it's {yourName} over at Outsource Accelerator. I know I caught you out of the blue — mind if I grab just 30 seconds? Then you can tell me straight if it's relevant or not.",
-    tip: "Fanatical Prospecting: the first 7 seconds determine the call. Stay upbeat and confident — not apologetic. 'I know I caught you out of the blue' disarms the reflex rejection before it fires. Pause briefly after 'relevant or not' — let them say yes.",
+    script: "Hey {leadName}? (Pause)\n\nOh hey uhh, {leadName}, it's {yourName} here over at Outsource Accelerator. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not? (pause)\n\nAppreciate that, yeah remind me uhh, have you heard of Outsource Accelerator just by the off chance?",
+    tip: "Fanatical Prospecting: the first 7 seconds determine the call. Stay upbeat and confident — not apologetic. 'I know I called you out of the blue' disarms the reflex rejection before it fires. Pause briefly after 'relevant or not' — let them say yes.",
     options: [
-      { label: 'Yes, go ahead', next: 'pitch_q1', type: 'positive' },
-      { label: 'Not a good time / who are you?', next: 'obj_timing', type: 'objection' },
-      { label: 'Not interested', next: 'obj_not_interested_opening', type: 'objection' },
+      { label: "No — haven't heard of OA", next: 'pitch_q1', type: 'positive' },
+      { label: 'Yes — familiar with OA', next: 'pitch_q1', type: 'positive' },
+      { label: 'Got cut off / not interested', next: 'end_not_interested', type: 'end' },
     ],
   },
 
