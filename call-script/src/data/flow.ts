@@ -79,7 +79,7 @@ export const flow: Record<string, FlowNode> = {
     tip: "SPIN — Implication: if they share any friction, multiply it before moving on. Try: 'When a key role sits open longer than expected, what does that cost you in practice — project delays, the team absorbing extra load, or lost revenue?' Get them to say the cost out loud. A gap they can quantify is a gap worth closing.",
     options: [
       { label: 'They share friction / challenges', next: 'discovery_q3', type: 'positive' },
-      { label: 'Team is doing fine / no real issues', next: 'obj_doing_fine', type: 'objection' },
+      { label: 'Team is doing fine / no real issues', next: 'discovery_q3', type: 'positive' },
     ],
   },
 
@@ -88,7 +88,7 @@ export const flow: Record<string, FlowNode> = {
   discovery_q3: {
     id: 'discovery_q3',
     title: 'Discovery Q3: Role + Need-Payoff',
-    script: "That makes sense. And what type of roles does your team typically prioritize — is it more technical, operations, customer-facing, or something else?",
+    script: "Makes sense. And what types of roles does your team prioritise most when you're hiring?",
     waitForAnswer: true,
     tip: "SPIN — Need-Payoff: after they name a role, use this bridge before moving to the pitch: 'So if you could bring on a great [role they named] at 70 to 80 percent less cost — dedicated full-time, not a freelancer — is that a conversation worth having?' Get the yes before you pitch. It pre-commits them to the value.",
     options: [
