@@ -26,10 +26,10 @@ const MAIN_FLOW = [
   'end_booked',
 ]
 
-function interpolate(text: string, leadName: string, geminiResearch: string, ctx: Context): string {
+function interpolate(text: string, leadName: string, yourName: string, geminiResearch: string, ctx: Context): string {
   return text
     .replace(/{leadName}/g, leadName || '[Lead Name]')
-    .replace(/{yourName}/g, 'I')
+    .replace(/{yourName}/g, yourName || '[BDR Name]')
     .replace(/{geminiResearch}/g, geminiResearch)
     .replace(/{hiringSetup}/g, ctx.hiringSetup ?? 'team')
     .trimEnd()
@@ -45,6 +45,7 @@ export default function CallScreen({ onReset }: Props) {
   const [showRates, setShowRates] = useState(false)
   const [showResearch, setShowResearch] = useState(false)
   const [leadName, setLeadName] = useState('')
+  const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
@@ -134,6 +135,13 @@ export default function CallScreen({ onReset }: Props) {
           <span className="brand-mark">OA</span>
         </div>
         <div className="call-info">
+          <input
+            className="lead-name-input"
+            type="text"
+            placeholder="BDR name..."
+            value={yourName}
+            onChange={e => setYourName(e.target.value)}
+          />
           <input
             className="lead-name-input"
             type="text"
@@ -233,7 +241,7 @@ export default function CallScreen({ onReset }: Props) {
           const isDone     = idx < activeIdx
           const isActive   = idx === activeIdx
           const isUpcoming = idx > activeIdx
-          const script     = interpolate(node.script, leadName, geminiResearch, context)
+          const script     = interpolate(node.script, leadName, yourName, geminiResearch, context)
 
           const stepEndLabel =
             step.nodeId === 'end_booked'   ? 'BOOKED' :
