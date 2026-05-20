@@ -108,6 +108,9 @@ export const flow: Record<string, FlowNode> = {
     options: [
       { label: 'Full-time, gave experience level', next: 'booking', type: 'positive' },
       { label: 'Part-time / contract / unsure', next: 'booking', type: 'positive' },
+      { label: "Can't give a specific role", next: 'value_prop', type: 'positive' },
+      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
+      { label: 'Got cut off', next: 'end_callback', type: 'end' },
     ],
   },
 
