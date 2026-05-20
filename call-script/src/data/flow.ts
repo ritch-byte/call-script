@@ -50,7 +50,21 @@ export const flow: Record<string, FlowNode> = {
     options: [
       { label: "No — haven't heard of OA", next: 'pitch_q1', type: 'positive' },
       { label: 'Yes — familiar with OA', next: 'pitch_q1', type: 'positive' },
-      { label: 'Got cut off / not interested', next: 'end_not_interested', type: 'end' },
+      { label: 'Got cut off / not interested', next: 'obj_cutoff_opening', type: 'objection' },
+    ],
+  },
+
+  // ── CUTOFF / NOT INTERESTED RECOVERY (OPENING) ───────────────────────────
+
+  obj_cutoff_opening: {
+    id: 'obj_cutoff_opening',
+    title: 'Recovery: Got Cut Off / Not Interested',
+    isObjection: true,
+    script: "That's completely fair. Before I let you go though, just out of curiosity — do you handle all your hiring in-house or do you ever work with external partners for anything?",
+    tip: "Schiffman's Ledge — don't fight the brush-off, acknowledge it and pivot with a single soft question. This is Discovery Q1 used as a hail mary. If they answer at all, you're back in the conversation. Stay calm and curious, not desperate.",
+    options: [
+      { label: 'They answer — back in the conversation', next: 'discovery_q2', type: 'positive' },
+      { label: 'Hard no / hung up', next: 'end_not_interested', type: 'end' },
     ],
   },
 
