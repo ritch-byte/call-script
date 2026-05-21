@@ -107,7 +107,22 @@ export const flow: Record<string, FlowNode> = {
     tip: "SPIN — Need-Payoff: after they name a role, use this bridge before moving to the pitch: 'So if you could bring on a great [role they named] at 70 to 80 percent less cost — dedicated full-time, not a freelancer — is that a conversation worth having?' Get the yes before you pitch. It pre-commits them to the value.",
     options: [
       { label: 'They share a role or answer', next: 'role_qualify', type: 'positive' },
-      { label: "We don't really hire externally", next: 'obj_no_external', type: 'objection' },
+      { label: "Can't give a role / not interested", next: 'obj_no_role', type: 'objection' },
+    ],
+  },
+
+  // ── NO ROLE — VALUE PITCH + RESEARCH ─────────────────────────────────────
+
+  obj_no_role: {
+    id: 'obj_no_role',
+    title: "No Role — Value Pitch + Research",
+    isObjection: true,
+    script: "Okay, no worries!\n\nThe reason I asked you is because we help business leaders like you cut salary costs by up to 80% using world-class global talent. And before calling you, I actually did some research...\n\n{geminiResearch}",
+    tip: "Gap Selling: even without a named role, lead with the cost problem — 'salary costs by up to 80%' creates instant curiosity. The research insert makes it feel personal, not scripted. After delivering, pause and let them react before moving to the booking ask.",
+    options: [
+      { label: 'Lead is engaged / curious', next: 'booking', type: 'positive' },
+      { label: 'Already outsourcing / need to think', next: 'obj_already_outsourcing', type: 'objection' },
+      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
 
