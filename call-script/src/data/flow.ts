@@ -78,8 +78,7 @@ export const flow: Record<string, FlowNode> = {
     tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms — it signals confidence, not desperation. Lead with the industry pain (rising local talent costs) before introducing OA. The discovery question at the end is binary — don't stack more questions on top of it.",
     options: [
       { label: 'They answer (in-house / external / mix)', next: 'discovery_q2', type: 'positive' },
-      { label: 'Not interested / budget concern', next: 'obj_not_interested_pitch', type: 'objection' },
-      { label: "We're not hiring right now", next: 'obj_not_hiring', type: 'objection' },
+      { label: "Not interested / not hiring / budget concern", next: 'obj_not_hiring', type: 'objection' },
     ],
   },
 
