@@ -84,21 +84,24 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
           setIsGenerating(false)
           return
         }
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: SPIEL_PROMPT(rawInput.trim()) }] }],
-              generationConfig: { maxOutputTokens: 400 },
-            }),
-          }
-        )
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': GEMINI_KEY,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-allow-browser': 'true',
+          },
+          body: JSON.stringify({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 400,
+            messages: [{ role: 'user', content: SPIEL_PROMPT(rawInput.trim()) }],
+          }),
+        })
         const data = await res.json()
-        if (!res.ok) throw new Error(data.error?.message || 'Gemini API error — check your key')
-        const spiel = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
-        if (!spiel) throw new Error('No response from Gemini')
+        if (!res.ok) throw new Error(data.error?.message || 'Claude API error — check your key')
+        const spiel = data.content?.[0]?.text?.trim()
+        if (!spiel) throw new Error('No response from Claude')
         setGeminiResearch(spiel)
       } else {
         const res = await fetch('/.netlify/functions/generate-spiel', {
