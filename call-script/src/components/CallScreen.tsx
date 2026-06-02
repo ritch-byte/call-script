@@ -293,8 +293,8 @@ export default function CallScreen({ onReset }: Props) {
                 )}
               </div>
 
-              {/* Inline research form — value_prop step, active only */}
-              {step.nodeId === 'value_prop' && isActive && (
+              {/* Inline research form — value_prop and obj_no_role steps, active only */}
+              {(['value_prop', 'obj_no_role'].includes(step.nodeId)) && isActive && (
                 <div className="inline-research-form">
                   {!geminiResearch ? (
                     <>
