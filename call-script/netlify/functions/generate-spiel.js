@@ -27,13 +27,13 @@ exports.handler = async (event) => {
 
 Goal: Write a short, hyper-personalized outreach message based on a prospect's Job Title and Company.
 
-The following is raw information about the prospect (may include job title, company name, website, or other details in any format):
+The following is raw information about the prospect (may include job title, company name, website, or other details in any format — extract the company name and job title from it):
 ${rawInput}
 
 Instructions & Guidelines:
 Analyze the Company: Briefly infer their industry and verify their prestige (e.g., "leader in...").
 Analyze the Role: Based strictly on their Job Title, identify 2 high-level complexities or responsibilities they likely face.
-Positive Framing (Crucial): Do not frame these as "problems" or "pain points." Frame them as "complexities" that lead to a desire for enhancement or growth.
+Positive Framing (Crucial): Do not frame these as "problems" or "pain points." Frame them as "complexities" that lead to a desire for enhancement or growth (e.g., instead of "struggling with workload," use "focused on enhancing operational efficiency").
 The Solution: Suggest 2 specific offshore roles that would logically support the complexities you identified. Briefly state what each role does.
 Length: Keep it under 80 words.
 Tone: Professional, knowledgeable, and helpful.
