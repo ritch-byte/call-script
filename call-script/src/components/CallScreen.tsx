@@ -50,15 +50,10 @@ export default function CallScreen({ onReset }: Props) {
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
-  const [geminiApiKey, setGeminiApiKey] = useState(() => localStorage.getItem('oa_gemini_key') || '')
   const activeRef = useRef<HTMLDivElement>(null)
 
   const isGitHubPages = window.location.hostname.includes('github.io')
-
-  const saveGeminiKey = (key: string) => {
-    setGeminiApiKey(key)
-    localStorage.setItem('oa_gemini_key', key)
-  }
+  const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY as string | undefined
 
   const SPIEL_PROMPT = (input: string) => `Role: You are an expert B2B Sales Development Representative specializing in offshore staffing solutions.
 
@@ -84,13 +79,13 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
     setGenError('')
     try {
       if (isGitHubPages) {
-        if (!geminiApiKey.trim()) {
-          setGenError('Enter your Gemini API key above first')
+        if (!GEMINI_KEY) {
+          setGenError('Gemini key not configured — contact your admin')
           setIsGenerating(false)
           return
         }
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey.trim()}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -349,30 +344,23 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
                 <div className="inline-research-form">
                   {!geminiResearch ? (
                     <>
-                      <div className="inline-research-label">{isGitHubPages ? 'Paste your research spiel here:' : 'Paste lead info — Job Title, Company Name, Website:'}</div>
+                      <div className="inline-research-label">Paste lead info — Job Title, Company Name, Website:</div>
                       <div className="gen-fields">
                         <textarea
                           className="gen-paste-input"
-                          placeholder={isGitHubPages ? 'Paste generated spiel from Gemini / ChatGPT...' : 'e.g. Head of Sales · Acme Corp · acme.com'}
+                          placeholder="e.g. Head of Sales · Acme Corp · acme.com"
                           value={rawInput}
                           onChange={e => setRawInput(e.target.value)}
                           rows={2}
                         />
-                        {!isGitHubPages && (
-                          <button
-                            className="btn-generate"
-                            onClick={generateSpiel}
-                            disabled={isGenerating || !rawInput.trim()}
-                          >
-                            {isGenerating ? 'Generating...' : 'Generate'}
-                          </button>
-                        )}
-                      </div>
-                      {isGitHubPages && rawInput.trim() && (
-                        <button className="btn-generate" style={{ marginTop: 6, width: '100%' }} onClick={() => setGeminiResearch(rawInput.trim())}>
-                          Use this research
+                        <button
+                          className="btn-generate"
+                          onClick={generateSpiel}
+                          disabled={isGenerating || !rawInput.trim()}
+                        >
+                          {isGenerating ? 'Generating...' : 'Generate'}
                         </button>
-                      )}
+                      </div>
                       {genError && <div className="gen-error">{genError}</div>}
                     </>
                   ) : (
