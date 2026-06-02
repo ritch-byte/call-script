@@ -307,13 +307,15 @@ export default function CallScreen({ onReset }: Props) {
                           onChange={e => setRawInput(e.target.value)}
                           rows={2}
                         />
-                        <button
-                          className="btn-generate"
-                          onClick={generateSpiel}
-                          disabled={isGenerating || !rawInput.trim()}
-                        >
-                          {isGenerating ? 'Generating...' : 'Generate'}
-                        </button>
+                        {!window.location.hostname.includes('github.io') && (
+                          <button
+                            className="btn-generate"
+                            onClick={generateSpiel}
+                            disabled={isGenerating || !rawInput.trim()}
+                          >
+                            {isGenerating ? 'Generating...' : 'Generate'}
+                          </button>
+                        )}
                       </div>
                       {genError && <div className="gen-error">{genError}</div>}
                     </>
