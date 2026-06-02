@@ -50,22 +50,73 @@ export default function CallScreen({ onReset }: Props) {
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
+  const [geminiApiKey, setGeminiApiKey] = useState(() => localStorage.getItem('oa_gemini_key') || '')
   const activeRef = useRef<HTMLDivElement>(null)
+
+  const isGitHubPages = window.location.hostname.includes('github.io')
+
+  const saveGeminiKey = (key: string) => {
+    setGeminiApiKey(key)
+    localStorage.setItem('oa_gemini_key', key)
+  }
+
+  const SPIEL_PROMPT = (input: string) => `Role: You are an expert B2B Sales Development Representative specializing in offshore staffing solutions.
+
+Goal: Write a short, hyper-personalized outreach message based on a prospect's Job Title and Company.
+
+The following is raw information about the prospect (may include job title, company name, website, or other details in any format — extract the company name and job title from it):
+${input}
+
+Instructions & Guidelines:
+Analyze the Company: Briefly infer their industry and verify their prestige (e.g., "leader in...").
+Analyze the Role: Based strictly on their Job Title, identify 2 high-level complexities or responsibilities they likely face.
+Positive Framing (Crucial): Do not frame these as "problems" or "pain points." Frame them as "complexities" that lead to a desire for enhancement or growth (e.g., instead of "struggling with workload," use "focused on enhancing operational efficiency").
+The Solution: Suggest 2 specific offshore roles that would logically support the complexities you identified. Briefly state what each role does.
+Length: Keep it under 80 words.
+Tone: Professional, knowledgeable, and helpful.
+
+Output Format:
+Output ONLY the message itself, no preamble, no quotes around it. Use this exact structure:
+I researched [Company] and know you're a leader in the [Industry/Niche]. Given the [Complexity 1] and [Complexity 2] you face as a [Job Title], you're most likely focused on [Positive Goal 1] and [Positive Goal 2]. A great starting point to help is an offshore [Role 1] to [Task 1] or a [Role 2] to [Task 2]. Aside from the roles I've mentioned, what type of role do you think might also be suitable for offshore?`
 
   const generateSpiel = async () => {
     setIsGenerating(true)
     setGenError('')
     try {
-      const res = await fetch('/.netlify/functions/generate-spiel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rawInput: rawInput.trim() }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Generation failed')
-      setGeminiResearch(data.spiel)
+      if (isGitHubPages) {
+        if (!geminiApiKey.trim()) {
+          setGenError('Enter your Gemini API key above first')
+          setIsGenerating(false)
+          return
+        }
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey.trim()}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: SPIEL_PROMPT(rawInput.trim()) }] }],
+              generationConfig: { maxOutputTokens: 400 },
+            }),
+          }
+        )
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error?.message || 'Gemini API error — check your key')
+        const spiel = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+        if (!spiel) throw new Error('No response from Gemini')
+        setGeminiResearch(spiel)
+      } else {
+        const res = await fetch('/.netlify/functions/generate-spiel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rawInput: rawInput.trim() }),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Generation failed')
+        setGeminiResearch(data.spiel)
+      }
     } catch (err) {
-      setGenError(err instanceof Error ? err.message : 'Generation failed — check API key is set in Netlify')
+      setGenError(err instanceof Error ? err.message : 'Generation failed')
     } finally {
       setIsGenerating(false)
     }
@@ -298,6 +349,18 @@ export default function CallScreen({ onReset }: Props) {
                 <div className="inline-research-form">
                   {!geminiResearch ? (
                     <>
+                      {isGitHubPages && (
+                        <div className="gen-fields" style={{ marginBottom: 6 }}>
+                          <input
+                            type="password"
+                            className="gen-paste-input"
+                            style={{ fontSize: 12 }}
+                            placeholder="Gemini API key (saved locally — enter once)"
+                            value={geminiApiKey}
+                            onChange={e => saveGeminiKey(e.target.value)}
+                          />
+                        </div>
+                      )}
                       <div className="inline-research-label">Paste lead info — Job Title, Company Name, Website:</div>
                       <div className="gen-fields">
                         <textarea
@@ -307,15 +370,13 @@ export default function CallScreen({ onReset }: Props) {
                           onChange={e => setRawInput(e.target.value)}
                           rows={2}
                         />
-                        {!window.location.hostname.includes('github.io') && (
-                          <button
-                            className="btn-generate"
-                            onClick={generateSpiel}
-                            disabled={isGenerating || !rawInput.trim()}
-                          >
-                            {isGenerating ? 'Generating...' : 'Generate'}
-                          </button>
-                        )}
+                        <button
+                          className="btn-generate"
+                          onClick={generateSpiel}
+                          disabled={isGenerating || !rawInput.trim()}
+                        >
+                          {isGenerating ? 'Generating...' : 'Generate'}
+                        </button>
                       </div>
                       {genError && <div className="gen-error">{genError}</div>}
                     </>
