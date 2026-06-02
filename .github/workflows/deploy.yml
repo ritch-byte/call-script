@@ -33,6 +33,8 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: call-script
+        env:
+          VITE_GEMINI_KEY: ${{ secrets.VITE_GEMINI_KEY }}
 
       - uses: actions/configure-pages@v5
 
