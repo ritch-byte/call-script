@@ -85,7 +85,7 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
           return
         }
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
