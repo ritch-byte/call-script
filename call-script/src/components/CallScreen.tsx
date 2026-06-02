@@ -84,25 +84,14 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
           setIsGenerating(false)
           return
         }
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
+        const res = await fetch('https://silver-cuchufli-071209.netlify.app/.netlify/functions/generate-spiel', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': GEMINI_KEY,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-allow-browser': 'true',
-          },
-          body: JSON.stringify({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 400,
-            messages: [{ role: 'user', content: SPIEL_PROMPT(rawInput.trim()) }],
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rawInput: rawInput.trim() }),
         })
         const data = await res.json()
-        if (!res.ok) throw new Error(data.error?.message || 'Claude API error — check your key')
-        const spiel = data.content?.[0]?.text?.trim()
-        if (!spiel) throw new Error('No response from Claude')
-        setGeminiResearch(spiel)
+        if (!res.ok) throw new Error(data.error || 'Generation failed')
+        setGeminiResearch(data.spiel)
       } else {
         const res = await fetch('/.netlify/functions/generate-spiel', {
           method: 'POST',
