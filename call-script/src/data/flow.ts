@@ -117,28 +117,103 @@ export const flow: Record<string, FlowNode> = {
     title: "No Role — Value Pitch + Research",
     isObjection: true,
     script: "Okay, no worries!\n\nThe reason I asked you is because we help business leaders like you cut salary costs by up to 80% using world-class global talent. And before calling you, I actually did some research...\n\n{geminiResearch}",
-    tip: "Gap Selling: even without a named role, lead with the cost problem — 'salary costs by up to 80%' creates instant curiosity. The research insert makes it feel personal, not scripted. After delivering, pause and let them react before moving to the booking ask.",
+    tip: "Gap Selling: even without a named role, lead with the cost problem — 'salary costs by up to 80%' creates instant curiosity. The research insert lets you surface a role for them. Once they're engaged, run them through qualification (full-time, 1–2 month timeline, offshore) so the call qualifies and isn't flagged.",
     options: [
-      { label: 'Lead is engaged / curious', next: 'booking', type: 'positive' },
+      { label: 'Lead is engaged / curious', next: 'role_qualify', type: 'positive' },
       { label: 'Already outsourcing / need to think', next: 'obj_already_outsourcing', type: 'objection' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
 
-  // ── ROLE QUALIFY ─────────────────────────────────────────────────────────
+  // ── QUALIFICATION — CORE GATE 1: FULL-TIME & DEDICATED ───────────────────
 
   role_qualify: {
     id: 'role_qualify',
-    title: 'Role Qualify',
-    script: "① Full-time check:\n\"Is this a full-time role you're looking to hire for?\"\n\n② Experience:\n\"And roughly how many years of experience are you looking for in that [role]?\"",
+    title: 'Qualify ① Full-Time & Dedicated',
+    script: "Perfect, and this'd be a full-time, dedicated seat right?",
     waitForAnswer: true,
-    tip: "Two quick questions before the pitch — they personalise everything that follows. If they say part-time or contract, don't drop it; note it and continue — it's still a valid lead. The experience answer gives you a concrete detail to reference in the pitch and the CTA.",
+    tip: "Core Gate 1 — full-time & dedicated. We only place full-time, dedicated talent, so frame it as a full-time seat — don't plant the part-time idea. If they push back to part-time/project, handle it; don't just roll on.",
     options: [
-      { label: 'Full-time, gave experience level', next: 'booking', type: 'positive' },
-      { label: 'Part-time / contract / unsure', next: 'booking', type: 'positive' },
+      { label: 'Yes — full-time & dedicated', next: 'qualify_experience', type: 'positive' },
+      { label: 'Part-time / project', next: 'obj_parttime', type: 'objection' },
       { label: "Can't give a specific role", next: 'value_prop', type: 'positive' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
-      { label: 'Got cut off', next: 'end_callback', type: 'end' },
+    ],
+  },
+
+  // ── QUALIFICATION — PART-TIME REBUTTAL (WE PLACE FULL-TIME ONLY) ──────────
+
+  obj_parttime: {
+    id: 'obj_parttime',
+    title: 'Qualify: Part-Time Rebuttal',
+    isObjection: true,
+    script: "Got it — and most leaders are surprised here: at offshore rates a full-time, dedicated person often costs less than part-time help locally, and you get someone fully embedded in your team instead of splitting their attention. Worth looking at it as a full-time seat?",
+    waitForAnswer: true,
+    tip: "We only place full-time, dedicated talent — part-time/project reads as a non-dedicated (disqualified) lead. Don't accept it: reframe on cost (offshore full-time ≈ local part-time) and on focus (dedicated beats shared). Convert to a full-time yes, then keep qualifying.",
+    options: [
+      { label: 'Open to a full-time seat', next: 'qualify_experience', type: 'positive' },
+      { label: 'Still only wants part-time', next: 'obj_not_interested_late', type: 'objection' },
+    ],
+  },
+
+  // ── QUALIFICATION — VALUE BRIDGE + EXPERIENCE LEVEL ──────────────────────
+
+  qualify_experience: {
+    id: 'qualify_experience',
+    title: 'Qualify: Value Bridge + Experience',
+    script: "Perfect — I actually work with a couple of source partners who place that exact role. They'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours up to 80% on salary.\n\nAnd so they pull the right people for you, do you have a specific experience level in mind for that role?",
+    waitForAnswer: true,
+    tip: "Full-time's confirmed — now bridge to value before you ask anything else. Naming the source partners + curated CVs + 80% savings frames the experience question as 'so they can pull the right person for you,' not interrogation. Capture the experience level; it personalises the rest of the call. Any answer moves you forward to the timeline gate.",
+    options: [
+      { label: 'Gives an experience level', next: 'qualify_timeline', type: 'positive' },
+      { label: 'Not sure / open to any', next: 'qualify_timeline', type: 'positive' },
+      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
+    ],
+  },
+
+  // ── QUALIFICATION — CORE GATE 2: IMMEDIATE HIRING NEED ───────────────────
+
+  qualify_timeline: {
+    id: 'qualify_timeline',
+    title: 'Qualify ② Timeline / Immediate Need',
+    script: "And you're looking to get someone in fairly soon — within the next month or two, is that about right?",
+    waitForAnswer: true,
+    tip: "Core Gate 2 — immediate need. Get an explicit timeframe; never accept 'eventually.' If it's far out, don't bail — reframe and keep driving to the book.",
+    options: [
+      { label: 'Within ~2 months', next: 'qualify_offshore', type: 'positive' },
+      { label: '3+ months / no firm date', next: 'obj_timeline_far', type: 'objection' },
+      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
+    ],
+  },
+
+  // ── QUALIFICATION — CORE GATE 3: OPEN TO OFFSHORE ────────────────────────
+
+  qualify_offshore: {
+    id: 'qualify_offshore',
+    title: 'Qualify ③ Open to Offshore',
+    script: "And you're open to an offshore setup for this type of talent, typically based in the Philippines? Right?",
+    waitForAnswer: true,
+    tip: "Core Gate 3 — open to offshore, the most-skipped one. Ask it directly. A clear yes = qualified. If they lean on-site, don't fold — handle it, don't end the call.",
+    options: [
+      { label: 'Yes — open to offshore', next: 'booking', type: 'positive' },
+      { label: 'Hesitant / prefers on-site', next: 'obj_need_inoffice', type: 'objection' },
+      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
+    ],
+  },
+
+  // ── QUALIFICATION — PULL TIMELINE INTO THE 1–2 MONTH WINDOW ──────────────
+
+  obj_timeline_far: {
+    id: 'obj_timeline_far',
+    title: 'Qualify: Bring Timeline Forward',
+    isObjection: true,
+    script: "Totally get it — most leaders think it's months out, but once they see the talent and pricing sitting ready, they usually move within weeks. If the right person was in front of you, would you be open to bringing them on in the next month or two?",
+    waitForAnswer: true,
+    tip: "Goal: pull the timeline into the ~2-month window so the QC qualifies instead of getting flagged — don't settle for a 'later' booking. Paint it: the talent's ready now, no lead time, no scramble later. Get them to say they'd move sooner; a strong DC then seals it. Never accept a flat 3+ months as the end of the road.",
+    options: [
+      { label: 'Yes — open to 1–2 months', next: 'qualify_offshore', type: 'positive' },
+      { label: 'Maybe, if the fit is right', next: 'qualify_offshore', type: 'positive' },
+      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
 
@@ -150,7 +225,7 @@ export const flow: Record<string, FlowNode> = {
     script: "Perfect — and that's exactly the scenario we help with every day.\n\nHere's what most business leaders don't realize: the roles they're hiring locally are available at world-class quality offshore — dedicated, full-time staff — at 50 to 80 percent of the cost. Not freelancers, not shared resources. One person, fully committed to your business, your hours, your systems.\n\nAnd before I called, I did some research on your company specifically...\n\n{geminiResearch}",
     tip: "Gap Selling: tie this directly to what they just shared. 'You mentioned hiring [role] takes time and costs are high — here's exactly what that looks like differently.' Then make savings concrete: 'If you're paying $60K locally for that role, offshore that's typically $12–18K. Three of those roles? You're saving over $100K a year.' Numbers they can picture beat percentages every time.",
     options: [
-      { label: 'Lead is engaged / curious', next: 'booking', type: 'positive' },
+      { label: 'Lead is engaged / curious', next: 'role_qualify', type: 'positive' },
       { label: 'Already outsourcing / need to think', next: 'obj_already_outsourcing', type: 'objection' },
       { label: 'Not interested / budget', next: 'obj_not_interested_late', type: 'objection' },
     ],
@@ -161,7 +236,7 @@ export const flow: Record<string, FlowNode> = {
   booking: {
     id: 'booking',
     title: 'Booking',
-    script: "\"That's perfect — especially since you're looking for that specific role. We can dive this deeper with our sourcing partners for a brief consultation. They'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours 80% on salary costs. Plus, as a thank-you for your time, we'll send you a $100 Amazon voucher right after the call. How's your calendar look in the next 3 days?\"",
+    script: "Perfect! Let's grab you a time while it's fresh. What does your calendar look like over the next couple of days?\n\n(they give a day/time)\n\nAwesome, I'll send the invite right over. The moment you accept it, a $10 Amazon voucher is on its way as a thank-you, and the remaining $50 lands right after we meet. Can I count on you to be there, {leadName}?",
     waitForAnswer: true,
     tip: "Schiffman: stay silent after the CTA — the next person to speak loses. If they ask 'morning or afternoon?', that's a yes. Pin down a specific date and time before hanging up. Reference the exact role and experience level they gave you earlier to make the ask feel personal.",
     options: [
@@ -175,11 +250,11 @@ export const flow: Record<string, FlowNode> = {
 
   booking_recap: {
     id: 'booking_recap',
-    title: 'Booking Recap + Commitment Lock',
-    script: "Brilliant — let me lock that in properly so we're both set.\n\n\"So we're looking at [NUMBER] full-time [ROLE]s — is that right?\" (confirm)\n\n\"And as the decision-maker, if the sourcing team shows you the right talent at the right price, you'd be in a position to move forward — is that fair to say?\" (confirm — if they say 'maybe' or 'it depends', ask: \"I just want to make sure the call is worth your time — if the fit is right, is there anything that would hold you back?\")\n\n\"The call is locked for [DAY, DATE] at [TIME] [TIMEZONE]. Can I count on you to be there?\"\n\n\"Perfect — sending the invite now. Once you accept, your $10 voucher is on the way, and the full $100 lands right after we meet on [DATE]. Looking forward to it, {leadName}!\"",
-    tip: "QA data: soft commitments = no-shows. You need three hard yeses before you hang up: (1) role and headcount confirmed, (2) decision-maker will move if the fit is right — re-ask if they give a conditional, (3) personal attendance locked. 'Probably' and 'should be fine' are not yeses. A soft yes here is a no-show on the day.",
+    title: 'Confirm Decision-Maker',
+    script: "\"And just to confirm — you're one of the decision-makers who'd be involved in moving forward once you've seen the talent and pricing?\"\n\n(if 'maybe' / 'it depends': \"No problem — who else would be part of that call? Let's get them on the invite too so nothing stalls.\")",
+    tip: "Booking already locked the time, invite, voucher and attendance — authority is the one gap left. Confirm they can actually move it forward; if not, get the name of who can and add them to the invite. A booked call with no decision-maker is a polite dead end.",
     options: [
-      { label: 'All three confirmed — solid booking', next: 'end_booked', type: 'positive' },
+      { label: 'Decision-maker confirmed', next: 'end_booked', type: 'positive' },
     ],
   },
 
@@ -286,7 +361,7 @@ export const flow: Record<string, FlowNode> = {
   obj_no_challenges: {
     id: 'obj_no_challenges',
     title: 'Objection: No Hiring Challenges',
-    script: "That's impressive — sounds like you've built a solid team and process.\n\nI'd still love to show you what we do, purely as a benchmarking exercise. Even if you're not looking to change anything, seeing the real cost comparison for your specific roles takes 15 minutes and gives you useful data either way.\n\nNo commitment at all — and we'll send a $100 Amazon voucher just for your time. Worth a quick look?",
+    script: "That's impressive — sounds like you've built a solid team and process.\n\nI'd still love to show you what we do, purely as a benchmarking exercise. Even if you're not looking to change anything, seeing the real cost comparison for your specific roles takes 15 minutes and gives you useful data either way.\n\nNo commitment at all — and we'll send a $60 Amazon voucher just for your time. Worth a quick look?",
     isObjection: true,
     tip: "Reciprocity (Psychology of Selling): frame the consultation as giving them something useful regardless of outcome — real salary benchmarking data. Lower the stakes completely: 'even if you don't change anything, you'll know your number.' The voucher is social proof of zero risk.",
     options: [
@@ -310,7 +385,7 @@ export const flow: Record<string, FlowNode> = {
   obj_already_outsourcing: {
     id: 'obj_already_outsourcing',
     title: 'Objection: Already Outsourcing / Need to Think',
-    script: "That's great — you already know the model works. Can I ask: are you happy with both the quality and the cost of your current setup, or is there room for improvement on either?\n\nThe reason I ask is most clients who come to us were already outsourcing — they just found our partners offered better talent at a lower cost. It's a quick benchmarking call, no commitment, and you'll know in 15 minutes whether there's an upgrade on the table.\n\nPlus the $100 Amazon voucher just for showing up.",
+    script: "That's great — you already know the model works. Can I ask: are you happy with both the quality and the cost of your current setup, or is there room for improvement on either?\n\nThe reason I ask is most clients who come to us were already outsourcing — they just found our partners offered better talent at a lower cost. It's a quick benchmarking call, no commitment, and you'll know in 15 minutes whether there's an upgrade on the table.\n\nPlus a $60 Amazon voucher just for showing up.",
     isObjection: true,
     tip: "Smart Calling: they're already sold on the concept — that's the hard part done. Your only job here is to make them curious about whether their current setup is optimal. 'Are you happy with both quality AND cost?' is a double-gate question — most people are happy with one but not both.",
     options: [
