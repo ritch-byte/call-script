@@ -107,16 +107,19 @@ body {
   flex: 1;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  gap: 8px;
+  padding: 0 12px;
   position: relative;
   z-index: 1;
+  min-width: 0;
 }
 
 .header-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .lead-name-input {
@@ -124,11 +127,12 @@ body {
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   color: var(--white);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
-  padding: 6px 12px;
-  width: 210px;
+  padding: 6px 10px;
+  width: 160px;
+  min-width: 0;
   transition: all 0.15s;
 }
 
@@ -147,15 +151,16 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.7);
-  padding: 6px 14px;
+  padding: 6px 10px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   transition: all 0.15s;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .btn-header-ghost:hover {
