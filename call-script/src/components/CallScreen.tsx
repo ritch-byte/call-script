@@ -26,6 +26,8 @@ const MAIN_FLOW = [
   'end_booked',
 ]
 
+const NETLIFY_BASE = 'https://silver-cuchufli-071209.netlify.app'
+
 function interpolate(text: string, leadName: string, yourName: string, geminiResearch: string, ctx: Context): string {
   return text
     .replace(/{leadName}/g, leadName || '[Lead Name]')
@@ -44,12 +46,18 @@ export default function CallScreen({ onReset }: Props) {
   const [showObjections, setShowObjections] = useState(false)
   const [showRates, setShowRates] = useState(false)
   const [showResearch, setShowResearch] = useState(false)
+  const [showEmail, setShowEmail] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
+  const [emailSubject, setEmailSubject] = useState('')
+  const [emailBody, setEmailBody] = useState('')
+  const [isGeneratingEmail, setIsGeneratingEmail] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const [emailCopied, setEmailCopied] = useState(false)
   const activeRef = useRef<HTMLDivElement>(null)
 
   const isGitHubPages = window.location.hostname.includes('github.io')
@@ -74,6 +82,11 @@ Output Format:
 Output ONLY the message itself, no preamble, no quotes around it. Use this exact structure:
 I researched [Company] and know you're a leader in the [Industry/Niche]. Given the [Complexity 1] and [Complexity 2] you face as a [Job Title], you're most likely focused on [Positive Goal 1] and [Positive Goal 2]. A great starting point to help is an offshore [Role 1] to [Task 1] or a [Role 2] to [Task 2]. Aside from the roles I've mentioned, what type of role do you think might also be suitable for offshore?`
 
+  const functionUrl = (name: string) =>
+    isGitHubPages
+      ? `${NETLIFY_BASE}/.netlify/functions/${name}`
+      : `/.netlify/functions/${name}`
+
   const generateSpiel = async () => {
     setIsGenerating(true)
     setGenError('')
@@ -84,7 +97,7 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
           setIsGenerating(false)
           return
         }
-        const res = await fetch('https://silver-cuchufli-071209.netlify.app/.netlify/functions/generate-spiel', {
+        const res = await fetch(functionUrl('generate-spiel'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ rawInput: rawInput.trim() }),
@@ -93,7 +106,7 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
         if (!res.ok) throw new Error(data.error || 'Generation failed')
         setGeminiResearch(data.spiel)
       } else {
-        const res = await fetch('/.netlify/functions/generate-spiel', {
+        const res = await fetch(functionUrl('generate-spiel'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ rawInput: rawInput.trim() }),
@@ -107,6 +120,41 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
     } finally {
       setIsGenerating(false)
     }
+  }
+
+  const generateEmail = async () => {
+    setIsGeneratingEmail(true)
+    setEmailError('')
+    setEmailSubject('')
+    setEmailBody('')
+    try {
+      const res = await fetch(functionUrl('generate-email'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadName: leadName.trim(),
+          yourName: yourName.trim(),
+          rawInput: rawInput.trim(),
+          spiel: geminiResearch.trim(),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Generation failed')
+      setEmailSubject(data.subject)
+      setEmailBody(data.body)
+    } catch (err) {
+      setEmailError(err instanceof Error ? err.message : 'Generation failed')
+    } finally {
+      setIsGeneratingEmail(false)
+    }
+  }
+
+  const copyEmail = () => {
+    const full = `Subject: ${emailSubject}\n\n${emailBody}`
+    navigator.clipboard.writeText(full).then(() => {
+      setEmailCopied(true)
+      setTimeout(() => setEmailCopied(false), 2000)
+    })
   }
 
   const goTo = (option: FlowOption) => {
@@ -162,6 +210,12 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
     activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [activeIdx])
 
+  const closeAllPanels = () => {
+    setShowRates(false)
+    setShowResearch(false)
+    setShowEmail(false)
+  }
+
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
   return (
@@ -191,15 +245,21 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
         <div className="header-actions">
           <button
             className={`btn-header-ghost${showRates ? ' btn-header-active' : ''}`}
-            onClick={() => { setShowRates(v => !v); setShowResearch(false) }}
+            onClick={() => { setShowRates(v => !v); setShowResearch(false); setShowEmail(false) }}
           >
             Rates
           </button>
           <button
             className={`btn-header-ghost${showResearch ? ' btn-header-active' : ''}`}
-            onClick={() => { setShowResearch(v => !v); setShowRates(false) }}
+            onClick={() => { setShowResearch(v => !v); setShowRates(false); setShowEmail(false) }}
           >
             Research
+          </button>
+          <button
+            className={`btn-header-ghost${showEmail ? ' btn-header-active' : ''}`}
+            onClick={() => { setShowEmail(v => !v); setShowRates(false); setShowResearch(false) }}
+          >
+            Email
           </button>
           <button className="btn-header-ghost" onClick={onReset}>
             Reset
@@ -267,6 +327,53 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
             onChange={e => setGeminiResearch(e.target.value)}
             rows={4}
           />
+        </div>
+      )}
+
+      {/* ── Email Panel ── */}
+      {showEmail && (
+        <div className="reference-bar">
+          <div className="reference-bar-header">
+            <span className="reference-bar-title">Follow-Up Email Generator</span>
+            <button className="btn-ref-close" onClick={() => setShowEmail(false)}>Close</button>
+          </div>
+          <div className="generator-form">
+            <div className="email-meta-row">
+              <span className="email-meta-hint">
+                Uses lead info, BDR name, and research already entered above.
+              </span>
+              <button
+                className="btn-generate"
+                onClick={generateEmail}
+                disabled={isGeneratingEmail}
+              >
+                {isGeneratingEmail ? 'Generating...' : emailBody ? 'Regenerate' : 'Generate Email'}
+              </button>
+            </div>
+            {emailError && <div className="gen-error">{emailError}</div>}
+          </div>
+          {emailBody && (
+            <div className="email-output">
+              <div className="email-subject-row">
+                <span className="email-field-label">Subject</span>
+                <input
+                  className="email-subject-input"
+                  value={emailSubject}
+                  onChange={e => setEmailSubject(e.target.value)}
+                />
+              </div>
+              <div className="email-field-label" style={{ marginTop: 8 }}>Body</div>
+              <textarea
+                className="research-input"
+                value={emailBody}
+                onChange={e => setEmailBody(e.target.value)}
+                rows={6}
+              />
+              <button className="btn-copy-email" onClick={copyEmail}>
+                {emailCopied ? 'Copied!' : 'Copy Email'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -402,7 +509,13 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
               {/* End state */}
               {isActive && node.isEnd && (
                 <div className="end-actions">
-                  <button className="btn-primary" onClick={onReset}>
+                  <button
+                    className="btn-primary"
+                    onClick={() => { setShowEmail(true); closeAllPanels(); setShowEmail(true) }}
+                  >
+                    Generate Follow-Up Email
+                  </button>
+                  <button className="btn-secondary" onClick={onReset}>
                     Start New Call
                   </button>
                 </div>

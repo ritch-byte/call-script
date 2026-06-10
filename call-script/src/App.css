@@ -371,6 +371,76 @@ body {
 }
 
 /* ─────────────────────────────────────────
+   EMAIL PANEL
+───────────────────────────────────────── */
+
+.email-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.email-meta-hint {
+  font-size: 12px;
+  color: var(--text-2);
+  flex: 1;
+}
+
+.email-output {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.email-subject-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.email-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.email-subject-input {
+  flex: 1;
+  padding: 7px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background: var(--white);
+  transition: border-color 0.15s;
+}
+.email-subject-input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+.btn-copy-email {
+  align-self: flex-end;
+  margin-top: 6px;
+  padding: 8px 20px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-copy-email:hover { background: #162699; }
+
+/* ─────────────────────────────────────────
    CALL FLOW — scrollable step timeline
 ───────────────────────────────────────── */
 
@@ -625,7 +695,7 @@ body {
 
 /* ── End Actions ── */
 
-.end-actions { padding: 18px 0 0; }
+.end-actions { padding: 18px 0 0; display: flex; flex-direction: column; gap: 0; }
 
 .btn-primary {
   width: 100%;
@@ -644,6 +714,23 @@ body {
 
 .btn-primary:hover:not(:disabled) { background: var(--blue-hover); }
 .btn-primary:disabled { background: var(--gray); cursor: not-allowed; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  color: var(--blue);
+  border: 1.5px solid var(--blue-muted);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.15s, border-color 0.15s;
+  letter-spacing: 0.01em;
+  margin-top: 8px;
+}
+.btn-secondary:hover { background: var(--blue-soft); border-color: var(--blue); }
 
 /* ── Coach Tip ── */
 
