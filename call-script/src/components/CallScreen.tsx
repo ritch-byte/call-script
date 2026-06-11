@@ -176,61 +176,6 @@ export default function CallScreen({ onReset }: Props) {
 
         <div className="email-page-body">
 
-          {/* ── Shared booking fields ── */}
-          <div className="email-booking-block">
-            <div className="email-booking-header-row">
-              <div className="email-booking-title">Booking Details</div>
-              <div className="cad-fg" style={{ width: 130, flexShrink: 0 }}>
-                <label className="cad-lbl">Lead's Timezone</label>
-                <input className="cad-input" value={sharedTz} onChange={e => setSharedTz(e.target.value)} placeholder="e.g. EST" />
-              </div>
-            </div>
-
-            <div className="email-booking-sp-section">
-              <div className="email-booking-sp-label">Source Partner 1</div>
-              <div className="email-booking-sp-row">
-                <div className="cad-fg">
-                  <label className="cad-lbl">SP Name</label>
-                  <input className="cad-input" value={sharedSp} onChange={e => setSharedSp(e.target.value)} placeholder="e.g. ConnectOS" />
-                </div>
-                <div className="cad-fg">
-                  <label className="cad-lbl">Date</label>
-                  <input className="cad-input" value={sharedDate} onChange={e => setSharedDate(e.target.value)} placeholder="e.g. June 14, 2026" />
-                </div>
-                <div className="cad-fg">
-                  <label className="cad-lbl">Time</label>
-                  <input className="cad-input" value={sharedTime} onChange={e => setSharedTime(e.target.value)} placeholder="e.g. 10:00 AM" />
-                </div>
-                <div className="cad-fg">
-                  <label className="cad-lbl">Meeting Link</label>
-                  <input className="cad-input" value={sharedLink} onChange={e => setSharedLink(e.target.value)} placeholder="https://meet.google.com/..." />
-                </div>
-              </div>
-            </div>
-
-            <div className="email-booking-sp-section email-booking-sp-section--optional">
-              <div className="email-booking-sp-label">Source Partner 2 <span className="email-booking-optional">(optional)</span></div>
-              <div className="email-booking-sp-row">
-                <div className="cad-fg">
-                  <label className="cad-lbl">SP Name</label>
-                  <input className="cad-input" value={sharedSp2} onChange={e => setSharedSp2(e.target.value)} placeholder="e.g. Sourcefit" />
-                </div>
-                <div className="cad-fg">
-                  <label className="cad-lbl">Date</label>
-                  <input className="cad-input" value={sharedDate2} onChange={e => setSharedDate2(e.target.value)} placeholder="same as SP1 if blank" />
-                </div>
-                <div className="cad-fg">
-                  <label className="cad-lbl">Time</label>
-                  <input className="cad-input" value={sharedTime2} onChange={e => setSharedTime2(e.target.value)} placeholder="same as SP1 if blank" />
-                </div>
-                <div className="cad-fg">
-                  <label className="cad-lbl">Meeting Link</label>
-                  <input className="cad-input" value={sharedLink2} onChange={e => setSharedLink2(e.target.value)} placeholder="https://meet.google.com/..." />
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* ── Intro Email ── */}
           <div className="email-section-hd">
             <span className="email-section-title">Intro Email</span>
