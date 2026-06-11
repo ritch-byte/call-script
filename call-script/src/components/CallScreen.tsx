@@ -16,7 +16,6 @@ type StepEntry = {
   chosenLabel?: string
 }
 
-// The main positive call path — always pre-rendered so the caller can see the full script
 const MAIN_FLOW = [
   'opening',
   'pitch_q1',
@@ -47,7 +46,7 @@ export default function CallScreen({ onReset }: Props) {
   const [showObjections, setShowObjections] = useState(false)
   const [showRates, setShowRates] = useState(false)
   const [showResearch, setShowResearch] = useState(false)
-  const [showEmail, setShowEmail] = useState(false)
+  const [emailPageOpen, setEmailPageOpen] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
@@ -65,25 +64,6 @@ export default function CallScreen({ onReset }: Props) {
   const isGitHubPages = window.location.hostname.includes('github.io')
   const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY as string | undefined
 
-  const SPIEL_PROMPT = (input: string) => `Role: You are an expert B2B Sales Development Representative specializing in offshore staffing solutions.
-
-Goal: Write a short, hyper-personalized outreach message based on a prospect's Job Title and Company.
-
-The following is raw information about the prospect (may include job title, company name, website, or other details in any format — extract the company name and job title from it):
-${input}
-
-Instructions & Guidelines:
-Analyze the Company: Briefly infer their industry and verify their prestige (e.g., "leader in...").
-Analyze the Role: Based strictly on their Job Title, identify 2 high-level complexities or responsibilities they likely face.
-Positive Framing (Crucial): Do not frame these as "problems" or "pain points." Frame them as "complexities" that lead to a desire for enhancement or growth (e.g., instead of "struggling with workload," use "focused on enhancing operational efficiency").
-The Solution: Suggest 2 specific offshore roles that would logically support the complexities you identified. Briefly state what each role does.
-Length: Keep it under 80 words.
-Tone: Professional, knowledgeable, and helpful.
-
-Output Format:
-Output ONLY the message itself, no preamble, no quotes around it. Use this exact structure:
-I researched [Company] and know you're a leader in the [Industry/Niche]. Given the [Complexity 1] and [Complexity 2] you face as a [Job Title], you're most likely focused on [Positive Goal 1] and [Positive Goal 2]. A great starting point to help is an offshore [Role 1] to [Task 1] or a [Role 2] to [Task 2]. Aside from the roles I've mentioned, what type of role do you think might also be suitable for offshore?`
-
   const functionUrl = (name: string) =>
     isGitHubPages
       ? `${NETLIFY_BASE}/.netlify/functions/${name}`
@@ -93,30 +73,14 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
     setIsGenerating(true)
     setGenError('')
     try {
-      if (isGitHubPages) {
-        if (!GEMINI_KEY) {
-          setGenError('Gemini key not configured — contact your admin')
-          setIsGenerating(false)
-          return
-        }
-        const res = await fetch(functionUrl('generate-spiel'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rawInput: rawInput.trim() }),
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'Generation failed')
-        setGeminiResearch(data.spiel)
-      } else {
-        const res = await fetch(functionUrl('generate-spiel'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rawInput: rawInput.trim() }),
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'Generation failed')
-        setGeminiResearch(data.spiel)
-      }
+      const res = await fetch(functionUrl('generate-spiel'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rawInput: rawInput.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Generation failed')
+      setGeminiResearch(data.spiel)
     } catch (err) {
       setGenError(err instanceof Error ? err.message : 'Generation failed')
     } finally {
@@ -161,26 +125,17 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
 
   const goTo = (option: FlowOption) => {
     if (option.capture) setContext(prev => ({ ...prev, ...option.capture }))
-
     const nextId = option.next
     const updatedSteps = [...steps]
-
-    // Record the choice on the current step
     updatedSteps[activeIdx] = { ...updatedSteps[activeIdx], chosenLabel: option.label }
-
-    // Is the next node already pre-rendered ahead of us?
     const aheadIdx = updatedSteps.findIndex((s, i) => i > activeIdx && s.nodeId === nextId)
-
     let nextActive: number
     if (aheadIdx !== -1) {
-      // Jump to the pre-rendered step (positive flow advance)
       nextActive = aheadIdx
     } else {
-      // Inject new step right after current (objection handler or alternate branch)
       updatedSteps.splice(activeIdx + 1, 0, { nodeId: nextId })
       nextActive = activeIdx + 1
     }
-
     setSteps(updatedSteps)
     setActiveIdx(nextActive)
     setShowObjections(false)
@@ -189,37 +144,100 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
 
   const goBack = () => {
     if (activeIdx <= 0) return
-
     const updatedSteps = [...steps]
-
-    // If the current step was injected (not in the original main flow), remove it
     const isInjected = !MAIN_FLOW.includes(updatedSteps[activeIdx].nodeId)
-    if (isInjected) {
-      updatedSteps.splice(activeIdx, 1)
-    }
-
-    // Clear the chosen label on the step we're returning to
+    if (isInjected) updatedSteps.splice(activeIdx, 1)
     const prevIdx = activeIdx - 1
     updatedSteps[prevIdx] = { ...updatedSteps[prevIdx], chosenLabel: undefined }
-
     setSteps(updatedSteps)
     setActiveIdx(prevIdx)
     setShowObjections(false)
   }
 
-  // Scroll active step into view whenever it changes
   useEffect(() => {
     activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [activeIdx])
 
-  const closeAllPanels = () => {
-    setShowRates(false)
-    setShowResearch(false)
-    setShowEmail(false)
-  }
-
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
+  // ── Email Generator full-page view ──────────────────────────────────────
+  if (emailPageOpen) {
+    return (
+      <div className="call-screen">
+        <div className="email-page-header">
+          <button className="email-page-back" onClick={() => setEmailPageOpen(false)}>
+            ← Back to Call
+          </button>
+          <span className="email-page-title">Email Generator</span>
+          <div className="email-page-tabs">
+            <button
+              className={`email-tab-btn${emailTab === 'spconfirm' ? ' email-tab-btn--active' : ''}`}
+              onClick={() => setEmailTab('spconfirm')}
+            >
+              Intro Email
+            </button>
+            <button
+              className={`email-tab-btn${emailTab === 'followup' ? ' email-tab-btn--active' : ''}`}
+              onClick={() => setEmailTab('followup')}
+            >
+              Follow-Up
+            </button>
+          </div>
+        </div>
+
+        <div className="email-page-body">
+          {emailTab === 'spconfirm' && (
+            <SPEmailPanel
+              leadName={leadName}
+              rawInput={rawInput}
+              geminiResearch={geminiResearch}
+            />
+          )}
+
+          {emailTab === 'followup' && (
+            <div className="followup-page-content">
+              <p className="followup-hint">Uses the lead info, BDR name, and research you already entered on the call screen.</p>
+              <div className="email-meta-row">
+                <span className="email-meta-hint" />
+                <button
+                  className="btn-generate"
+                  onClick={generateEmail}
+                  disabled={isGeneratingEmail}
+                >
+                  {isGeneratingEmail ? 'Generating...' : emailBody ? 'Regenerate' : 'Generate Email'}
+                </button>
+              </div>
+              {emailError && <div className="gen-error">{emailError}</div>}
+              {emailBody && (
+                <div className="email-output" style={{ marginTop: 16 }}>
+                  <div className="email-subject-row">
+                    <span className="email-field-label">Subject</span>
+                    <input
+                      className="email-subject-input"
+                      value={emailSubject}
+                      onChange={e => setEmailSubject(e.target.value)}
+                    />
+                  </div>
+                  <div className="email-field-label" style={{ marginTop: 12 }}>Body</div>
+                  <textarea
+                    className="research-input"
+                    value={emailBody}
+                    onChange={e => setEmailBody(e.target.value)}
+                    rows={8}
+                  />
+                  <button className="btn-copy-email" onClick={copyEmail}>
+                    {emailCopied ? 'Copied!' : 'Copy Email'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // ── Normal call screen ───────────────────────────────────────────────────
   return (
     <div className="call-screen">
 
@@ -247,19 +265,19 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
         <div className="header-actions">
           <button
             className={`btn-header-ghost${showRates ? ' btn-header-active' : ''}`}
-            onClick={() => { setShowRates(v => !v); setShowResearch(false); setShowEmail(false) }}
+            onClick={() => { setShowRates(v => !v); setShowResearch(false) }}
           >
             Rates
           </button>
           <button
             className={`btn-header-ghost${showResearch ? ' btn-header-active' : ''}`}
-            onClick={() => { setShowResearch(v => !v); setShowRates(false); setShowEmail(false) }}
+            onClick={() => { setShowResearch(v => !v); setShowRates(false) }}
           >
             Research
           </button>
           <button
-            className={`btn-header-ghost${showEmail ? ' btn-header-active' : ''}`}
-            onClick={() => { setShowEmail(v => !v); setShowRates(false); setShowResearch(false) }}
+            className="btn-header-ghost"
+            onClick={() => setEmailPageOpen(true)}
           >
             Email Generator
           </button>
@@ -307,7 +325,7 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
             <div className="gen-fields">
               <textarea
                 className="gen-paste-input"
-                placeholder={"Paste lead info here — Job Title, Company Name, Website"}
+                placeholder="Paste lead info here — Job Title, Company Name, Website"
                 value={rawInput}
                 onChange={e => setRawInput(e.target.value)}
                 rows={2}
@@ -329,79 +347,6 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
             onChange={e => setGeminiResearch(e.target.value)}
             rows={4}
           />
-        </div>
-      )}
-
-      {/* ── Email Panel ── */}
-      {showEmail && (
-        <div className="reference-bar">
-          <div className="reference-bar-header">
-            <div className="email-panel-tabs">
-              <button
-                className={`email-tab-btn${emailTab === 'spconfirm' ? ' email-tab-btn--active' : ''}`}
-                onClick={() => setEmailTab('spconfirm')}
-              >
-                Intro Email
-              </button>
-              <button
-                className={`email-tab-btn${emailTab === 'followup' ? ' email-tab-btn--active' : ''}`}
-                onClick={() => setEmailTab('followup')}
-              >
-                Follow-Up
-              </button>
-            </div>
-            <button className="btn-ref-close" onClick={() => setShowEmail(false)}>Close</button>
-          </div>
-
-          {emailTab === 'followup' && (
-            <>
-              <div className="generator-form">
-                <div className="email-meta-row">
-                  <span className="email-meta-hint">
-                    Uses lead info, BDR name, and research already entered above.
-                  </span>
-                  <button
-                    className="btn-generate"
-                    onClick={generateEmail}
-                    disabled={isGeneratingEmail}
-                  >
-                    {isGeneratingEmail ? 'Generating...' : emailBody ? 'Regenerate' : 'Generate Email'}
-                  </button>
-                </div>
-                {emailError && <div className="gen-error">{emailError}</div>}
-              </div>
-              {emailBody && (
-                <div className="email-output">
-                  <div className="email-subject-row">
-                    <span className="email-field-label">Subject</span>
-                    <input
-                      className="email-subject-input"
-                      value={emailSubject}
-                      onChange={e => setEmailSubject(e.target.value)}
-                    />
-                  </div>
-                  <div className="email-field-label" style={{ marginTop: 8 }}>Body</div>
-                  <textarea
-                    className="research-input"
-                    value={emailBody}
-                    onChange={e => setEmailBody(e.target.value)}
-                    rows={6}
-                  />
-                  <button className="btn-copy-email" onClick={copyEmail}>
-                    {emailCopied ? 'Copied!' : 'Copy Email'}
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-
-          {emailTab === 'spconfirm' && (
-            <SPEmailPanel
-              leadName={leadName}
-              rawInput={rawInput}
-              geminiResearch={geminiResearch}
-            />
-          )}
         </div>
       )}
 
@@ -435,7 +380,6 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
               className={cardClass}
               ref={isActive ? activeRef : null}
             >
-              {/* Step header */}
               <div className="step-header-row">
                 <span className="step-num">{idx + 1}</span>
                 <span className="step-label">
@@ -451,7 +395,6 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
                 )}
               </div>
 
-              {/* Wait indicator */}
               {node.waitForAnswer && isActive && (
                 <div className="wait-indicator">
                   <span className="pulse" />
@@ -459,14 +402,12 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
                 </div>
               )}
 
-              {/* Script text — always visible */}
               <div className="script-text">
                 {script.split('\n').map((line, i) =>
                   line ? <p key={i}>{line}</p> : <br key={i} />
                 )}
               </div>
 
-              {/* Inline research form — value_prop and obj_no_role steps, active only */}
               {(['value_prop', 'obj_no_role'].includes(step.nodeId)) && isActive && (
                 <div className="inline-research-form">
                   {!geminiResearch ? (
@@ -491,17 +432,13 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
                       {genError && <div className="gen-error">{genError}</div>}
                     </>
                   ) : (
-                    <button
-                      className="btn-regenerate"
-                      onClick={() => setGeminiResearch('')}
-                    >
+                    <button className="btn-regenerate" onClick={() => setGeminiResearch('')}>
                       Regenerate Research
                     </button>
                   )}
                 </div>
               )}
 
-              {/* Coach tip — active only */}
               {node.tip && isActive && (
                 <div className="coach-tip">
                   <div className="coach-tip-label">Coach Tip</div>
@@ -509,14 +446,13 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
                 </div>
               )}
 
-              {/* Response buttons — active non-end steps only */}
               {isActive && !node.isEnd && (
                 <div className="options-section">
                   <div className="options-label">Lead responds:</div>
                   <div className="options-grid">
                     {node.options.map(opt => {
                       const cls =
-                        opt.type === 'end'      ? ' btn-option--danger'
+                        opt.type === 'end'       ? ' btn-option--danger'
                         : opt.type === 'objection' ? ' btn-option--warn'
                         : opt.type === 'positive'  ? ' btn-option--positive'
                         : ''
@@ -534,12 +470,11 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
                 </div>
               )}
 
-              {/* End state */}
               {isActive && node.isEnd && (
                 <div className="end-actions">
                   <button
                     className="btn-primary"
-                    onClick={() => { setShowEmail(true); closeAllPanels(); setShowEmail(true) }}
+                    onClick={() => { setEmailTab('followup'); setEmailPageOpen(true) }}
                   >
                     Generate Follow-Up Email
                   </button>
