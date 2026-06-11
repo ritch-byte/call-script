@@ -1316,6 +1316,16 @@ body {
   border-radius: 10px;
   padding: 14px 16px 16px;
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.email-booking-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .email-booking-title {
@@ -1325,13 +1335,46 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--blue);
-  margin-bottom: 10px;
 }
 
-.email-booking-fields {
+.email-booking-sp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.email-booking-sp-section--optional {
+  border-top-style: dashed;
+  border-top-color: var(--blue-muted);
+}
+
+.email-booking-sp-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--blue-dark);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.email-booking-optional {
+  font-weight: 400;
+  text-transform: none;
+  font-size: 10px;
+  color: var(--text-2);
+  letter-spacing: 0;
+}
+
+.email-booking-sp-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px 12px;
+  grid-template-columns: 1.1fr 1.3fr 0.9fr 2fr;
+  gap: 8px 10px;
+}
+
+@media (max-width: 640px) {
+  .email-booking-sp-row { grid-template-columns: 1fr 1fr; }
 }
 
 .cad-fg--wide2 { grid-column: span 2; }

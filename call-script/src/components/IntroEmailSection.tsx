@@ -5,10 +5,11 @@ interface Props {
   leadName: string
   rawInput: string
   geminiResearch: string
-  bookingPrefill: string
+  sp1BookingPrefill: string
+  sp2BookingPrefill: string
 }
 
-export default function IntroEmailSection({ leadName, rawInput, geminiResearch, bookingPrefill }: Props) {
+export default function IntroEmailSection({ leadName, rawInput, geminiResearch, sp1BookingPrefill, sp2BookingPrefill }: Props) {
   const [conversation, setConversation] = useState(() => {
     const parts: string[] = []
     if (leadName) parts.push(`Lead name: ${leadName}`)
@@ -32,11 +33,11 @@ export default function IntroEmailSection({ leadName, rawInput, geminiResearch, 
       <div className="intro-email-cols">
         <div className="intro-email-col">
           <div className="intro-email-col-title">Source Partner 1</div>
-          <SPEmailPanel conversation={conversation} bookingPrefill={bookingPrefill} />
+          <SPEmailPanel conversation={conversation} bookingPrefill={sp1BookingPrefill} />
         </div>
         <div className="intro-email-col">
           <div className="intro-email-col-title">Source Partner 2</div>
-          <SPEmailPanel conversation={conversation} bookingPrefill={bookingPrefill} />
+          <SPEmailPanel conversation={conversation} bookingPrefill={sp2BookingPrefill} />
         </div>
       </div>
     </div>

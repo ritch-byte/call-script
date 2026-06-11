@@ -8,6 +8,10 @@ interface Props {
   time: string
   tz: string
   link: string
+  sp2?: string
+  date2?: string
+  time2?: string
+  link2?: string
 }
 
 const CHANNEL_COLOR: Record<string, string> = {
@@ -25,26 +29,29 @@ function Badge({ ch }: { ch: string }) {
   )
 }
 
-export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz, link }: Props) {
-  const [p2n, setP2n]   = useState('')
-  const [p2dt, setP2dt] = useState('')
-  const [p2lk, setP2lk] = useState('')
+export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz, link, sp2, date2, time2, link2 }: Props) {
   const [copied, setCopied] = useState('')
-  const [showP2, setShowP2] = useState(false)
 
   const L  = leadName || '[Lead Name]'
   const Y  = yourName || '[Your Name]'
-  const SP = sp   || '[SP Company Name]'
+  const SP = sp   || '[SP Name]'
   const D  = date || '[Date]'
   const T  = time || '[Time]'
-  const TZ = tz   || "[Lead's Timezone]"
+  const TZ = tz   || ''
   const LK = link || '[Meeting Link]'
 
-  const partnerBlock = () => {
-    let out = `${SP} - ${T} on ${D}: ${LK}`
-    if (p2n) out += `\n${p2n} - ${p2dt || '[Time and Date]'}: ${p2lk || '[Link]'}`
-    return out
-  }
+  const hasSp2 = Boolean(sp2)
+  const SP2 = sp2 || ''
+  const D2  = date2 || date || '[Date 2]'
+  const T2  = time2 || time || '[Time 2]'
+  const LK2 = link2 || '[Meeting Link 2]'
+
+  const spLine = (name: string, d: string, t: string, lk: string) =>
+    `${name} ${[d, t, TZ].filter(Boolean).join(' ')} - ${lk}`
+
+  const meetingList = hasSp2
+    ? `${spLine(SP, D, T, LK)}\n${spLine(SP2, D2, T2, LK2)}`
+    : spLine(SP, D, T, LK)
 
   const flash = (key: string) => {
     setCopied(key)
@@ -63,41 +70,43 @@ export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz
     flash(key)
   }
 
+  const s = hasSp2 ? 's' : ''
+
   const steps = [
     {
       id: 's1',
       title: 'Step 1 — Immediately After Booking',
       timing: 'Right after successfully booking the lead',
       channels: ['TEXT'],
-      text: `Hi ${L}, this is ${Y} again from Outsource Accelerator. Thank you so much for your time earlier.\n\nI've successfully sent the calendar invites and would appreciate it if you'll accept them by clicking "yes" to confirm your attendance.\n\nPlease refer to your meeting details below:\n${SP}\n${D} at ${T} ${TZ}\n${LK}\n\nLooking forward to our meeting on ${D}!`,
+      text: `Hi ${L}, this is ${Y} again from Outsource Accelerator. Thank you so much for your time earlier.\n\nI've successfully sent the calendar invites and would appreciate it if you'll accept them by clicking "yes" to confirm your attendance.\n\nPlease refer to your meeting details below:\n${meetingList}\n\nLooking forward to our meeting${s} on ${D}!`,
     },
     {
       id: 's2',
       title: 'Step 2 — 3 Days Before Meeting',
       timing: '72 hours prior',
       channels: ['EMAIL'],
-      text: `Hi ${L},\n\nJust sending a friendly reminder about our upcoming business meeting with ${SP} scheduled at ${T} on ${D}.\n\nFor easy access, you can use this link to join: ${LK}\n\nLooking forward to our quick chat on ${D}.`,
+      text: `Hi ${L},\n\nJust sending a friendly reminder about your upcoming meeting${s} with our outsourcing partner${s}:\n\n${meetingList}\n\nLooking forward to our quick chat on ${D}!`,
     },
     {
       id: 's3',
       title: 'Step 3 — 1 Day Before Meeting',
       timing: '24 hours prior',
       channels: ['TEXT', 'EMAIL', 'LinkedIn'],
-      text: `Hi ${L},\n\nI hope you've been well. This is just a gentle reminder for your upcoming meeting/s tomorrow, ${D}.\n\n${partnerBlock()}\n\nWe're looking forward to speaking with you!`,
+      text: `Hi ${L},\n\nI hope you've been well. This is just a gentle reminder for your upcoming meeting${s} tomorrow, ${D}.\n\n${meetingList}\n\nWe're looking forward to speaking with you!`,
     },
     {
       id: 's4',
       title: 'Step 4 — 1 Hour Before Meeting',
       timing: '60 minutes prior',
       channels: ['TEXT', 'EMAIL'],
-      text: `Hi ${L},\n\nWe're thrilled about your upcoming meetings with our top outsourcing partners today! This is an incredible opportunity for you to explore tailored outsourcing solutions for your business.\n\nHere's the schedule:\n${partnerBlock()}\n\nWe're confident you'll find these discovery calls insightful and valuable.\n\nSee you later!`,
+      text: `Hi ${L},\n\nWe're thrilled about your upcoming meeting${s} with our top outsourcing partner${s} today! This is an incredible opportunity for you to explore tailored outsourcing solutions for your business.\n\n${meetingList}\n\nWe're confident you'll find these discovery calls insightful and valuable.\n\nSee you later!`,
     },
     {
       id: 's5',
       title: 'Step 5 — 3 Minutes Before Meeting',
       timing: '3 minutes prior — you MUST be in the virtual meeting room',
       channels: ['TEXT', 'EMAIL'],
-      text: `Hi ${L},\n\nJust wanted to let you know that I'm in the meeting room now.\n\nFeel free to join the meeting using this link: ${LK}\n\nLooking forward to speaking with you soon!`,
+      text: `Hi ${L},\n\nJust wanted to let you know that I'm in the meeting room now.\n\n${meetingList}\n\nLooking forward to speaking with you soon!`,
     },
   ]
 
@@ -118,7 +127,7 @@ export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz
       id: 'ns3',
       label: 'Action 3 — Minute 5',
       channels: ['TEXT', 'EMAIL'],
-      text: `Hi ${L}, just following up. Our meeting was scheduled for 5 minutes ago. Are you having any trouble with the link? ${LK}`,
+      text: `Hi ${L}, just following up. Our meeting was scheduled for 5 minutes ago. Are you having any trouble with the link?\n\n${meetingList}`,
     },
     {
       id: 'ns4',
@@ -130,29 +139,6 @@ export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz
 
   return (
     <div className="cad-wrap">
-
-      {/* 2nd partner (optional, for steps 3 & 4) */}
-      <button className="cad-p2-toggle" onClick={() => setShowP2(v => !v)}>
-        {showP2 ? '− Hide' : '+ Add'} 2nd Partner <span className="cad-p2-hint">(for Steps 3 & 4)</span>
-      </button>
-      {showP2 && (
-        <div className="cad-fields cad-fields--p2">
-          <div className="cad-fg">
-            <label className="cad-lbl">Partner 2 Name</label>
-            <input className="cad-input" value={p2n} onChange={e => setP2n(e.target.value)} placeholder="e.g. Sourcefit" />
-          </div>
-          <div className="cad-fg">
-            <label className="cad-lbl">P2 Time & Date</label>
-            <input className="cad-input" value={p2dt} onChange={e => setP2dt(e.target.value)} placeholder="e.g. 11:00 AM, June 14" />
-          </div>
-          <div className="cad-fg cad-fg--wide">
-            <label className="cad-lbl">P2 Meeting Link</label>
-            <input className="cad-input" value={p2lk} onChange={e => setP2lk(e.target.value)} placeholder="https://..." />
-          </div>
-        </div>
-      )}
-
-      {/* Steps 1–5 */}
       <div className="cad-steps">
         {steps.map(step => (
           <div key={step.id} className="cad-step">
