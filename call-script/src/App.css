@@ -1312,3 +1312,213 @@ body {
   margin-bottom: 14px;
   line-height: 1.5;
 }
+
+/* ─────────────────────────────────────────
+   FOLLOW UP CADENCE
+───────────────────────────────────────── */
+
+.cad-wrap {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cad-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 12px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.cad-fields--p2 {
+  margin-top: 8px;
+  background: var(--bg);
+  border-color: var(--blue-muted);
+}
+
+.cad-fg { display: flex; flex-direction: column; gap: 4px; }
+.cad-fg--wide { grid-column: span 3; }
+
+.cad-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.cad-input {
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background: var(--white);
+  transition: border-color 0.15s;
+}
+.cad-input:focus { outline: none; border-color: var(--blue); background: var(--white); }
+
+.cad-p2-toggle {
+  background: none;
+  border: 1.5px dashed var(--blue-muted);
+  border-radius: 7px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  margin-bottom: 10px;
+  transition: background 0.13s;
+}
+.cad-p2-toggle:hover { background: var(--blue-soft); }
+.cad-p2-hint { font-weight: 400; color: var(--text-2); }
+
+/* Steps list */
+
+.cad-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cad-step {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--blue);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cad-step--noshow {
+  border-left-color: #dc2626;
+}
+
+.cad-step-hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px 10px;
+  flex-wrap: wrap;
+}
+
+.cad-step-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cad-step-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.cad-step--noshow .cad-step-title { color: #b91c1c; }
+
+.cad-step-timing {
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.cad-step-timing--warn {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.cad-step-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.cad-badges {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.cad-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+}
+
+.cad-copy {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1.5px solid var(--blue-muted);
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  transition: all 0.13s;
+}
+.cad-copy:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+.cad-copy--sm { padding: 4px 10px; font-size: 11px; }
+
+.cad-tpl {
+  margin: 0;
+  padding: 10px 14px 14px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.cad-tpl--sm { font-size: 12.5px; padding: 8px 14px 10px; }
+
+/* No-show sub-actions */
+
+.cad-noshow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cad-noshow-action {
+  border-top: 1px solid var(--border);
+}
+
+.cad-noshow-action:first-child { border-top: none; }
+
+.cad-noshow-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px 6px;
+  flex-wrap: wrap;
+}
+
+.cad-noshow-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #b91c1c;
+  font-family: 'DM Sans', sans-serif;
+}

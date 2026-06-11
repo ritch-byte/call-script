@@ -3,6 +3,7 @@ import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE } from '../data/f
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import SPEmailPanel from './SPEmailPanel'
+import FollowUpCadence from './FollowUpCadence'
 
 interface Props {
   callData: CallData
@@ -54,15 +55,9 @@ export default function CallScreen({ onReset }: Props) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
   const [emailTab, setEmailTab] = useState<'followup' | 'spconfirm'>('spconfirm')
-  const [emailSubject, setEmailSubject] = useState('')
-  const [emailBody, setEmailBody] = useState('')
-  const [isGeneratingEmail, setIsGeneratingEmail] = useState(false)
-  const [emailError, setEmailError] = useState('')
-  const [emailCopied, setEmailCopied] = useState(false)
   const activeRef = useRef<HTMLDivElement>(null)
 
   const isGitHubPages = window.location.hostname.includes('github.io')
-  const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY as string | undefined
 
   const functionUrl = (name: string) =>
     isGitHubPages
@@ -86,41 +81,6 @@ export default function CallScreen({ onReset }: Props) {
     } finally {
       setIsGenerating(false)
     }
-  }
-
-  const generateEmail = async () => {
-    setIsGeneratingEmail(true)
-    setEmailError('')
-    setEmailSubject('')
-    setEmailBody('')
-    try {
-      const res = await fetch(functionUrl('generate-email'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          leadName: leadName.trim(),
-          yourName: yourName.trim(),
-          rawInput: rawInput.trim(),
-          spiel: geminiResearch.trim(),
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Generation failed')
-      setEmailSubject(data.subject)
-      setEmailBody(data.body)
-    } catch (err) {
-      setEmailError(err instanceof Error ? err.message : 'Generation failed')
-    } finally {
-      setIsGeneratingEmail(false)
-    }
-  }
-
-  const copyEmail = () => {
-    const full = `Subject: ${emailSubject}\n\n${emailBody}`
-    navigator.clipboard.writeText(full).then(() => {
-      setEmailCopied(true)
-      setTimeout(() => setEmailCopied(false), 2000)
-    })
   }
 
   const goTo = (option: FlowOption) => {
@@ -180,7 +140,7 @@ export default function CallScreen({ onReset }: Props) {
               className={`email-tab-btn${emailTab === 'followup' ? ' email-tab-btn--active' : ''}`}
               onClick={() => setEmailTab('followup')}
             >
-              Follow-Up
+              Follow Up Cadence
             </button>
           </div>
         </div>
@@ -195,42 +155,7 @@ export default function CallScreen({ onReset }: Props) {
           )}
 
           {emailTab === 'followup' && (
-            <div className="followup-page-content">
-              <p className="followup-hint">Uses the lead info, BDR name, and research you already entered on the call screen.</p>
-              <div className="email-meta-row">
-                <span className="email-meta-hint" />
-                <button
-                  className="btn-generate"
-                  onClick={generateEmail}
-                  disabled={isGeneratingEmail}
-                >
-                  {isGeneratingEmail ? 'Generating...' : emailBody ? 'Regenerate' : 'Generate Email'}
-                </button>
-              </div>
-              {emailError && <div className="gen-error">{emailError}</div>}
-              {emailBody && (
-                <div className="email-output" style={{ marginTop: 16 }}>
-                  <div className="email-subject-row">
-                    <span className="email-field-label">Subject</span>
-                    <input
-                      className="email-subject-input"
-                      value={emailSubject}
-                      onChange={e => setEmailSubject(e.target.value)}
-                    />
-                  </div>
-                  <div className="email-field-label" style={{ marginTop: 12 }}>Body</div>
-                  <textarea
-                    className="research-input"
-                    value={emailBody}
-                    onChange={e => setEmailBody(e.target.value)}
-                    rows={8}
-                  />
-                  <button className="btn-copy-email" onClick={copyEmail}>
-                    {emailCopied ? 'Copied!' : 'Copy Email'}
-                  </button>
-                </div>
-              )}
-            </div>
+            <FollowUpCadence leadName={leadName} yourName={yourName} />
           )}
         </div>
       </div>
@@ -476,7 +401,7 @@ export default function CallScreen({ onReset }: Props) {
                     className="btn-primary"
                     onClick={() => { setEmailTab('followup'); setEmailPageOpen(true) }}
                   >
-                    Generate Follow-Up Email
+                    Follow Up Cadence
                   </button>
                   <button className="btn-secondary" onClick={onReset}>
                     Start New Call
