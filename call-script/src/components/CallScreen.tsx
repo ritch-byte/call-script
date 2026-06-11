@@ -128,21 +128,32 @@ export default function CallScreen({ onReset }: Props) {
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
-  // ── Sync SP name + link from intro email panels back to shared booking state ──
+  // ── Sync SP name, date, time, link from intro email panels back to shared booking state ──
   const extractLink = (text: string) =>
     text.match(/https?:\/\/[^\s]+/)?.[0]?.replace(/[.,;!?]$/, '') ?? ''
 
-  const handleSp1Sync = (name: string, bookingText: string) => {
-    if (name) setSharedSp(name)
-    const lk = extractLink(bookingText)
-    if (lk) setSharedLink(lk)
+  const extractTime = (text: string) =>
+    text.match(/\b\d{1,2}:\d{2}\s*(?:am|pm)(?:\s+[A-Z]{2,5})?\b/i)?.[0]?.trim() ?? ''
+
+  const extractDate = (text: string) =>
+    text.match(/\b(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\w*[,\s]+)?(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*[\s.]+\d{1,2}(?:[,\s]+\d{4})?\b/i)?.[0]?.trim() ?? ''
+
+  const syncBooking = (
+    name: string, bookingText: string,
+    setName: (v: string) => void, setLk: (v: string) => void,
+    setT: (v: string) => void, setD: (v: string) => void,
+  ) => {
+    if (name) setName(name)
+    const lk = extractLink(bookingText); if (lk) setLk(lk)
+    const t  = extractTime(bookingText);  if (t)  setT(t)
+    const d  = extractDate(bookingText);  if (d)  setD(d)
   }
 
-  const handleSp2Sync = (name: string, bookingText: string) => {
-    if (name) setSharedSp2(name)
-    const lk = extractLink(bookingText)
-    if (lk) setSharedLink2(lk)
-  }
+  const handleSp1Sync = (name: string, bt: string) =>
+    syncBooking(name, bt, setSharedSp, setSharedLink, setSharedTime, setSharedDate)
+
+  const handleSp2Sync = (name: string, bt: string) =>
+    syncBooking(name, bt, setSharedSp2, setSharedLink2, setSharedTime2, setSharedDate2)
 
   // ── Email Generator full-page view ──────────────────────────────────────
   const mkPrefill = (d: string, t: string, lk: string) => [
