@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
-import SPEmailPanel from './SPEmailPanel'
+import IntroEmailSection from './IntroEmailSection'
 import FollowUpCadence from './FollowUpCadence'
 
 interface Props {
@@ -172,9 +172,9 @@ export default function CallScreen({ onReset }: Props) {
           {/* ── Intro Email ── */}
           <div className="email-section-hd">
             <span className="email-section-title">Intro Email</span>
-            <span className="email-section-sub">Select a Source Partner and generate the confirmation email</span>
+            <span className="email-section-sub">Paste the conversation once — generate for up to 2 Source Partners</span>
           </div>
-          <SPEmailPanel
+          <IntroEmailSection
             leadName={leadName}
             rawInput={rawInput}
             geminiResearch={geminiResearch}

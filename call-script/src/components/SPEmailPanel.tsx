@@ -61,26 +61,17 @@ interface SPResult {
 }
 
 interface Props {
-  leadName: string
-  rawInput: string
-  geminiResearch: string
+  conversation: string
   bookingPrefill?: string
 }
 
-export default function SPEmailPanel({ leadName, rawInput, geminiResearch, bookingPrefill }: Props) {
+export default function SPEmailPanel({ conversation, bookingPrefill }: Props) {
   const isGitHubPages = window.location.hostname.includes('github.io')
   const fnUrl = (name: string) =>
     isGitHubPages ? `${NETLIFY_BASE}/.netlify/functions/${name}` : `/.netlify/functions/${name}`
 
   const [partnerIdx, setPartnerIdx] = useState(0)
   const [variantIdx, setVariantIdx] = useState(0)
-  const [conversation, setConversation] = useState(() => {
-    const parts: string[] = []
-    if (leadName) parts.push(`Lead name: ${leadName}`)
-    if (rawInput) parts.push(`Lead info: ${rawInput}`)
-    if (geminiResearch) parts.push(`Research spiel used: ${geminiResearch}`)
-    return parts.join('\n')
-  })
   const [booking, setBooking] = useState(() => bookingPrefill || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -194,22 +185,14 @@ export default function SPEmailPanel({ leadName, rawInput, geminiResearch, booki
         )}
       </div>
 
-      {/* Inputs */}
-      <label className="sp-label" style={{ marginTop: 10 }}>Conversation / call notes</label>
-      <textarea
-        className="gen-paste-input"
-        style={{ width: '100%', boxSizing: 'border-box', minHeight: 90 }}
-        placeholder="Paste call notes or transcript — include lead name, job title, company and what they want to outsource."
-        value={conversation}
-        onChange={e => setConversation(e.target.value)}
-        rows={4}
-      />
-
-      <label className="sp-label" style={{ marginTop: 8 }}>Booking details <span style={{ fontWeight: 400, textTransform: 'none', fontSize: 11 }}>(optional)</span></label>
+      {/* Booking details */}
+      <label className="sp-label" style={{ marginTop: 10 }}>
+        Booking details <span style={{ fontWeight: 400, textTransform: 'none', fontSize: 11 }}>(optional)</span>
+      </label>
       <textarea
         className="gen-paste-input"
         style={{ width: '100%', boxSizing: 'border-box' }}
-        placeholder="Date, time, meeting link — e.g. June 13, 2026, 10:00 AM PHT, Google Meet link"
+        placeholder="Date, time, meeting link — auto-filled from Booking Details above"
         value={booking}
         onChange={e => setBooking(e.target.value)}
         rows={2}
@@ -234,7 +217,6 @@ export default function SPEmailPanel({ leadName, rawInput, geminiResearch, booki
             </div>
           )}
 
-          {/* To */}
           <div className="sp-result-field">
             <div className="sp-result-field-left">
               <span className="sp-field-label">TO</span>
@@ -249,7 +231,6 @@ export default function SPEmailPanel({ leadName, rawInput, geminiResearch, booki
             )}
           </div>
 
-          {/* CC */}
           {variant.cc && (
             <div className="sp-result-field">
               <div className="sp-result-field-left">
@@ -262,7 +243,6 @@ export default function SPEmailPanel({ leadName, rawInput, geminiResearch, booki
             </div>
           )}
 
-          {/* Subject */}
           <div className="sp-result-field">
             <div className="sp-result-field-left">
               <span className="sp-field-label">SUBJECT</span>
@@ -273,7 +253,6 @@ export default function SPEmailPanel({ leadName, rawInput, geminiResearch, booki
             </button>
           </div>
 
-          {/* Body */}
           <div className="sp-body-section">
             <div className="sp-body-header">
               <span className="sp-field-label">BODY</span>

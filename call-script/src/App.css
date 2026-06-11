@@ -1355,6 +1355,52 @@ body {
   color: var(--text-2);
 }
 
+/* ─────────────────────────────────────────
+   INTRO EMAIL — 2-COLUMN LAYOUT
+───────────────────────────────────────── */
+
+.intro-email-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.intro-email-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+@media (max-width: 600px) {
+  .intro-email-cols { grid-template-columns: 1fr; }
+}
+
+.intro-email-col {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.intro-email-col-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--blue-muted);
+}
+
+.intro-email-col .sp-email-panel {
+  padding: 0;
+}
+
 .email-section-divider {
   display: flex;
   flex-direction: column;
