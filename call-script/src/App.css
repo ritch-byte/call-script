@@ -184,6 +184,8 @@ body {
   border-bottom: 2px solid var(--border);
   padding: 14px 20px;
   flex-shrink: 0;
+  max-height: 55vh;
+  overflow-y: auto;
 }
 
 .reference-bar-header {
