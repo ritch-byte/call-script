@@ -82,7 +82,7 @@ export default function SPEmailPanel({ conversation, bookingPrefill, onSyncBack 
 
   const partner = SP_TEMPLATES[partnerIdx]
   const variant = partner.variants[Math.min(variantIdx, partner.variants.length - 1)]
-  const canGenerate = conversation.trim().length > 20 && !loading
+  const canGenerate = conversation.trim().length > 0 && !loading
 
   const flash = (key: string) => {
     setCopied(key)
