@@ -146,6 +146,7 @@ export default function SPEmailPanel({ conversation, bookingPrefill, onSyncBack 
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Generation failed')
       setResult({ subject: data.subject, body: data.body, missing: data.missing || [] })
+      onSyncBack?.(partner.partner, `${data.body}\n${data.subject}`)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Generation failed')
     }
