@@ -446,6 +446,197 @@ body {
 .btn-copy-email:hover { background: #162699; }
 
 /* ─────────────────────────────────────────
+   EMAIL PANEL TABS
+───────────────────────────────────────── */
+
+.email-panel-tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.email-tab-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.email-tab-btn:hover { background: var(--blue-soft); color: var(--blue); border-color: var(--blue-muted); }
+.email-tab-btn--active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+/* ─────────────────────────────────────────
+   SP CONFIRMATION EMAIL PANEL
+───────────────────────────────────────── */
+
+.sp-email-panel {
+  padding: 4px 0 8px;
+}
+
+.sp-form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.sp-form-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 5px;
+}
+
+.sp-select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background: var(--white);
+  cursor: pointer;
+}
+.sp-select:focus { outline: none; border-color: var(--blue); }
+
+.sp-variant-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sp-variant-pill {
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.sp-variant-pill:hover { border-color: var(--blue-muted); background: var(--blue-soft); }
+.sp-variant-pill--active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+.sp-result {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sp-missing-warning {
+  background: #FFF4E5;
+  border: 1px solid #F0C27A;
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  color: #7A4D00;
+}
+
+.sp-result-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 12px;
+  background: var(--blue-soft);
+  border: 1px solid var(--blue-muted);
+  border-radius: 7px;
+}
+
+.sp-result-field-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.sp-field-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--text-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sp-field-value {
+  font-size: 13px;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.sp-copy-btn {
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.sp-copy-btn:hover { background: var(--bg); }
+.sp-copy-btn--primary {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.sp-copy-btn--primary:hover { background: #162699; }
+
+.sp-body-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sp-body-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sp-body-preview {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  background: var(--white);
+  min-height: 200px;
+  color: var(--text);
+}
+
+/* ─────────────────────────────────────────
    CALL FLOW — scrollable step timeline
 ───────────────────────────────────────── */
 

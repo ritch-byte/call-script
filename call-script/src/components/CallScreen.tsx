@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
+import SPEmailPanel from './SPEmailPanel'
 
 interface Props {
   callData: CallData
@@ -53,6 +54,7 @@ export default function CallScreen({ onReset }: Props) {
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
+  const [emailTab, setEmailTab] = useState<'followup' | 'spconfirm'>('followup')
   const [emailSubject, setEmailSubject] = useState('')
   const [emailBody, setEmailBody] = useState('')
   const [isGeneratingEmail, setIsGeneratingEmail] = useState(false)
@@ -334,45 +336,71 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
       {showEmail && (
         <div className="reference-bar">
           <div className="reference-bar-header">
-            <span className="reference-bar-title">Follow-Up Email Generator</span>
+            <div className="email-panel-tabs">
+              <button
+                className={`email-tab-btn${emailTab === 'followup' ? ' email-tab-btn--active' : ''}`}
+                onClick={() => setEmailTab('followup')}
+              >
+                Follow-Up
+              </button>
+              <button
+                className={`email-tab-btn${emailTab === 'spconfirm' ? ' email-tab-btn--active' : ''}`}
+                onClick={() => setEmailTab('spconfirm')}
+              >
+                SP Confirmation
+              </button>
+            </div>
             <button className="btn-ref-close" onClick={() => setShowEmail(false)}>Close</button>
           </div>
-          <div className="generator-form">
-            <div className="email-meta-row">
-              <span className="email-meta-hint">
-                Uses lead info, BDR name, and research already entered above.
-              </span>
-              <button
-                className="btn-generate"
-                onClick={generateEmail}
-                disabled={isGeneratingEmail}
-              >
-                {isGeneratingEmail ? 'Generating...' : emailBody ? 'Regenerate' : 'Generate Email'}
-              </button>
-            </div>
-            {emailError && <div className="gen-error">{emailError}</div>}
-          </div>
-          {emailBody && (
-            <div className="email-output">
-              <div className="email-subject-row">
-                <span className="email-field-label">Subject</span>
-                <input
-                  className="email-subject-input"
-                  value={emailSubject}
-                  onChange={e => setEmailSubject(e.target.value)}
-                />
+
+          {emailTab === 'followup' && (
+            <>
+              <div className="generator-form">
+                <div className="email-meta-row">
+                  <span className="email-meta-hint">
+                    Uses lead info, BDR name, and research already entered above.
+                  </span>
+                  <button
+                    className="btn-generate"
+                    onClick={generateEmail}
+                    disabled={isGeneratingEmail}
+                  >
+                    {isGeneratingEmail ? 'Generating...' : emailBody ? 'Regenerate' : 'Generate Email'}
+                  </button>
+                </div>
+                {emailError && <div className="gen-error">{emailError}</div>}
               </div>
-              <div className="email-field-label" style={{ marginTop: 8 }}>Body</div>
-              <textarea
-                className="research-input"
-                value={emailBody}
-                onChange={e => setEmailBody(e.target.value)}
-                rows={6}
-              />
-              <button className="btn-copy-email" onClick={copyEmail}>
-                {emailCopied ? 'Copied!' : 'Copy Email'}
-              </button>
-            </div>
+              {emailBody && (
+                <div className="email-output">
+                  <div className="email-subject-row">
+                    <span className="email-field-label">Subject</span>
+                    <input
+                      className="email-subject-input"
+                      value={emailSubject}
+                      onChange={e => setEmailSubject(e.target.value)}
+                    />
+                  </div>
+                  <div className="email-field-label" style={{ marginTop: 8 }}>Body</div>
+                  <textarea
+                    className="research-input"
+                    value={emailBody}
+                    onChange={e => setEmailBody(e.target.value)}
+                    rows={6}
+                  />
+                  <button className="btn-copy-email" onClick={copyEmail}>
+                    {emailCopied ? 'Copied!' : 'Copy Email'}
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {emailTab === 'spconfirm' && (
+            <SPEmailPanel
+              leadName={leadName}
+              rawInput={rawInput}
+              geminiResearch={geminiResearch}
+            />
           )}
         </div>
       )}
