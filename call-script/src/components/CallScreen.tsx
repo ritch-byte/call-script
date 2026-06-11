@@ -54,7 +54,7 @@ export default function CallScreen({ onReset }: Props) {
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
-  const [emailTab, setEmailTab] = useState<'followup' | 'spconfirm'>('followup')
+  const [emailTab, setEmailTab] = useState<'followup' | 'spconfirm'>('spconfirm')
   const [emailSubject, setEmailSubject] = useState('')
   const [emailBody, setEmailBody] = useState('')
   const [isGeneratingEmail, setIsGeneratingEmail] = useState(false)
@@ -338,16 +338,16 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
           <div className="reference-bar-header">
             <div className="email-panel-tabs">
               <button
+                className={`email-tab-btn${emailTab === 'spconfirm' ? ' email-tab-btn--active' : ''}`}
+                onClick={() => setEmailTab('spconfirm')}
+              >
+                Intro Email
+              </button>
+              <button
                 className={`email-tab-btn${emailTab === 'followup' ? ' email-tab-btn--active' : ''}`}
                 onClick={() => setEmailTab('followup')}
               >
                 Follow-Up
-              </button>
-              <button
-                className={`email-tab-btn${emailTab === 'spconfirm' ? ' email-tab-btn--active' : ''}`}
-                onClick={() => setEmailTab('spconfirm')}
-              >
-                SP Confirmation
               </button>
             </div>
             <button className="btn-ref-close" onClick={() => setShowEmail(false)}>Close</button>
