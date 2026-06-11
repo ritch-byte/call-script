@@ -261,7 +261,7 @@ I researched [Company] and know you're a leader in the [Industry/Niche]. Given t
             className={`btn-header-ghost${showEmail ? ' btn-header-active' : ''}`}
             onClick={() => { setShowEmail(v => !v); setShowRates(false); setShowResearch(false) }}
           >
-            Email
+            Email Generator
           </button>
           <button className="btn-header-ghost" onClick={onReset}>
             Reset
