@@ -128,6 +128,22 @@ export default function CallScreen({ onReset }: Props) {
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
+  // ── Sync SP name + link from intro email panels back to shared booking state ──
+  const extractLink = (text: string) =>
+    text.match(/https?:\/\/[^\s]+/)?.[0]?.replace(/[.,;!?]$/, '') ?? ''
+
+  const handleSp1Sync = (name: string, bookingText: string) => {
+    if (name) setSharedSp(name)
+    const lk = extractLink(bookingText)
+    if (lk) setSharedLink(lk)
+  }
+
+  const handleSp2Sync = (name: string, bookingText: string) => {
+    if (name) setSharedSp2(name)
+    const lk = extractLink(bookingText)
+    if (lk) setSharedLink2(lk)
+  }
+
   // ── Email Generator full-page view ──────────────────────────────────────
   const mkPrefill = (d: string, t: string, lk: string) => [
     [d, t, sharedTz].filter(Boolean).join(' '),
@@ -215,6 +231,8 @@ export default function CallScreen({ onReset }: Props) {
             geminiResearch={geminiResearch}
             sp1BookingPrefill={sp1Prefill}
             sp2BookingPrefill={sp2Prefill}
+            onSp1SyncBack={handleSp1Sync}
+            onSp2SyncBack={handleSp2Sync}
           />
 
           {/* ── Follow Up Cadence ── */}

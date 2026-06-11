@@ -7,9 +7,11 @@ interface Props {
   geminiResearch: string
   sp1BookingPrefill: string
   sp2BookingPrefill: string
+  onSp1SyncBack?: (name: string, bookingText: string) => void
+  onSp2SyncBack?: (name: string, bookingText: string) => void
 }
 
-export default function IntroEmailSection({ leadName, rawInput, geminiResearch, sp1BookingPrefill, sp2BookingPrefill }: Props) {
+export default function IntroEmailSection({ leadName, rawInput, geminiResearch, sp1BookingPrefill, sp2BookingPrefill, onSp1SyncBack, onSp2SyncBack }: Props) {
   const [conversation, setConversation] = useState(() => {
     const parts: string[] = []
     if (leadName) parts.push(`Lead name: ${leadName}`)
@@ -33,11 +35,11 @@ export default function IntroEmailSection({ leadName, rawInput, geminiResearch, 
       <div className="intro-email-cols">
         <div className="intro-email-col">
           <div className="intro-email-col-title">Source Partner 1</div>
-          <SPEmailPanel conversation={conversation} bookingPrefill={sp1BookingPrefill} />
+          <SPEmailPanel conversation={conversation} bookingPrefill={sp1BookingPrefill} onSyncBack={onSp1SyncBack} />
         </div>
         <div className="intro-email-col">
           <div className="intro-email-col-title">Source Partner 2</div>
-          <SPEmailPanel conversation={conversation} bookingPrefill={sp2BookingPrefill} />
+          <SPEmailPanel conversation={conversation} bookingPrefill={sp2BookingPrefill} onSyncBack={onSp2SyncBack} />
         </div>
       </div>
     </div>

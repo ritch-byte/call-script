@@ -63,9 +63,10 @@ interface SPResult {
 interface Props {
   conversation: string
   bookingPrefill?: string
+  onSyncBack?: (partnerName: string, bookingText: string) => void
 }
 
-export default function SPEmailPanel({ conversation, bookingPrefill }: Props) {
+export default function SPEmailPanel({ conversation, bookingPrefill, onSyncBack }: Props) {
   const isGitHubPages = window.location.hostname.includes('github.io')
   const fnUrl = (name: string) =>
     isGitHubPages ? `${NETLIFY_BASE}/.netlify/functions/${name}` : `/.netlify/functions/${name}`
@@ -130,6 +131,7 @@ export default function SPEmailPanel({ conversation, bookingPrefill }: Props) {
   }
 
   const generate = async () => {
+    onSyncBack?.(partner.partner, booking)
     setLoading(true)
     setError('')
     setResult(null)
