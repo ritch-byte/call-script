@@ -64,9 +64,10 @@ interface Props {
   leadName: string
   rawInput: string
   geminiResearch: string
+  bookingPrefill?: string
 }
 
-export default function SPEmailPanel({ leadName, rawInput, geminiResearch }: Props) {
+export default function SPEmailPanel({ leadName, rawInput, geminiResearch, bookingPrefill }: Props) {
   const isGitHubPages = window.location.hostname.includes('github.io')
   const fnUrl = (name: string) =>
     isGitHubPages ? `${NETLIFY_BASE}/.netlify/functions/${name}` : `/.netlify/functions/${name}`
@@ -80,7 +81,7 @@ export default function SPEmailPanel({ leadName, rawInput, geminiResearch }: Pro
     if (geminiResearch) parts.push(`Research spiel used: ${geminiResearch}`)
     return parts.join('\n')
   })
-  const [booking, setBooking] = useState('')
+  const [booking, setBooking] = useState(() => bookingPrefill || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState<SPResult | null>(null)

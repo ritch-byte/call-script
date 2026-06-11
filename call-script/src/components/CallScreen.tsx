@@ -54,7 +54,11 @@ export default function CallScreen({ onReset }: Props) {
   const [rawInput, setRawInput] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [genError, setGenError] = useState('')
-  const [emailTab, setEmailTab] = useState<'followup' | 'spconfirm'>('spconfirm')
+  const [sharedSp, setSharedSp]     = useState('')
+  const [sharedDate, setSharedDate] = useState('')
+  const [sharedTime, setSharedTime] = useState('')
+  const [sharedTz, setSharedTz]     = useState('')
+  const [sharedLink, setSharedLink] = useState('')
   const activeRef = useRef<HTMLDivElement>(null)
 
   const isGitHubPages = window.location.hostname.includes('github.io')
@@ -121,6 +125,11 @@ export default function CallScreen({ onReset }: Props) {
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
   // ── Email Generator full-page view ──────────────────────────────────────
+  const bookingPrefill = [
+    [sharedDate, sharedTime, sharedTz].filter(Boolean).join(' '),
+    sharedLink ? `Meeting Link: ${sharedLink}` : '',
+  ].filter(Boolean).join('\n')
+
   if (emailPageOpen) {
     return (
       <div className="call-screen">
@@ -129,34 +138,64 @@ export default function CallScreen({ onReset }: Props) {
             ← Back to Call
           </button>
           <span className="email-page-title">Email Generator</span>
-          <div className="email-page-tabs">
-            <button
-              className={`email-tab-btn${emailTab === 'spconfirm' ? ' email-tab-btn--active' : ''}`}
-              onClick={() => setEmailTab('spconfirm')}
-            >
-              Intro Email
-            </button>
-            <button
-              className={`email-tab-btn${emailTab === 'followup' ? ' email-tab-btn--active' : ''}`}
-              onClick={() => setEmailTab('followup')}
-            >
-              Follow Up Cadence
-            </button>
-          </div>
         </div>
 
         <div className="email-page-body">
-          {emailTab === 'spconfirm' && (
-            <SPEmailPanel
-              leadName={leadName}
-              rawInput={rawInput}
-              geminiResearch={geminiResearch}
-            />
-          )}
 
-          {emailTab === 'followup' && (
-            <FollowUpCadence leadName={leadName} yourName={yourName} />
-          )}
+          {/* ── Shared booking fields ── */}
+          <div className="email-booking-block">
+            <div className="email-booking-title">Booking Details</div>
+            <div className="email-booking-fields">
+              <div className="cad-fg">
+                <label className="cad-lbl">SP / Partner Name</label>
+                <input className="cad-input" value={sharedSp} onChange={e => setSharedSp(e.target.value)} placeholder="e.g. ConnectOS" />
+              </div>
+              <div className="cad-fg">
+                <label className="cad-lbl">Date</label>
+                <input className="cad-input" value={sharedDate} onChange={e => setSharedDate(e.target.value)} placeholder="e.g. June 14, 2026" />
+              </div>
+              <div className="cad-fg">
+                <label className="cad-lbl">Time</label>
+                <input className="cad-input" value={sharedTime} onChange={e => setSharedTime(e.target.value)} placeholder="e.g. 10:00 AM" />
+              </div>
+              <div className="cad-fg">
+                <label className="cad-lbl">Lead's Timezone</label>
+                <input className="cad-input" value={sharedTz} onChange={e => setSharedTz(e.target.value)} placeholder="e.g. EST" />
+              </div>
+              <div className="cad-fg cad-fg--wide2">
+                <label className="cad-lbl">Meeting Link</label>
+                <input className="cad-input" value={sharedLink} onChange={e => setSharedLink(e.target.value)} placeholder="https://meet.google.com/..." />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Intro Email ── */}
+          <div className="email-section-hd">
+            <span className="email-section-title">Intro Email</span>
+            <span className="email-section-sub">Select a Source Partner and generate the confirmation email</span>
+          </div>
+          <SPEmailPanel
+            leadName={leadName}
+            rawInput={rawInput}
+            geminiResearch={geminiResearch}
+            bookingPrefill={bookingPrefill}
+          />
+
+          {/* ── Follow Up Cadence ── */}
+          <div className="email-section-divider">
+            <span className="email-section-divider-label">Follow Up Cadence</span>
+            <span className="email-section-sub">Templates auto-fill from Booking Details above</span>
+          </div>
+          <FollowUpCadence
+            leadName={leadName}
+            yourName={yourName}
+            sp={sharedSp}
+            date={sharedDate}
+            time={sharedTime}
+            tz={sharedTz}
+            link={sharedLink}
+          />
+
         </div>
       </div>
     )
@@ -399,7 +438,7 @@ export default function CallScreen({ onReset }: Props) {
                 <div className="end-actions">
                   <button
                     className="btn-primary"
-                    onClick={() => { setEmailTab('followup'); setEmailPageOpen(true) }}
+                    onClick={() => setEmailPageOpen(true)}
                   >
                     Follow Up Cadence
                   </button>

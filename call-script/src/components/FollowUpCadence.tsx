@@ -3,6 +3,11 @@ import { useState } from 'react'
 interface Props {
   leadName: string
   yourName: string
+  sp: string
+  date: string
+  time: string
+  tz: string
+  link: string
 }
 
 const CHANNEL_COLOR: Record<string, string> = {
@@ -20,22 +25,15 @@ function Badge({ ch }: { ch: string }) {
   )
 }
 
-export default function FollowUpCadence({ leadName: initLead, yourName: initYou }: Props) {
-  const [lead, setLead]   = useState(initLead || '')
-  const [you, setYou]     = useState(initYou || '')
-  const [sp, setSp]       = useState('')
-  const [date, setDate]   = useState('')
-  const [time, setTime]   = useState('')
-  const [tz, setTz]       = useState('')
-  const [link, setLink]   = useState('')
-  const [p2n, setP2n]     = useState('')
-  const [p2dt, setP2dt]   = useState('')
-  const [p2lk, setP2lk]   = useState('')
+export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz, link }: Props) {
+  const [p2n, setP2n]   = useState('')
+  const [p2dt, setP2dt] = useState('')
+  const [p2lk, setP2lk] = useState('')
   const [copied, setCopied] = useState('')
   const [showP2, setShowP2] = useState(false)
 
-  const L  = lead || '[Lead Name]'
-  const Y  = you  || '[Your Name]'
+  const L  = leadName || '[Lead Name]'
+  const Y  = yourName || '[Your Name]'
   const SP = sp   || '[SP Company Name]'
   const D  = date || '[Date]'
   const T  = time || '[Time]'
@@ -133,39 +131,7 @@ export default function FollowUpCadence({ leadName: initLead, yourName: initYou 
   return (
     <div className="cad-wrap">
 
-      {/* ── Fields ── */}
-      <div className="cad-fields">
-        <div className="cad-fg">
-          <label className="cad-lbl">Lead Name</label>
-          <input className="cad-input" value={lead} onChange={e => setLead(e.target.value)} placeholder="e.g. John" />
-        </div>
-        <div className="cad-fg">
-          <label className="cad-lbl">Your Name</label>
-          <input className="cad-input" value={you} onChange={e => setYou(e.target.value)} placeholder="e.g. Maria" />
-        </div>
-        <div className="cad-fg">
-          <label className="cad-lbl">SP / Partner Name</label>
-          <input className="cad-input" value={sp} onChange={e => setSp(e.target.value)} placeholder="e.g. ConnectOS" />
-        </div>
-        <div className="cad-fg">
-          <label className="cad-lbl">Date</label>
-          <input className="cad-input" value={date} onChange={e => setDate(e.target.value)} placeholder="e.g. June 14, 2026" />
-        </div>
-        <div className="cad-fg">
-          <label className="cad-lbl">Time</label>
-          <input className="cad-input" value={time} onChange={e => setTime(e.target.value)} placeholder="e.g. 10:00 AM" />
-        </div>
-        <div className="cad-fg">
-          <label className="cad-lbl">Lead's Timezone</label>
-          <input className="cad-input" value={tz} onChange={e => setTz(e.target.value)} placeholder="e.g. EST" />
-        </div>
-        <div className="cad-fg cad-fg--wide">
-          <label className="cad-lbl">Meeting Link</label>
-          <input className="cad-input" value={link} onChange={e => setLink(e.target.value)} placeholder="https://meet.google.com/..." />
-        </div>
-      </div>
-
-      {/* ── 2nd partner (optional) ── */}
+      {/* 2nd partner (optional, for steps 3 & 4) */}
       <button className="cad-p2-toggle" onClick={() => setShowP2(v => !v)}>
         {showP2 ? '− Hide' : '+ Add'} 2nd Partner <span className="cad-p2-hint">(for Steps 3 & 4)</span>
       </button>
@@ -186,7 +152,7 @@ export default function FollowUpCadence({ leadName: initLead, yourName: initYou 
         </div>
       )}
 
-      {/* ── Steps 1–5 ── */}
+      {/* Steps 1–5 */}
       <div className="cad-steps">
         {steps.map(step => (
           <div key={step.id} className="cad-step">
@@ -208,7 +174,7 @@ export default function FollowUpCadence({ leadName: initLead, yourName: initYou 
           </div>
         ))}
 
-        {/* ── Step 6 — No-Show Protocol ── */}
+        {/* Step 6 — No-Show Protocol */}
         <div className="cad-step cad-step--noshow">
           <div className="cad-step-hd">
             <div className="cad-step-meta">
