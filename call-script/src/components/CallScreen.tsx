@@ -331,23 +331,19 @@ export default function CallScreen({ onReset }: Props) {
       {/* ── Full call script — all steps visible ── */}
       <div className="call-flow">
         {steps.map((step, idx) => {
+          if (idx !== activeIdx) return null
+
           const node = flow[step.nodeId]
           if (!node) return null
 
-          const isDone     = idx < activeIdx
-          const isActive   = idx === activeIdx
-          const isUpcoming = idx > activeIdx
-          const script     = interpolate(node.script, leadName, yourName, geminiResearch, context)
+          const script = interpolate(node.script, leadName, yourName, geminiResearch, context)
 
           const stepEndLabel =
             step.nodeId === 'end_booked'   ? 'BOOKED' :
             step.nodeId === 'end_callback' ? 'CALLBACK SET' : 'CALL ENDED'
 
           const cardClass = [
-            'step-card',
-            isActive   ? 'step-card--active'   : '',
-            isDone     ? 'step-card--done'     : '',
-            isUpcoming ? 'step-card--upcoming' : '',
+            'step-card step-card--active',
             node.isObjection ? 'step-card--objection' : '',
             node.isEnd       ? 'step-card--end'       : '',
           ].filter(Boolean).join(' ')
@@ -365,15 +361,9 @@ export default function CallScreen({ onReset }: Props) {
                     : node.isEnd ? stepEndLabel
                     : node.title}
                 </span>
-                {isDone && step.chosenLabel && (
-                  <span className="chosen-pill">{step.chosenLabel}</span>
-                )}
-                {isUpcoming && (
-                  <span className="upcoming-badge">UPCOMING</span>
-                )}
               </div>
 
-              {node.waitForAnswer && isActive && (
+              {node.waitForAnswer && (
                 <div className="wait-indicator">
                   <span className="pulse" />
                   Waiting for answer...
@@ -386,7 +376,7 @@ export default function CallScreen({ onReset }: Props) {
                 )}
               </div>
 
-              {(['value_prop', 'obj_no_role'].includes(step.nodeId)) && isActive && (
+              {(['value_prop', 'obj_no_role'].includes(step.nodeId)) && (
                 <div className="inline-research-form">
                   {!geminiResearch ? (
                     <>
@@ -417,14 +407,14 @@ export default function CallScreen({ onReset }: Props) {
                 </div>
               )}
 
-              {node.tip && isActive && (
+              {node.tip && (
                 <div className="coach-tip">
                   <div className="coach-tip-label">Coach Tip</div>
                   {node.tip}
                 </div>
               )}
 
-              {isActive && !node.isEnd && (
+              {!node.isEnd && (
                 <div className="options-section">
                   <div className="options-label">Lead responds:</div>
                   <div className="options-grid">
@@ -448,7 +438,7 @@ export default function CallScreen({ onReset }: Props) {
                 </div>
               )}
 
-              {isActive && node.isEnd && (
+              {node.isEnd && (
                 <div className="end-actions">
                   <button
                     className="btn-primary"
