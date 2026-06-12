@@ -123,7 +123,7 @@ export default function CallScreen({ onReset }: Props) {
   }
 
   useEffect(() => {
-    activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [activeIdx])
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']

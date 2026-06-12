@@ -693,6 +693,7 @@ body {
   border-left: 4px solid var(--blue);
   box-shadow: var(--shadow-active);
   animation: fadeSlideIn 0.22s ease-out;
+  scroll-margin-top: 14px;
 }
 
 .step-card--objection.step-card--active {
