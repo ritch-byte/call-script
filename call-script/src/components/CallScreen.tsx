@@ -352,7 +352,7 @@ export default function CallScreen({ onReset }: Props) {
             <div
               key={`${step.nodeId}-${idx}`}
               className={cardClass}
-              ref={isActive ? activeRef : null}
+              ref={activeRef}
             >
               <div className="step-header-row">
                 <span className="step-num">{idx + 1}</span>

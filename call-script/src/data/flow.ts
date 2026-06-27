@@ -50,7 +50,6 @@ export const flow: Record<string, FlowNode> = {
     options: [
       { label: "No — haven't heard of OA", next: 'pitch_q1', type: 'positive' },
       { label: 'Yes — familiar with OA', next: 'pitch_q1', type: 'positive' },
-      { label: 'Got cut off / not interested', next: 'obj_cutoff_opening', type: 'objection' },
     ],
   },
 
