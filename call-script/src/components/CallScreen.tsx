@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
-import IntroEmailSection from './IntroEmailSection'
-import FollowUpCadence from './FollowUpCadence'
+import EmailComposer from './EmailComposer'
 
 interface Props {
   callData: CallData
@@ -175,41 +174,7 @@ export default function CallScreen({ onReset }: Props) {
         </div>
 
         <div className="email-page-body">
-
-          {/* ── Intro Email ── */}
-          <div className="email-section-hd">
-            <span className="email-section-title">Intro Email</span>
-            <span className="email-section-sub">Paste the conversation once — generate for up to 2 Source Partners</span>
-          </div>
-          <IntroEmailSection
-            leadName={leadName}
-            rawInput={rawInput}
-            geminiResearch={geminiResearch}
-            sp1BookingPrefill={sp1Prefill}
-            sp2BookingPrefill={sp2Prefill}
-            onSp1SyncBack={handleSp1Sync}
-            onSp2SyncBack={handleSp2Sync}
-          />
-
-          {/* ── Follow Up Cadence ── */}
-          <div className="email-section-divider">
-            <span className="email-section-divider-label">Follow Up Cadence</span>
-            <span className="email-section-sub">Templates auto-fill from Booking Details above</span>
-          </div>
-          <FollowUpCadence
-            leadName={leadName}
-            yourName={yourName}
-            sp={sharedSp}
-            date={sharedDate}
-            time={sharedTime}
-            tz={sharedTz}
-            link={sharedLink}
-            sp2={sharedSp2}
-            date2={sharedDate2}
-            time2={sharedTime2}
-            link2={sharedLink2}
-          />
-
+          <EmailComposer />
         </div>
       </div>
     )
