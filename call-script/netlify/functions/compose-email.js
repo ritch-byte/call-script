@@ -1,3 +1,4 @@
+// Netlify function backing the Conversation to Email Composer.
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
