@@ -104,7 +104,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "SPIN — Need-Payoff: after they name a role, use this bridge before moving to the pitch: 'So if you could bring on a great [role they named] at 70 to 80 percent less cost — dedicated full-time, not a freelancer — is that a conversation worth having?' Get the yes before you pitch. It pre-commits them to the value.",
     options: [
-      { label: 'They share a role or answer', next: 'role_qualify', type: 'positive' },
+      { label: 'They share a role or answer', next: 'qualify_experience', type: 'positive' },
       { label: "Can't give a role / not interested", next: 'obj_no_role', type: 'objection' },
     ],
   },
@@ -133,7 +133,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Core Gate 1 — full-time & dedicated. We only place full-time, dedicated talent, so frame it as a full-time seat — don't plant the part-time idea. If they push back to part-time/project, handle it; don't just roll on.",
     options: [
-      { label: 'Yes — full-time & dedicated', next: 'qualify_experience', type: 'positive' },
+      { label: 'Yes — full-time & dedicated', next: 'qualify_timeline', type: 'positive' },
       { label: 'Part-time / project', next: 'obj_parttime', type: 'objection' },
       { label: "Can't give a specific role", next: 'value_prop', type: 'positive' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
@@ -150,7 +150,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "We only place full-time, dedicated talent — part-time/project reads as a non-dedicated (disqualified) lead. Don't accept it: reframe on cost (offshore full-time ≈ local part-time) and on focus (dedicated beats shared). Convert to a full-time yes, then keep qualifying.",
     options: [
-      { label: 'Open to a full-time seat', next: 'qualify_experience', type: 'positive' },
+      { label: 'Open to a full-time seat', next: 'qualify_timeline', type: 'positive' },
       { label: 'Still only wants part-time', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
@@ -162,10 +162,10 @@ export const flow: Record<string, FlowNode> = {
     title: 'Qualify: Value Bridge + Experience',
     script: "Perfect — I actually work with a couple of source partners who place that exact role. They'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours up to 80% on salary.\n\nAnd so they pull the right people for you, do you have a specific experience level in mind for that role?",
     waitForAnswer: true,
-    tip: "Full-time's confirmed — now bridge to value before you ask anything else. Naming the source partners + curated CVs + 80% savings frames the experience question as 'so they can pull the right person for you,' not interrogation. Capture the experience level; it personalises the rest of the call. Any answer moves you forward to the timeline gate.",
+    tip: "They've named the role — bridge to value first, before you gate anything. Naming the source partners + curated CVs + 80% savings frames the experience question as 'so they can pull the right person for you,' not interrogation. Capture the experience level; it personalises the rest of the call. Any answer moves you forward to confirming the full-time seat.",
     options: [
-      { label: 'Gives an experience level', next: 'qualify_timeline', type: 'positive' },
-      { label: 'Not sure / open to any', next: 'qualify_timeline', type: 'positive' },
+      { label: 'Gives an experience level', next: 'role_qualify', type: 'positive' },
+      { label: 'Not sure / open to any', next: 'role_qualify', type: 'positive' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
