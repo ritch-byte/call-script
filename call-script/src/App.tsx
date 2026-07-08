@@ -1,4 +1,5 @@
 import CallScreen from './components/CallScreen'
+import PasswordGate from './components/PasswordGate'
 
 export interface CallData {
   leadName: string
@@ -14,8 +15,10 @@ const DEFAULT_CALL_DATA: CallData = {
 
 export default function App() {
   return (
-    <div className="app">
-      <CallScreen callData={DEFAULT_CALL_DATA} onReset={() => window.location.reload()} />
-    </div>
+    <PasswordGate>
+      <div className="app">
+        <CallScreen callData={DEFAULT_CALL_DATA} onReset={() => window.location.reload()} />
+      </div>
+    </PasswordGate>
   )
 }
