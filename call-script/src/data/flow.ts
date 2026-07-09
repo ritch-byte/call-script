@@ -126,9 +126,9 @@ export const flow: Record<string, FlowNode> = {
   qualify_fulltime: {
     id: 'qualify_fulltime',
     title: 'Qualify ② Full-Time',
-    script: "Makes sense. And would that be a full-time, dedicated seat, or more of a part-time thing?",
+    script: "Makes sense. And I assume this'd be a full-time position, like thirty to forty hours a week, right?",
     waitForAnswer: true,
-    tip: "Must-Know 2 of 5 (full-time). We only place full-time, dedicated talent, so frame it as a full-time seat — don't plant the part-time idea. If they lean part-time, handle it; don't just roll on.",
+    tip: "Must-Know 2 of 5 (full-time). Frame it assumptively as full-time (thirty to forty hours) — don't plant the part-time idea. If they push back to part-time, handle it; don't just roll on.",
     options: [
       { label: 'Full-time / dedicated', next: 'qualify_volume', type: 'positive' },
       { label: 'Part-time / project', next: 'obj_parttime', type: 'objection' },
