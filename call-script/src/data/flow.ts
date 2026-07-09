@@ -90,22 +90,84 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "SPIN — Implication: if they share any friction, multiply it before moving on. Try: 'When a key role sits open longer than expected, what does that cost you — project delays, the team absorbing extra load, or lost revenue?' Get them to say the cost out loud. A gap they can quantify is a gap worth closing.",
     options: [
-      { label: 'They share friction / challenges', next: 'discovery_authority', type: 'positive' },
-      { label: 'Team is doing fine / no real issues', next: 'discovery_authority', type: 'positive' },
+      { label: 'They share friction / challenges', next: 'discovery_priority', type: 'positive' },
+      { label: 'Team is doing fine / no real issues', next: 'discovery_priority', type: 'positive' },
     ],
   },
 
-  // ── DISCOVERY + SOFT AUTHORITY CHECK (v5 FIX #2) ─────────────────────────
+  // ── DISCOVERY BRIDGE — WHAT THEY PRIORITIZE (Move 3) ─────────────────────
 
-  discovery_authority: {
-    id: 'discovery_authority',
-    title: 'Soft Authority Check',
-    script: "Makes sense. And when your team decides to bring someone new on — is that a call you make, or do you usually loop in a partner or co-founder on it?",
+  discovery_priority: {
+    id: 'discovery_priority',
+    title: 'Discovery: What They Prioritize',
+    script: "Thanks for sharing that. And what type of talent do you usually prioritize when you're bringing people on?",
     waitForAnswer: true,
-    tip: "FIX #2 — capture the Decision-Maker criterion as conversation, not interrogation. NEVER ask 'are you the decision-maker?' — QA flags it. A collaborative answer ('me and my partner') still qualifies, as long as they're in the room when the decision is made. If someone else entirely owns hiring, get a name and a warm intro.",
+    tip: "Move 3 bridge question — keep it open and curious, you're just getting them talking about their world. Whatever they name here is the thread you pull into the five must-knows.",
     options: [
-      { label: 'They decide / decide with a partner (in the room)', next: 'discovery_q3', type: 'positive' },
-      { label: 'Someone else owns hiring decisions', next: 'obj_wrong_person', type: 'objection' },
+      { label: 'They open up about their hiring', next: 'qualify_role', type: 'positive' },
+      { label: 'Not really hiring / no priorities', next: 'obj_not_hiring', type: 'objection' },
+    ],
+  },
+
+  // ── QUALIFY — THE FIVE MUST-KNOWS (Move 4) ───────────────────────────────
+
+  qualify_role: {
+    id: 'qualify_role',
+    title: 'Qualify ① Role Fit',
+    script: "Got it. So if you did add some support, what role would you want to fill first?",
+    waitForAnswer: true,
+    tip: "Must-Know 1 of 5 (role fit). Frame it hypothetically — 'if you did add support' — so it feels like planning, not pressure. Whatever they name becomes 'that role' for the rest of the call. If they can't name one, pivot to the value pitch with your research.",
+    options: [
+      { label: 'They name a role', next: 'qualify_fulltime', type: 'positive' },
+      { label: "Can't name a role", next: 'obj_no_role', type: 'objection' },
+    ],
+  },
+
+  qualify_fulltime: {
+    id: 'qualify_fulltime',
+    title: 'Qualify ② Full-Time',
+    script: "Makes sense. And would that be a full-time, dedicated seat, or more of a part-time thing?",
+    waitForAnswer: true,
+    tip: "Must-Know 2 of 5 (full-time). We only place full-time, dedicated talent, so frame it as a full-time seat — don't plant the part-time idea. If they lean part-time, handle it; don't just roll on.",
+    options: [
+      { label: 'Full-time / dedicated', next: 'qualify_volume', type: 'positive' },
+      { label: 'Part-time / project', next: 'obj_parttime', type: 'objection' },
+    ],
+  },
+
+  qualify_volume: {
+    id: 'qualify_volume',
+    title: 'Qualify ③ Volume',
+    script: "And how many are we talking, one to start with, or more of a small team?",
+    waitForAnswer: true,
+    tip: "Must-Know 3 of 5 (volume). A quick sizing question — it tells the partners what to prep and hints at deal size. One is plenty to book; a team is a bonus. Keep it light.",
+    options: [
+      { label: 'One to start', next: 'qualify_timeline', type: 'positive' },
+      { label: 'A small team / a few', next: 'qualify_timeline', type: 'positive' },
+    ],
+  },
+
+  qualify_timeline: {
+    id: 'qualify_timeline',
+    title: 'Qualify ④ Timeline',
+    script: "And if the right person showed up, when would you ideally want them starting?",
+    waitForAnswer: true,
+    tip: "Must-Know 4 of 5 (timeline). Just capture it conversationally here, in their own words — you'll firm up the 1 to 2 month window in the recap. Don't gate it yet; get the honest answer first.",
+    options: [
+      { label: 'Soon / within a couple months', next: 'qualify_dm', type: 'positive' },
+      { label: 'Further out / not sure yet', next: 'qualify_dm', type: 'positive' },
+    ],
+  },
+
+  qualify_dm: {
+    id: 'qualify_dm',
+    title: 'Qualify ⑤ Decision-Maker',
+    script: "Perfect. And are you the one who'd sign off on this, or is there someone else involved in that call?",
+    waitForAnswer: true,
+    tip: "Must-Know 5 of 5 (decision-maker). 'Are you the one who'd sign off, or is someone else involved?' is clean and doesn't read as interrogation. A collaborative answer still qualifies as long as they're in the room. If it's entirely someone else, get a name.",
+    options: [
+      { label: 'They sign off / involved in it', next: 'value_offer', type: 'positive' },
+      { label: 'Someone else entirely decides', next: 'obj_wrong_person', type: 'objection' },
     ],
   },
 
@@ -117,22 +179,8 @@ export const flow: Record<string, FlowNode> = {
     tip: "Always get a name before you hang up — a warm referral converts far faster than a cold dial. If they'll still be in the room when the decision is made, you can carry on; just get the other decision-maker onto the same invite.",
     options: [
       { label: 'Gives a name / warm intro', next: 'end_callback', type: 'positive' },
-      { label: "They're still in the room for the decision", next: 'discovery_q3', type: 'positive' },
+      { label: "They're still in the room for the decision", next: 'value_offer', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
-    ],
-  },
-
-  // ── DISCOVERY Q3 — ROLE ──────────────────────────────────────────────────
-
-  discovery_q3: {
-    id: 'discovery_q3',
-    title: 'Discovery Q3: Role',
-    script: "Got it. And what kinds of roles does your team prioritise most when you do hire?",
-    waitForAnswer: true,
-    tip: "Once they name a role you have everything you need to make the value land. Bridge straight into the offer using their exact role — don't stack more discovery. If they can't name one, a general direction (ops, sales, admin, tech) is enough.",
-    options: [
-      { label: 'They share a role or answer', next: 'value_offer', type: 'positive' },
-      { label: "Can't give a role / not interested", next: 'obj_no_role', type: 'objection' },
     ],
   },
 
@@ -248,7 +296,6 @@ export const flow: Record<string, FlowNode> = {
     options: [
       { label: 'Clean — 1-2 months, full-time, offshore, in the room', next: 'end_booked', type: 'positive' },
       { label: 'Timeline is 3+ months / no firm date', next: 'obj_timeline_far', type: 'objection' },
-      { label: 'Only wants part-time', next: 'obj_parttime', type: 'objection' },
       { label: 'Needs to check with a partner / boss', next: 'obj_authority_late', type: 'objection' },
     ],
   },
@@ -263,7 +310,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "We only place full-time, dedicated talent — part-time/project reads as a non-dedicated (disqualified) lead. Approved reframe (Summer / Jimmy): 'eight hours paid anyway, you still save.' Convert to a full-time yes; if they'll only ever do part-time, they don't qualify.",
     options: [
-      { label: 'Open to a full-time seat', next: 'end_booked', type: 'positive' },
+      { label: 'Open to a full-time seat', next: 'qualify_volume', type: 'positive' },
       { label: 'Still only wants part-time', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
@@ -410,7 +457,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Approved reframe (Carl / David, UBC Digital): 'strategic resource, not replacement' — the single most effective line in the approved set, use it verbatim. Challenge the status quo gently: 'doing fine' is not the same as 'doing it optimally.' Then get them to name their friction point.",
     options: [
-      { label: 'They mention a challenge (time / cost / skill)', next: 'discovery_q3', type: 'positive' },
+      { label: 'They mention a challenge (time / cost / skill)', next: 'discovery_priority', type: 'positive' },
       { label: 'Genuinely no challenges', next: 'obj_no_challenges', type: 'objection' },
     ],
   },
