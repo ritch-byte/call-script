@@ -156,6 +156,23 @@ export const flow: Record<string, FlowNode> = {
     options: [
       { label: 'Within a few weeks', next: 'qualify_dm', type: 'positive' },
       { label: 'One to two months', next: 'qualify_dm', type: 'positive' },
+      { label: 'More than 2 months / further out', next: 'obj_timeline_disco', type: 'objection' },
+    ],
+  },
+
+  // ── QUALIFY — TIMELINE PUSHBACK (bring it into the window) ────────────────
+
+  obj_timeline_disco: {
+    id: 'obj_timeline_disco',
+    title: 'Qualify: Timeline Further Out',
+    isObjection: true,
+    script: "That's totally okay, I'm not trying to rush you into anything. Honestly, even a couple months out this is really just planning, so you'd have options and names ready for when you actually need them. That said, if someone genuinely great landed in front of you, would you be open to moving in the next month or two rather than sitting on it?",
+    waitForAnswer: true,
+    tip: "Pull the timeline into the ~1-2 month window so the call qualifies. Approved line (Vince / Kaito): 'Even if it's two months, it's planning.' Don't argue, reframe it as 'options ready when you are.' HARD STOP: if they're firmly 4+ months with no flexibility, they don't qualify — note it and let them go rather than manufacture a false yes.",
+    options: [
+      { label: 'Open to the next month or two after all', next: 'qualify_dm', type: 'positive' },
+      { label: 'Maybe, if the fit is right', next: 'qualify_dm', type: 'positive' },
+      { label: 'Firmly 3+ months, no flexibility', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
 
