@@ -113,7 +113,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_wrong_person',
     title: "Objection: Not the Decision-Maker",
     isObjection: true,
-    script: "Appreciate you being straight with me. Who typically owns hiring or staffing strategy over there? I'd love to make sure the right person sees this — would you introduce me, or is it alright if I reach out and mention your name?\n\n(if they'd still be part of the decision: keep going — you can bring both of you onto the same call.)",
+    script: "No worries at all, and thanks for being upfront. Who's usually the one who'd own something like this over there? I'd just hate for the right person to miss it. Happy to reach out myself, or if it's easier you can point me their way and I'll mention we spoke.\n\n(if they'd still be in on the decision: honestly, then it's still worth your while, we can just get both of you on the same call.)",
     tip: "Always get a name before you hang up — a warm referral converts far faster than a cold dial. If they'll still be in the room when the decision is made, you can carry on; just get the other decision-maker onto the same invite.",
     options: [
       { label: 'Gives a name / warm intro', next: 'end_callback', type: 'positive' },
@@ -142,7 +142,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_no_role',
     title: "No Role — Value Pitch + Research",
     isObjection: true,
-    script: "Okay, no worries!\n\nThe reason I asked is because we help business leaders like you cut salary costs by up to 80% using world-class global talent. And before calling you, I actually did some research...\n\n{geminiResearch}",
+    script: "No worries at all!\n\nThe only reason I ask is we help leaders like you bring down salary costs by up to 80% with really strong global talent, and I actually did a bit of homework on you before I called...\n\n{geminiResearch}",
     tip: "Gap Selling: even without a named role, lead with the cost problem — 'salary costs by up to 80%' creates instant curiosity. The research insert lets you surface a role for them. A general direction is enough to keep going into the value and offer.",
     options: [
       { label: 'Lead is engaged / curious', next: 'value_offer', type: 'positive' },
@@ -156,7 +156,7 @@ export const flow: Record<string, FlowNode> = {
   value_offer: {
     id: 'value_offer',
     title: 'Value & Offer (Pre-empt Price + Offshore)',
-    script: "Perfect — that's exactly the kind of role we place every day. I work with a couple of source partners who specialise in that exact role, and on the call they'll show you curated CVs and a full pricing breakdown so you can see the savings for yourself.\n\nAnd just so it's on the table up front: for Philippines-based talent the salary cost typically runs $3 to $9 an hour depending on the role and experience. The exact number is what the call nails down. We're a marketplace, not a recruiter — the world's leading one for offshore staffing, backed by Forbes and Harvard Business Review, with 4,000+ vetted partners. They present the CVs and pricing; you decide.\n\nSo they can line up the right people — do you have a particular experience level in mind for that role?",
+    script: "Perfect, that's honestly the kind of role we place all the time. I work with a couple of partners who specialise in exactly that, and on the call they'll put real CVs and a full pricing breakdown in front of you so you can see the savings for yourself.\n\nAnd just so it's out in the open early, talent in the Philippines usually runs $3 to $9 an hour depending on the role and experience, and the exact number gets pinned down on the call. Quick thing to know, we're a marketplace, not a recruiter, the biggest one in the world for offshore staffing actually, backed by Forbes and Harvard Business Review, with over 4,000 vetted partners. They bring the CVs and the pricing, you just decide.\n\nSo they can line up the right people for you, do you have a particular experience level in mind for that role?",
     waitForAnswer: true,
     tip: "FIX #5 — pre-empt the two universal objections here (price came up on 100% of calls, offshore on 93%) so they never derail the close. The '$3 to $9 an hour' range and 'Forbes and Harvard Business Review, 4,000+ partners' are approved, QA-gold lines — the exact wording that flipped skeptical leads. Capture the experience level to personalise the rest of the call; any answer moves you forward.",
     options: [
@@ -172,7 +172,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_offshore',
     title: 'Objection: Prefers Local / Unsure on Offshore',
     isObjection: true,
-    script: "Totally fair — a lot of leaders feel that way before they see it. Every partner we work with is pre-vetted, and you review curated profiles before committing to anyone, so you're never hiring blind. We target countries with strong English proficiency — in the Philippines it's an official business language — and most of our partners exclusively serve US, UK and Australian clients, so it's built for your market. Worth at least seeing the profiles and pricing side by side before you decide?",
+    script: "Totally fair, honestly most people feel that way until they actually see it. Every partner we work with is already vetted, and you'd get to look through real profiles before committing to anyone, so you're never going in blind. And on the language side, English is an official business language in the Philippines, and a lot of these partners work almost entirely with US, UK and Aussie companies, so it's genuinely built for your market. Would it be worth just seeing a few profiles and the pricing side by side before you make any call on it?",
     waitForAnswer: true,
     tip: "Offshore is raised on 93% of calls — handle it as a normal step, not a crisis. Lead with the profile preview (they're not hiring blind) and the English / market-fit proof. Your goal is just to get a yes to SEE the comparison.",
     options: [
@@ -187,7 +187,7 @@ export const flow: Record<string, FlowNode> = {
   two_meeting: {
     id: 'two_meeting',
     title: 'Two-Meeting Explainer',
-    script: "Here's how it works: I'll set you up with two back-to-back sessions, each with a different sourcing partner — different pricing and approach — so you get an apples-to-apples comparison in one 30-minute block, instead of shopping around yourself.",
+    script: "So here's how it'll work, I'll set you up with two quick back-to-back sessions, each with a different partner, slightly different pricing and approach, so you get a proper apples-to-apples comparison in one 30-minute block instead of having to chase it all down yourself.",
     tip: "Say the two-meeting explainer BEFORE the calendar ask, every call — it pre-empts the 'why two meetings?' objection that hit 5 of 18 scripts. 'Apples to apples, one 30-minute block' is the cleanest framing. Then go straight into the trial close.",
     options: [
       { label: 'Makes sense', next: 'trial_close', type: 'positive' },
@@ -199,7 +199,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_two_meetings',
     title: 'Objection: Why Two Meetings?',
     isObjection: true,
-    script: "We're a marketplace, not a single agency. Two sourcing partners each present their model, pricing and sample CVs — slightly different approaches — so you get an apples-to-apples comparison in one 30-minute block instead of shopping around yourself. It saves you time, it doesn't add to it.",
+    script: "Yeah, good question. So we're a marketplace, not just one agency, so I line you up with two partners back to back. Each one shows you their pricing and a few sample CVs, and they go about it a little differently, so you basically get an apples-to-apples comparison in one 30-minute sitting instead of chasing it all down yourself. It's meant to save you time, not eat more of it.",
     tip: "Approved pattern (Mickey / Jamar, Seashell Group): 'Oh, for comparison — that makes sense.' Frame the second partner as more choice, not more work. Don't lose the booking over it — if they insist on one, accommodate and keep moving.",
     options: [
       { label: 'Understood — open to it', next: 'trial_close', type: 'positive' },
@@ -212,7 +212,7 @@ export const flow: Record<string, FlowNode> = {
   trial_close: {
     id: 'trial_close',
     title: 'Trial Close (Mandatory)',
-    script: "Based on everything you've shared, this genuinely sounds worth 30 minutes of your time — fair to say?",
+    script: "Honestly, from everything you've told me, this really does sound worth 30 minutes of your time, fair to say?",
     waitForAnswer: true,
     tip: "FIX #1 — the step reps skip. Only 37% of non-booking calls ever attempt next-steps. DO NOT end discovery without this line. Wait for a yes or soft-yes, then book. If they hesitate, handle the ONE objection and re-ask — never skip to goodbye.",
     options: [
@@ -242,7 +242,7 @@ export const flow: Record<string, FlowNode> = {
   close_recap: {
     id: 'close_recap',
     title: 'Timeline Capture & Close (4 Criteria)',
-    script: "Quick recap so we're aligned: discovery call locked in with our sourcing partners, on a full-time, dedicated, offshore hire built into your team.\n\nAnd realistically — if the talent and pricing make sense — what's your window for bringing someone on?\n\n(let THEM say the number, then repeat their exact words back)\n\nPerfect — so [their exact timeline]. And since you're one of the people who'd make that call, can I get your commitment to be there on [Day]?",
+    script: "Quick recap so we're on the same page: we've got the discovery call locked in with our sourcing partners, for a full-time, dedicated, offshore hire built right into your team.\n\nAnd realistically, if the talent and the pricing make sense, what's your window for actually bringing someone on?\n\n(let THEM say the number, then repeat their exact words back)\n\nPerfect, so [their exact timeline]. And since you're one of the people who'd make that call, can I count on you to be there on [Day]?",
     waitForAnswer: true,
     tip: "FIX #3 + the Clean-Pass Checklist. Capture all 4 core criteria HERE, in their words, no re-qualifying: (1) open to offshore, (2) full-time dedicated, (3) 1-2 month window, (4) decision-maker in the room. Say 'within the next 1 to 2 months' — NEVER '30-60 days' or '1-3 months.' Let them state the timeline, then mirror it verbatim. If any criterion is fuzzy, tighten it before you hang up — that is what eliminates the QA callback.",
     options: [
@@ -259,7 +259,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_parttime',
     title: 'Qualify: Part-Time Rebuttal',
     isObjection: true,
-    script: "I understand wanting to start small. Because our talent is up to 80% less than local rates, a lot of clients get a dedicated full-time expert for the same budget they'd set for a part-time local hire. In the Philippines the regular week is 40 hours — you're paying for the full eight hours anyway and still save. If the numbers made sense, open to keeping this as a full-time seat?",
+    script: "Yeah, I get wanting to dip a toe in first. Here's the thing though, because the rates are up to 80% lower, a lot of folks end up getting a dedicated full-time person for what they'd have spent on part-time help locally. It's a full 40-hour week over there, so you're getting all eight hours a day and still saving. If the numbers actually stacked up, would you be open to just keeping it as a full-time seat?",
     waitForAnswer: true,
     tip: "We only place full-time, dedicated talent — part-time/project reads as a non-dedicated (disqualified) lead. Approved reframe (Summer / Jimmy): 'eight hours paid anyway, you still save.' Convert to a full-time yes; if they'll only ever do part-time, they don't qualify.",
     options: [
@@ -274,7 +274,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_timeline_far',
     title: 'Qualify: Bring Timeline Forward',
     isObjection: true,
-    script: "That's okay — we're not trying to push anybody. Even two months out, it's planning. This call is exploratory, so you have options and references ready when you are. That said, if you saw a candidate that genuinely clicked, would you be open to moving within the next 1 to 2 months rather than waiting?",
+    script: "That's totally okay, I'm not trying to rush you into anything. Even if it's a couple months out, this is really just planning, so you've got options and names ready for when you actually need them. That said, if someone walked in who was genuinely a great fit, would you be open to moving in the next month or two rather than sitting on it?",
     waitForAnswer: true,
     tip: "Approved line (Vince / Kaito): 'Even if it's two months, it's planning.' Goal: pull the timeline into the ~2-month window so the QC qualifies. HARD STOP: if they explicitly say 4+ months with no flexibility, they do NOT qualify — do not manufacture a false 1-2 months. Note it and move on.",
     options: [
@@ -290,7 +290,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_authority_late',
     title: 'Qualify: Decision-Maker (Bring Them In)',
     isObjection: true,
-    script: "Totally understood — most decisions at this level involve more than one person. The great thing about the call is you can bring your partner or co-founder so you both get the same information at once, and nothing gets lost in translation. Shall we get them on the invite too?",
+    script: "Yeah, of course, a call like this usually isn't a one-person decision anyway. Easiest thing is to just have your partner or co-founder hop on with you, that way you both hear the same thing at the same time and nothing gets lost in the retelling. Want me to add them to the invite too?",
     waitForAnswer: true,
     tip: "QA accepts a collaborative decision as long as the lead confirms they're IN the final decision. Get the other decision-maker onto the SAME invite rather than losing the booking — 'when you decide together, nothing's lost in translation.'",
     options: [
@@ -344,7 +344,7 @@ export const flow: Record<string, FlowNode> = {
   obj_timing: {
     id: 'obj_timing',
     title: 'Objection: Timing / Who Are You',
-    script: "No worries at all — I only need 30 seconds, and if it's not relevant I won't waste another minute of your time.\n\nI'm {yourName} from Outsource Accelerator — we help businesses cut their hiring costs by 50 to 80 percent using world-class offshore talent. Is that even something on your radar right now?",
+    script: "No worries at all, give me 30 seconds and if it's not relevant I'll happily let you go.\n\nSo I'm {yourName} over at Outsource Accelerator, we basically help businesses cut their hiring costs by 50 to 80 percent using really strong offshore talent. Is that even on your radar at the moment?",
     isObjection: true,
     tip: "Smart Calling: answer the 'who are you' cleanly and fast — name, company, one-line value prop. Then re-qualify with a soft question. Don't re-pitch. If they give you 30 seconds, move straight to pitch_q1.",
     options: [
@@ -356,7 +356,7 @@ export const flow: Record<string, FlowNode> = {
   obj_not_interested_opening: {
     id: 'obj_not_interested_opening',
     title: 'Objection: Not Interested (Opening)',
-    script: "That's completely fair — and I appreciate you being straight with me.\n\nCan I ask — is it more that you're already happy with how you hire, or is it just not a priority right now?\n\nThe reason I ask: most leaders say the same thing at first, until they realize how much they're overspending on talent without knowing it. I'm not asking you to change anything — just 30 seconds to see if the numbers even make sense for your situation.",
+    script: "That's completely fair, and I appreciate you being straight with me.\n\nCan I ask, is it more that you're happy with how you hire already, or is it just not really a priority right now?\n\nOnly reason I ask is most people say the exact same thing at first, right up until they see how much they've been quietly overpaying on talent. I'm not asking you to change a thing, just give me 30 seconds to see if the numbers even make sense for you.",
     isObjection: true,
     tip: "Psychology of Selling — Law of Indirect Effort: don't push harder, pull back. 'I'm not asking you to change anything' removes the threat. Curiosity is your goal — not persuasion. If they're still a hard no after this, let them go with grace.",
     options: [
@@ -382,7 +382,7 @@ export const flow: Record<string, FlowNode> = {
   obj_not_hiring: {
     id: 'obj_not_hiring',
     title: "Objection: Not Hiring Right Now",
-    script: "Totally fair — you may not be hiring right now, which is completely fine. The reason I'm calling is just to be part of your hiring evaluation for the near future. In 30 minutes we'd show you a side-by-side pricing comparison for any role you might need, so when the time comes you're not starting from scratch — you walk away with curated CVs and a cost breakdown.\n\nJust out of curiosity — what roles do you typically bring on when business picks back up? (even on the sales side?)",
+    script: "Totally fair, you might not be hiring right now and that's completely fine. Honestly I'd just love to be on your radar for when you are. In about 30 minutes we'd show you a side-by-side on pricing for any role you might need down the line, so when the time comes you're not starting from zero, you've already got CVs and a cost breakdown in hand.\n\nJust out of curiosity, what kind of roles do you usually bring on when things pick back up? Even on the sales side?",
     isObjection: true,
     tip: "Approved (Ben / Mark, Frame Homes): 'we would love to be part of your hiring evaluation for the near future.' Always probe for a specific role after this — Ben's 'even in sales side?' probe is what flipped Mark from 'no point' to a booking. Route the role into discovery.",
     options: [
@@ -394,7 +394,7 @@ export const flow: Record<string, FlowNode> = {
   obj_budget: {
     id: 'obj_budget',
     title: 'Objection: Budget / Cost / Rates',
-    script: "I hear you — and that's exactly why I'm calling: we're not adding to your costs, we're cutting them.\n\nFor Philippines-based talent the salary cost typically runs $3 to $9 an hour depending on role and experience — for the role you mentioned you'd be mid-range, and the exact number gets nailed on the call. To make it concrete: if you're paying $60K locally, the same role offshore often runs $12 to 18K. Two or three of those and you're looking at over $100K a year back in the business.\n\nWorth 30 minutes just to see the real numbers for your roles?",
+    script: "I hear you, and honestly that's the whole reason I'm calling, we're not adding to your costs, we're cutting them.\n\nFor talent in the Philippines you're usually looking at $3 to $9 an hour depending on the role and experience, and for what you mentioned you'd land somewhere in the middle. The exact number we nail down on the call. But to make it real, if you're paying around $60K locally, that same role offshore is often $12 to 18K. Have two or three of those and that's over $100K a year back in your pocket.\n\nWorth 30 minutes just to see the actual numbers for your roles?",
     isObjection: true,
     tip: "The $3-$9/hr range is a verbatim approved line (Vince / Paul, 465 Office) — use it, convert for UK/EU (£2.25–£7.65). Never fully deflect pricing. Then quantify the gap in dollars, not percentages: '$100K a year back' beats '80% savings.'",
     options: [
@@ -406,7 +406,7 @@ export const flow: Record<string, FlowNode> = {
   obj_doing_fine: {
     id: 'obj_doing_fine',
     title: "Objection: Team is Doing Fine",
-    script: "Good to hear — and we're not here to change your current process. We'd just like to be a strategic resource for saving on salary cost, because most of our partners offer up to 80% less than local hiring. Everything's discussed on the free discovery call — a pricing breakdown and curated CVs. Worth 30 minutes just to have that number on file.\n\nJust out of curiosity — when a key role opens up, what's the bigger headache: the time it takes, the cost, or finding the right skill set?",
+    script: "Good to hear, and I'm not calling to change anything you've got going. I'd honestly just like to be a resource for you on the salary-cost side, since most of our partners come in up to 80% under local hiring. It's all laid out on a free call, pricing and a few CVs, so it's worth 30 minutes just to have that number on file.\n\nQuick one though, when a key role opens up, what's the bigger headache for you, the time it takes, the cost, or actually finding the right skill set?",
     isObjection: true,
     tip: "Approved reframe (Carl / David, UBC Digital): 'strategic resource, not replacement' — the single most effective line in the approved set, use it verbatim. Challenge the status quo gently: 'doing fine' is not the same as 'doing it optimally.' Then get them to name their friction point.",
     options: [
@@ -418,7 +418,7 @@ export const flow: Record<string, FlowNode> = {
   obj_no_challenges: {
     id: 'obj_no_challenges',
     title: 'Objection: No Hiring Challenges',
-    script: "That's impressive — sounds like you've built a solid team and process.\n\nI'd still love to show you what we do, purely as a benchmarking exercise. Even if you're not looking to change anything, seeing the real cost comparison for your specific roles takes 30 minutes and gives you useful data either way.\n\nNo commitment at all. Worth a quick look?",
+    script: "That's genuinely impressive, sounds like you've built a really solid team and setup.\n\nI'd still love to show you what we do, even just as a benchmarking thing. Whether or not you ever change anything, seeing a real cost comparison for your roles takes about 30 minutes and you walk away with useful data either way.\n\nZero commitment. Worth a quick look?",
     isObjection: true,
     tip: "Reciprocity: frame the consultation as giving them something useful regardless of outcome — real salary benchmarking data. Lower the stakes: 'even if you don't change anything, you'll know your number.' Hold the voucher unless they're wavering — it comes at the end.",
     options: [
@@ -442,7 +442,7 @@ export const flow: Record<string, FlowNode> = {
   obj_already_outsourcing: {
     id: 'obj_already_outsourcing',
     title: 'Objection: Already Outsourcing / Need to Think',
-    script: "Great — you already know the model works. Can I ask: are you happy with both the quality AND the cost of your current setup, or is there room for improvement on either?\n\nMost clients who come to us were already outsourcing — they just found our partners offered better talent at a lower cost. It's a quick benchmarking call, no commitment, and you'll know in 30 minutes whether there's an upgrade on the table. Is there a role that's been harder to fill or more expensive than you'd like?",
+    script: "Oh nice, so you already know the model works, that's half the battle. Can I ask though, are you actually happy with both the quality AND the cost right now, or is there a bit of room on either one?\n\nHonestly most people who come to us were already outsourcing, they just found our partners had better talent for less. It's a quick benchmarking call, no strings, and in 30 minutes you'll know if there's an upgrade worth having. Is there a role that's been tougher to fill or pricier than you'd like?",
     isObjection: true,
     tip: "Smart Calling: they're already sold on the concept — the hard part's done. Make them curious whether their setup is optimal. 'Happy with both quality AND cost?' is a double-gate — most people are happy with one but not both. This is a warm prospect, not a dead one.",
     options: [
@@ -454,7 +454,7 @@ export const flow: Record<string, FlowNode> = {
   obj_not_interested_late: {
     id: 'obj_not_interested_late',
     title: 'Objection: Not Interested (Late Stage)',
-    script: "That's completely fair — I appreciate you giving me your time.\n\nIs it more that the timing isn't right, or is it that this just genuinely isn't something you'd consider?\n\nI only ask because if it's timing, I'd rather call you back when it makes more sense than waste both our time now.",
+    script: "That's completely fair, and I appreciate you giving me the time.\n\nCan I just ask, is it more that the timing's off right now, or is it genuinely not something you'd ever look at?\n\nOnly reason I ask, if it's timing, I'd much rather circle back when it actually suits you than push it now.",
     isObjection: true,
     tip: "Separate timing from a hard no — they have very different follow-up paths. A timing issue is a future pipeline entry; a hard no is a closed door. Don't chase a hard no. Do lock a specific callback date if it's timing: 'When would be the right time — Q3, end of year?'",
     options: [
@@ -466,7 +466,7 @@ export const flow: Record<string, FlowNode> = {
   obj_think_about_it: {
     id: 'obj_think_about_it',
     title: 'Objection: Need to Think About It',
-    script: "Of course — and I completely respect that. Can I ask what specifically you'd need to think through? Is it the timing, whether it's the right fit, or something else?\n\nThe reason I ask: our sourcing partners actually answer most of those questions in the consultation itself — they'll show you real CVs and real pricing for your specific roles. It's 30 minutes of data, not a sales pitch. And you walk away with useful benchmarking whether you move forward or not.\n\nDoes [Tuesday] or [Thursday] this week work to at least get that information in front of you?",
+    script: "Of course, totally respect that. Can I ask what specifically you'd want to chew on? Is it the timing, whether it's the right fit, or something else?\n\nReason I ask is the partners actually answer most of that on the call itself, they'll put real CVs and real pricing for your roles right in front of you. It's 30 minutes of straight info, not a pitch, and you walk away with something useful whether you go ahead or not.\n\nWould [Tuesday] or [Thursday] this week work just to get that in front of you?",
     isObjection: true,
     tip: "Schiffman + SPIN: diagnose what they're thinking about before re-pitching. Then reframe the consultation as information-gathering, not a sales meeting — 'it answers the questions you're thinking through.' Offer two specific days. Then capture the 4 criteria at the close.",
     options: [
@@ -481,7 +481,7 @@ export const flow: Record<string, FlowNode> = {
   obj_quality: {
     id: 'obj_quality',
     title: "Objection: Quality Won't Be as Good",
-    script: "That's the most common concern I hear — and it's a fair one to raise.\n\nEvery partner is vetted: technical assessments, client references, compliance checks. And you review curated profiles before agreeing to anything, so you're not hiring blind. If you don't feel confident after seeing them, you don't move forward.\n\nCan I ask — what does 'quality' mean for your specific role? Technical skill, communication, reliability, or output speed? Once I know your standard, I'll tell you directly whether we can match it — and if we can't, I'll say so.",
+    script: "Yeah, that's easily the most common thing I hear, and it's a fair one to raise.\n\nEvery partner gets vetted properly, skills testing, client references, compliance checks, the lot. And you get to look through real profiles before you agree to anyone, so you're never hiring blind. If you're not confident once you've seen them, you simply don't move forward.\n\nCan I ask though, what does 'quality' actually mean for your role? Is it the technical skill, the communication, reliability, speed? Once I know what you're measuring against, I'll tell you straight whether we can hit it, and if we can't, I'll say so.",
     isObjection: true,
     tip: "The profile preview is your strongest quality proof point — lead with it (you're not hiring blind). SPIN — Problem Question: 'What does quality mean for this role?' gets them to define their own standard, which you can then address specifically or agree it's not a fit.",
     options: [
@@ -493,7 +493,7 @@ export const flow: Record<string, FlowNode> = {
   obj_language: {
     id: 'obj_language',
     title: 'Objection: Language / Communication Barrier',
-    script: "That's a very common assumption — and it surprises most people when they see the reality.\n\nWe only present candidates who've passed language and communication screening. The Philippines is the third-largest English-speaking country in the world — English is an official business language used daily — and most of our partners exclusively serve US, UK and Australian clients.\n\nIs your concern about internal team communication, or is this for a customer-facing role? If it's customer-facing, we'd focus your search on partners who specialise in that with proven track records.",
+    script: "Yeah, really common assumption, and honestly it surprises most people once they see it firsthand.\n\nWe only put forward people who've already passed language and communication screening. The Philippines is actually the third-largest English-speaking country in the world, it's an official business language there, used every day, and a lot of our partners work almost exclusively with US, UK and Aussie clients.\n\nIs the worry more about internal team chat, or is this a customer-facing role? If it's customer-facing, we'd point you at partners who specialise in exactly that and have the track record to back it.",
     isObjection: true,
     tip: "Answer with a fact that surprises — 'third-largest English-speaking country' lands because they didn't expect it. Pair it with a specific example: 'a lot of clients say their offshore team communicates better in writing than some local hires.' Then narrow the concern: internal vs customer-facing.",
     options: [
@@ -505,7 +505,7 @@ export const flow: Record<string, FlowNode> = {
   obj_timezone: {
     id: 'obj_timezone',
     title: 'Objection: Time Zone Issues',
-    script: "Time zones are a real consideration — you're right to flag it.\n\nA few things that work well in practice: most of our partner staff in the Philippines work US business hours by choice — they're used to it and many prefer it. And for roles that are more process-based, a lot of clients find async actually increases output because there's less interruption during their own day.\n\nWhat does collaboration look like day-to-day for this role — constant real-time communication, or more task and output based?",
+    script: "Time zones are a real thing, you're right to bring it up.\n\nCouple of things that tend to work in practice though: most of the staff over there actually choose to work US hours, they're used to it and a lot of them prefer it. And for the more process-driven roles, plenty of clients find the async gap actually boosts output, fewer interruptions during their own day.\n\nWhat does the day-to-day look like for this role, is it constant back-and-forth, or more task and output based?",
     isObjection: true,
     tip: "Diagnose before defending. Real-time vs async are completely different scenarios. Task-based roles (finance, admin, design, dev) work excellently async. High-communication roles need a different conversation about US-hours partners. Ask first.",
     options: [
@@ -517,7 +517,7 @@ export const flow: Record<string, FlowNode> = {
   obj_tried_before: {
     id: 'obj_tried_before',
     title: 'Objection: Tried Outsourcing Before',
-    script: "I'm really glad you told me that — it actually changes how I'd approach this.\n\nCan I ask what went wrong? Was it the quality of the talent, the communication with the agency, management overhead, or something else?\n\n[Listen, then:] What you're describing is almost always a sourcing-quality problem — unvetted agencies placing whoever's available, not who's right. We pre-vet every partner and you compare two side by side before committing. Would it be worth 30 minutes to see how we'd approach your situation differently — and you decide from there?",
+    script: "I'm actually really glad you told me that, it genuinely changes how I'd go about this with you.\n\nCan I ask what went sideways? Was it the talent itself, the communication with the agency, the management overhead, or something else?\n\n[Listen, then:] Yeah, what you're describing is nearly always a sourcing problem, unvetted agencies just handing you whoever's free instead of whoever's right. We vet every partner up front and you compare two of them side by side before you commit to anything. Would it be worth 30 minutes to see how we'd handle your situation differently, and you take it from there?",
     isObjection: true,
     tip: "'Tried before' is your best lead — they've validated the concept, they just had a bad experience. Diagnose what broke, then differentiate OA's vetting model as the specific fix. Listen more than you talk in this one.",
     options: [
@@ -529,7 +529,7 @@ export const flow: Record<string, FlowNode> = {
   obj_confidential: {
     id: 'obj_confidential',
     title: 'Objection: Work Too Sensitive / Confidential',
-    script: "Completely understandable — and it's one we take seriously.\n\nAll of our partners operate with strict NDAs and data security protocols. The talent works on your systems, under your processes, with your security policies applied. In practice they function as a dedicated employee — they're just employed through the partner entity locally.\n\nWhat specifically is the sensitive aspect — customer data, proprietary IP, or financial information? Depending on the answer, there are partners in our network who specialise in exactly that compliance requirement.",
+    script: "Completely understandable, and it's something we take seriously too.\n\nEvery partner works under strict NDAs and proper data-security protocols. The person works on your systems, follows your processes, under your security policies, so in practice they're basically a dedicated employee, they just happen to be employed through the local partner.\n\nWhat's the sensitive bit specifically, is it customer data, your IP, financial info? Depending on which, there are partners who specialise in exactly that kind of compliance.",
     isObjection: true,
     tip: "Narrow the concern — 'confidential' means different things. Customer data (SOC2 partners), IP (NDA-first workflows), financial data (finance-specialist partners) all have different solutions. The specific answer tells you which partner to match them with.",
     options: [
@@ -542,7 +542,7 @@ export const flow: Record<string, FlowNode> = {
   obj_need_inoffice: {
     id: 'obj_need_inoffice',
     title: 'Objection: Need Someone In-Office',
-    script: "That's fair — can I ask what specifically needs to happen in-office? Is it a physical task, a management preference, or a genuine on-site requirement?\n\nA lot of our clients felt the same before they tried it. Remote management is different — it needs clear SOPs and communication rhythms, and our partners actually help set that up in the first 30 days.\n\nWould it change your view if there was structured onboarding support specifically for managing the role remotely?",
+    script: "That's fair, can I ask what actually needs to happen in the office? Is it a hands-on physical task, more of a management preference, or a genuine on-site requirement?\n\nA lot of clients felt exactly the same before they tried it. Managing someone remote is a different muscle, it needs clear SOPs and a bit of rhythm, and our partners actually help you set all that up in the first 30 days.\n\nWould it shift things for you if you had proper onboarding support built specifically around managing the role remotely?",
     isObjection: true,
     tip: "SPIN — Situation Question: 'What specifically needs to happen in-office?' often reveals it's a management preference, not a genuine physical requirement. Most roles that 'need' to be in-office don't. Get them to describe the actual task — then test it.",
     options: [
@@ -554,7 +554,7 @@ export const flow: Record<string, FlowNode> = {
   obj_how_manage: {
     id: 'obj_how_manage',
     title: 'Objection: How Do I Manage Someone Overseas?',
-    script: "That's one of the most common questions — and it's one our sourcing partners address directly in the consultation.\n\nThey walk you through the full setup: onboarding, communication tools, performance management, and what happens if there are issues. Most clients say it's much simpler than they expected — once the first 30 days are set up, it runs like managing any remote employee.\n\nHave you managed a remote team before, even locally?",
+    script: "Yeah, that's one of the most common questions, and it's exactly the kind of thing the partners walk you through on the call.\n\nThey take you through the whole setup, onboarding, what tools to use, how performance gets managed, and what happens if something goes wrong. Most people say it's way simpler than they expected, once the first 30 days are sorted it honestly runs like managing any remote employee.\n\nHave you managed anyone remote before, even locally?",
     isObjection: true,
     tip: "Fear of the unknown is the real objection. Reduce it by making the process visible and simple. If they've managed remote workers before — even locally — draw the parallel. The consultation is where this fear dissolves, so get them there.",
     options: [
@@ -566,7 +566,7 @@ export const flow: Record<string, FlowNode> = {
   obj_legal: {
     id: 'obj_legal',
     title: 'Objection: Is This Even Legal?',
-    script: "Great question — and the short answer is yes, completely legal and very common.\n\nThe way it works: the talent is employed by our local partner in their country, not directly by you. You're entering a service contract with a registered business entity. No payroll tax complexity on your end, no visa issues, no local employment law complications — the partner handles all of it.\n\nDoes that help clarify it, or is there a specific legal area you'd want your team to look at first?",
+    script: "Great question, and the short answer is yes, it's completely legal and honestly really common.\n\nHere's how it works: the person is employed by our local partner in their country, not directly by you. You're just entering a service contract with a registered business. So no payroll-tax headaches on your side, no visas, no local employment-law tangles, the partner takes care of all of that.\n\nDoes that clear it up, or is there a specific legal angle you'd want your team to look at first?",
     isObjection: true,
     tip: "Answer directly and confidently — hesitation on legal questions destroys trust. The structure is simple: service contract, not employment. If they have a legal team to consult, offer to send information and set a follow-up. That's a slower yes, not a no.",
     options: [
