@@ -86,7 +86,7 @@ export const flow: Record<string, FlowNode> = {
   discovery_q2: {
     id: 'discovery_q2',
     title: 'Discovery Q2: Hiring Friction',
-    script: "Awesome — and how's that working out for you so far? Finding great people when you need them, or is it more of a grind?",
+    script: "Awesome — and how's that working out for you so far, in terms of finding great talents?",
     waitForAnswer: true,
     tip: "SPIN — Implication: if they share any friction, multiply it before moving on. Try: 'When a key role sits open longer than expected, what does that cost you — project delays, the team absorbing extra load, or lost revenue?' Get them to say the cost out loud. A gap they can quantify is a gap worth closing.",
     options: [
