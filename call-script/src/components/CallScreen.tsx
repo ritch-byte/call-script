@@ -20,9 +20,13 @@ const MAIN_FLOW = [
   'opening',
   'pitch_q1',
   'discovery_q2',
+  'discovery_authority',
   'discovery_q3',
-  'value_prop',
+  'value_offer',
+  'two_meeting',
+  'trial_close',
   'booking',
+  'close_recap',
   'end_booked',
 ]
 
