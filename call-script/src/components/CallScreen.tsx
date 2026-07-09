@@ -28,7 +28,6 @@ const MAIN_FLOW = [
   'qualify_dm',
   'value_offer',
   'two_meeting',
-  'trial_close',
   'booking',
   'close_recap',
   'end_booked',

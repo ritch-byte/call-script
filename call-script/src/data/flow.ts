@@ -255,7 +255,7 @@ export const flow: Record<string, FlowNode> = {
     script: "So here's how it'll work, I'll set you up with two quick back-to-back sessions, each with a different partner, slightly different pricing and approach, so you get a proper apples-to-apples comparison in one 30-minute block instead of having to chase it all down yourself.",
     tip: "Say the two-meeting explainer BEFORE the calendar ask, every call — it pre-empts the 'why two meetings?' objection that hit 5 of 18 scripts. 'Apples to apples, one 30-minute block' is the cleanest framing. Then go straight into the trial close.",
     options: [
-      { label: 'Makes sense', next: 'trial_close', type: 'positive' },
+      { label: 'Makes sense', next: 'booking', type: 'positive' },
       { label: '"Why two meetings? / just one?"', next: 'obj_two_meetings', type: 'objection' },
     ],
   },
@@ -267,23 +267,8 @@ export const flow: Record<string, FlowNode> = {
     script: "Yeah, good question. So we're a marketplace, not just one agency, so I line you up with two partners back to back. Each one shows you their pricing and a few sample CVs, and they go about it a little differently, so you basically get an apples-to-apples comparison in one 30-minute sitting instead of chasing it all down yourself. It's meant to save you time, not eat more of it.",
     tip: "Approved pattern (Mickey / Jamar, Seashell Group): 'Oh, for comparison — that makes sense.' Frame the second partner as more choice, not more work. Don't lose the booking over it — if they insist on one, accommodate and keep moving.",
     options: [
-      { label: 'Understood — open to it', next: 'trial_close', type: 'positive' },
-      { label: 'Still only wants one', next: 'trial_close', type: 'positive' },
-    ],
-  },
-
-  // ── TRIAL CLOSE — MANDATORY (v5 FIX #1) ──────────────────────────────────
-
-  trial_close: {
-    id: 'trial_close',
-    title: 'Trial Close (Mandatory)',
-    script: "Honestly, from everything you've told me, this really does sound worth 30 minutes of your time, fair to say?",
-    waitForAnswer: true,
-    tip: "FIX #1 — the step reps skip. Only 37% of non-booking calls ever attempt next-steps. DO NOT end discovery without this line. Wait for a yes or soft-yes, then book. If they hesitate, handle the ONE objection and re-ask — never skip to goodbye.",
-    options: [
-      { label: 'Yes / soft yes', next: 'booking', type: 'positive' },
-      { label: 'Hesitation / "need to think"', next: 'obj_think_about_it', type: 'objection' },
-      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
+      { label: 'Understood — open to it', next: 'booking', type: 'positive' },
+      { label: 'Still only wants one', next: 'booking', type: 'positive' },
     ],
   },
 
