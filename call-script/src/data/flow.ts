@@ -448,9 +448,9 @@ export const flow: Record<string, FlowNode> = {
     title: "Objection: Not Hiring Right Now",
     script: "Totally fair, you might not be hiring right now and that's completely fine. Honestly I'd just love to be on your radar for when you are. In about 30 minutes we'd show you a side-by-side on pricing for any role you might need down the line, so when the time comes you're not starting from zero, you've already got CVs and a cost breakdown in hand.\n\nJust out of curiosity, what kind of roles do you usually bring on when things pick back up? Even on the sales side?",
     isObjection: true,
-    tip: "Approved (Ben / Mark, Frame Homes): 'we would love to be part of your hiring evaluation for the near future.' Always probe for a specific role after this — Ben's 'even in sales side?' probe is what flipped Mark from 'no point' to a booking. Route the role into discovery.",
+    tip: "Approved (Ben / Mark, Frame Homes): 'we would love to be part of your hiring evaluation for the near future.' Always probe for a specific role after this — Ben's 'even in sales side?' probe is what flipped Mark from 'no point' to a booking. Once they name a role, go straight into the must-knows (you'll pick up at the full-time question).",
     options: [
-      { label: 'They share a role / future plan', next: 'discovery_q2', type: 'positive' },
+      { label: 'They share a role / future plan', next: 'qualify_fulltime', type: 'positive' },
       { label: 'Nothing planned / not relevant', next: 'end_not_interested', type: 'end' },
     ],
   },
