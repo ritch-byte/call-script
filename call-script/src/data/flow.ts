@@ -150,12 +150,12 @@ export const flow: Record<string, FlowNode> = {
   qualify_timeline: {
     id: 'qualify_timeline',
     title: 'Qualify ④ Timeline',
-    script: "And if the right person showed up, when would you ideally want them starting?",
+    script: "And if the right person showed up, would you be looking to bring them on within a few weeks, or more like one to two months?",
     waitForAnswer: true,
-    tip: "Must-Know 4 of 5 (timeline). Just capture it conversationally here, in their own words — you'll firm up the 1 to 2 month window in the recap. Don't gate it yet; get the honest answer first.",
+    tip: "Must-Know 4 of 5 (timeline). Give them a choice between two in-window options — a few weeks or one to two months — so either answer keeps them inside the qualifying window. If they push further out than that, don't gate it here; you'll firm it up in the recap.",
     options: [
-      { label: 'Soon / within a couple months', next: 'qualify_dm', type: 'positive' },
-      { label: 'Further out / not sure yet', next: 'qualify_dm', type: 'positive' },
+      { label: 'Within a few weeks', next: 'qualify_dm', type: 'positive' },
+      { label: 'One to two months', next: 'qualify_dm', type: 'positive' },
     ],
   },
 
