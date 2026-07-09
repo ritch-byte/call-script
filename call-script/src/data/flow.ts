@@ -336,15 +336,14 @@ export const flow: Record<string, FlowNode> = {
 
   obj_timeline_far: {
     id: 'obj_timeline_far',
-    title: 'Qualify: Bring Timeline Forward',
+    title: 'Timeline 3+ Months (AQPC)',
     isObjection: true,
-    script: "That's totally okay, I'm not trying to rush you into anything. Even if it's a couple months out, this is really just planning, so you've got options and names ready for when you actually need them. That said, if someone walked in who was genuinely a great fit, would you be open to moving in the next month or two rather than sitting on it?",
+    script: "I completely understand, you've got your standards, and honestly I'm right there with you.\n\nCan I ask, is it the skills, the experience, the culture fit, or the pricing?\n\nWhatever it is, that's exactly what gets expounded and explained on the discovery call, and that's the whole reason we're setting up this free consultative meeting for you.\n\n(processing the invitation now...) So can I count on you to attend our meeting?",
     waitForAnswer: true,
-    tip: "Approved line (Vince / Kaito): 'Even if it's two months, it's planning.' Goal: pull the timeline into the ~2-month window so the QC qualifies. HARD STOP: if they explicitly say 4+ months with no flexibility, they do NOT qualify — do not manufacture a false 1-2 months. Note it and move on.",
+    tip: "AQPC: Acknowledge their standards, Question to surface the real concern (skills, experience, culture fit, or pricing), Pivot to the discovery call as where it all gets answered, then Close for attendance. A '3+ months' stall is usually a smokescreen for one of those four — surface it, then drive straight back to the meeting.",
     options: [
-      { label: 'Yes — open to 1-2 months', next: 'end_booked', type: 'positive' },
-      { label: 'Maybe, if the fit is right', next: 'end_booked', type: 'positive' },
-      { label: '4+ months, no flexibility (does not qualify)', next: 'obj_not_interested_late', type: 'objection' },
+      { label: "Yes — I'll be there", next: 'end_booked', type: 'positive' },
+      { label: 'Still not ready / firmly 3+ months', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
 
