@@ -53,6 +53,7 @@ export default function CallScreen({ onReset }: Props) {
   const [showObjections, setShowObjections] = useState(false)
   const [showRates, setShowRates] = useState(false)
   const [showResearch, setShowResearch] = useState(false)
+  const [showGates, setShowGates] = useState(false)
   const [emailPageOpen, setEmailPageOpen] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
@@ -215,15 +216,21 @@ export default function CallScreen({ onReset }: Props) {
         <div className="header-actions">
           <button
             className={`btn-header-ghost${showRates ? ' btn-header-active' : ''}`}
-            onClick={() => { setShowRates(v => !v); setShowResearch(false) }}
+            onClick={() => { setShowRates(v => !v); setShowResearch(false); setShowGates(false) }}
           >
             Rates
           </button>
           <button
             className={`btn-header-ghost${showResearch ? ' btn-header-active' : ''}`}
-            onClick={() => { setShowResearch(v => !v); setShowRates(false) }}
+            onClick={() => { setShowResearch(v => !v); setShowRates(false); setShowGates(false) }}
           >
             Research
+          </button>
+          <button
+            className={`btn-header-ghost${showGates ? ' btn-header-active' : ''}`}
+            onClick={() => { setShowGates(v => !v); setShowRates(false); setShowResearch(false) }}
+          >
+            Gates
           </button>
           <button
             className="btn-header-ghost"
@@ -297,6 +304,46 @@ export default function CallScreen({ onReset }: Props) {
             onChange={e => setGeminiResearch(e.target.value)}
             rows={4}
           />
+        </div>
+      )}
+
+      {/* ── Gates Cheat Card ── */}
+      {showGates && (
+        <div className="reference-bar">
+          <div className="reference-bar-header">
+            <span className="reference-bar-title">The 3 Gates — say it out loud</span>
+            <button className="btn-ref-close" onClick={() => setShowGates(false)}>Close</button>
+          </div>
+          <p style={{ margin: '0 0 12px', fontSize: 12.5, color: '#5b6379' }}>
+            The analyzer credits what the <strong style={{ color: '#15213f' }}>buyer</strong> says out loud — not your summary. Get a spoken &ldquo;yes&rdquo; on all three.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+            {[
+              { g: 'Gate 1 · Near-term need', ask: '“When would you want someone starting?”', say: ['“one to two months”', '“thirty to sixty days”'], not: ['“2–3 months”', '“90 days”', '“next year”'] },
+              { g: 'Gate 2 · Open to offshore', ask: '“Offshore, on your hours — open to that?”', say: ['“yes, open to that”', '“the Philippines is fine”', '“we already use offshore”'], not: ['“must be local”', '“on-site only”'] },
+              { g: 'Gate 3 · Full-time dedicated', ask: '“Full-time dedicated, or part-time?”', say: ['“full-time”', '“dedicated, just for us”', '“forty hours”'], not: ['“part-time”', '“project / shared”', '“ad hoc”'] },
+            ].map(c => (
+              <div key={c.g} style={{ background: '#fff', border: '1px solid #e5e8f1', borderRadius: 10, padding: '12px 14px' }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '.02em', color: '#d6006e', marginBottom: 6 }}>{c.g}</div>
+                <div style={{ fontSize: 12.5, color: '#5b6379', fontStyle: 'italic', marginBottom: 10 }}>{c.ask}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {c.say.map(s => (
+                    <div key={s} style={{ fontSize: 13, color: '#15213f' }}>
+                      <span style={{ color: '#0f9e78', fontWeight: 800, marginRight: 6 }}>✓</span>{s}
+                    </div>
+                  ))}
+                  {c.not.map(n => (
+                    <div key={n} style={{ fontSize: 12.5, color: '#98a0b3' }}>
+                      <span style={{ color: '#c0364a', fontWeight: 800, marginRight: 6 }}>✕</span>{n}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 12, background: '#f2f4fa', borderRadius: 10, padding: '10px 14px', fontSize: 12.5, color: '#3f4a5f' }}>
+            <strong style={{ color: '#15213f' }}>Recap &amp; lock:</strong> end on a question, wait for an audible &ldquo;yes.&rdquo; A nod isn&rsquo;t proof. &ldquo;Maybe / possibly / probably&rdquo; reads as <strong style={{ color: '#c0364a' }}>unclear</strong> and flags — convert it to an explicit yes before you book.
+          </div>
         </div>
       )}
 
