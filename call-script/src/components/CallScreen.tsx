@@ -3,6 +3,7 @@ import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE } from '../data/f
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
+import { callAI, buildResearchPrompt } from '../lib/ai'
 
 interface Props {
   callData: CallData
@@ -32,8 +33,6 @@ const MAIN_FLOW = [
   'close_recap',
   'end_booked',
 ]
-
-const NETLIFY_BASE = 'https://silver-cuchufli-071209.netlify.app'
 
 function interpolate(text: string, leadName: string, yourName: string, geminiResearch: string, ctx: Context): string {
   return text
@@ -72,25 +71,16 @@ export default function CallScreen({ onReset }: Props) {
   const [sharedLink2, setSharedLink2] = useState('')
   const activeRef = useRef<HTMLDivElement>(null)
 
-  const isGitHubPages = window.location.hostname.includes('github.io')
-
-  const functionUrl = (name: string) =>
-    isGitHubPages
-      ? `${NETLIFY_BASE}/.netlify/functions/${name}`
-      : `/.netlify/functions/${name}`
-
   const generateSpiel = async () => {
     setIsGenerating(true)
     setGenError('')
     try {
-      const res = await fetch(functionUrl('generate-spiel'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rawInput: rawInput.trim() }),
+      const spiel = await callAI({
+        prompt: buildResearchPrompt(rawInput.trim()),
+        model: 'claude-haiku-4-5-20251001',
+        maxTokens: 400,
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Generation failed')
-      setGeminiResearch(data.spiel)
+      setGeminiResearch(spiel)
     } catch (err) {
       setGenError(err instanceof Error ? err.message : 'Generation failed')
     } finally {

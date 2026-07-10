@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
+import { callAI } from '../lib/ai'
 
 // ---------------------------------------------------------------
 // OA BRAND TOKENS
@@ -9,8 +10,6 @@ const NAVY_DEEP = '#0f1729'
 const MAGENTA = '#d6006e'
 const MAGENTA_SOFT = '#ff5fa8'
 const PAPER = '#f6f7fb'
-
-const NETLIFY_BASE = 'https://silver-cuchufli-071209.netlify.app'
 
 // ---------------------------------------------------------------
 // BEST-PRACTICES KNOWLEDGE BASE (from the internal field guide)
@@ -95,10 +94,6 @@ const wordCount = (s: string) => (s || '').trim().split(/\s+/).filter(Boolean).l
 const stripDashes = (s: string) => (s || '').replace(/—|–/g, ', ').replace(/ ,/g, ',')
 
 export default function EmailComposer() {
-  const isGitHubPages = window.location.hostname.includes('github.io')
-  const fnUrl = (name: string) =>
-    isGitHubPages ? `${NETLIFY_BASE}/.netlify/functions/${name}` : `/.netlify/functions/${name}`
-
   const [conversation, setConversation] = useState('')
   const [includeHook, setIncludeHook] = useState(true)
   const [showGuide, setShowGuide] = useState(false)
@@ -149,13 +144,9 @@ Respond with ONLY valid JSON, no markdown fences, no preamble, in exactly this s
 }`
 
     try {
-      const res = await fetch(fnUrl('compose-email'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Generation failed')
+      const text = await callAI({ prompt, model: 'claude-sonnet-4-6', maxTokens: 1500 })
+      const clean = text.replace(/```json|```/g, '').trim()
+      const data = JSON.parse(clean)
       if (!data.variants || !data.variants.length) throw new Error('No variants returned')
 
       // Safety net: strip any dash that slipped through
