@@ -72,7 +72,7 @@ export const flow: Record<string, FlowNode> = {
   pitch_q1: {
     id: 'pitch_q1',
     title: 'Value Hook + Discovery Q1',
-    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo the reason I'm reaching out — salaries for specialized talent keep climbing, and I work with a team that helps leaders grow their headcount WITHOUT growing the expense. Usually by connecting them with world-class global talent at up to 80% less than local hiring.\n\nJust out of curiosity — for your hiring right now, do you keep everything in-house, or do you ever work with external partners for anything?",
+    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah we are just trying to reach out to all businesses across different industries, mainly because salaries for specialized local talent is really getting expensive. Right? So I work with a team that focuses on helping leaders like you handle their growth without increasing their expenses, usually by connecting you with our global talent network that provide world class talent at 80% less than local hiring.\n\nJust out of curiosity — for your hiring right now, do you keep everything in-house, or do you ever work with external partners for anything?",
     waitForAnswer: true,
     tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'Grow headcount without growing the expense' is the v5 hook. Keep the discovery question binary; don't stack more on top of it.",
     options: [
