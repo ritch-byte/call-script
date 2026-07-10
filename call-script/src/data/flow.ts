@@ -128,7 +128,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Qualify ② Full-Time',
     script: "Makes sense. And I assume this'd be a full-time position, like thirty to forty hours a week, right?",
     waitForAnswer: true,
-    tip: "Must-Know 2 of 5 (full-time). Frame it assumptively as full-time (thirty to forty hours) — don't plant the part-time idea. If they push back to part-time, handle it; don't just roll on.",
+    tip: "Must-Know 2 of 5 (full-time). Frame it assumptively as full-time (thirty to forty hours) — don't plant the part-time idea. If they push back to part-time, handle it; don't just roll on. ANALYZER: Gate 3 counts only when the buyer says 'full-time' or 'dedicated' out loud — 'part-time / project / shared / ad hoc' kills it.",
     options: [
       { label: 'Full-time / dedicated', next: 'qualify_volume', type: 'positive' },
       { label: 'Part-time / project', next: 'obj_parttime', type: 'objection' },
@@ -152,7 +152,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Qualify ④ Timeline',
     script: "And if the right person showed up, would you be looking to bring them on within a few weeks, or more like one to two months?",
     waitForAnswer: true,
-    tip: "Must-Know 4 of 5 (timeline). Give them a choice between two in-window options — a few weeks or one to two months — so either answer keeps them inside the qualifying window. If they push further out than that, don't gate it here; you'll firm it up in the recap.",
+    tip: "Must-Know 4 of 5 (timeline). Give them a choice between two in-window options — a few weeks or one to two months — so either answer keeps them inside the qualifying window. If they push further out than that, don't gate it here; you'll firm it up in the recap. ANALYZER: timeline is the #1 flag reason — it credits the window in the buyer's OWN words, inside ~1-2 months. '2-3 months / 90 days / next year / no timeframe' flags or kills, and 'maybe / possibly / probably' reads as UNCLEAR. Land an explicit 'one to two months.'",
     options: [
       { label: 'Within a few weeks', next: 'qualify_dm', type: 'positive' },
       { label: 'One to two months', next: 'qualify_dm', type: 'positive' },
@@ -168,7 +168,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     script: "That's totally okay, I'm not trying to rush you into anything. Honestly, even a couple months out this is really just planning, so you'd have options and names ready for when you actually need them. That said, if someone genuinely great landed in front of you, would you be open to moving in the next month or two rather than sitting on it?",
     waitForAnswer: true,
-    tip: "Pull the timeline into the ~1-2 month window so the call qualifies. Approved line (Vince / Kaito): 'Even if it's two months, it's planning.' Don't argue, reframe it as 'options ready when you are.' HARD STOP: if they're firmly 4+ months with no flexibility, they don't qualify — note it and let them go rather than manufacture a false yes.",
+    tip: "Pull the timeline into the ~1-2 month window so the call qualifies. Approved line (Vince / Kaito): 'Even if it's two months, it's planning.' Don't argue, reframe it as 'options ready when you are.' HARD STOP: if they're firmly 4+ months with no flexibility, they don't qualify — note it and let them go rather than manufacture a false yes. ANALYZER: '2-3 months / 90 days' scores just outside the window and flags, and 'maybe / possibly / probably' reads as UNCLEAR — convert it to an explicit 'yes, one to two months' in their words before you book.",
     options: [
       { label: 'Open to the next month or two after all', next: 'qualify_dm', type: 'positive' },
       { label: 'Maybe, if the fit is right', next: 'qualify_dm', type: 'positive' },
@@ -181,7 +181,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Qualify ⑤ Decision-Maker',
     script: "Perfect. And are you the one who'd sign off on this, or is there someone else involved in that call?",
     waitForAnswer: true,
-    tip: "Must-Know 5 of 5 (decision-maker). 'Are you the one who'd sign off, or is someone else involved?' is clean and doesn't read as interrogation. A collaborative answer still qualifies as long as they're in the room. If it's entirely someone else, get a name.",
+    tip: "Must-Know 5 of 5 (decision-maker). 'Are you the one who'd sign off, or is someone else involved?' is clean and doesn't read as interrogation. A collaborative answer still qualifies as long as they're in the room. If it's entirely someone else, get a name. ANALYZER: not being the decision-maker doesn't kill the call but it flags a reviewer — clear it by getting the actual sign-off person onto the invite.",
     options: [
       { label: 'They sign off / involved in it', next: 'value_offer', type: 'positive' },
       { label: 'Someone else entirely decides', next: 'obj_wrong_person', type: 'objection' },
@@ -193,7 +193,7 @@ export const flow: Record<string, FlowNode> = {
     title: "Objection: Not the Decision-Maker",
     isObjection: true,
     script: "No worries at all, and thanks for being upfront. Who's usually the one who'd own something like this over there? I'd just hate for the right person to miss it. Happy to reach out myself, or if it's easier you can point me their way and I'll mention we spoke.\n\n(if they'd still be in on the decision: honestly, then it's still worth your while, we can just get both of you on the same call.)",
-    tip: "Always get a name before you hang up — a warm referral converts far faster than a cold dial. If they'll still be in the room when the decision is made, you can carry on; just get the other decision-maker onto the same invite.",
+    tip: "Always get a name before you hang up — a warm referral converts far faster than a cold dial. If they'll still be in the room when the decision is made, you can carry on; just get the other decision-maker onto the same invite. ANALYZER: authority is a flag, not an instant kill — clear it by getting the real sign-off person onto the invite or confirmed as attending.",
     options: [
       { label: 'Gives a name / warm intro', next: 'end_callback', type: 'positive' },
       { label: "They're still in the room for the decision", next: 'value_offer', type: 'positive' },
@@ -223,7 +223,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Value & Offer (Pre-empt Price + Offshore)',
     script: "Perfect, that's honestly the kind of role we place all the time. I work with a couple of partners who specialise in exactly that, and on the call they'll put real CVs and a full pricing breakdown in front of you so you can see the savings for yourself.\n\nAnd just so it's out in the open early, talent in the Philippines usually runs $3 to $9 an hour depending on the role and experience, and the exact number gets pinned down on the call. Quick thing to know, we're a marketplace, not a recruiter, the biggest one in the world for offshore staffing actually, backed by Forbes and Harvard Business Review, with over 4,000 vetted partners. They bring the CVs and the pricing, you just decide.\n\nSo they can line up the right people for you, do you have a particular experience level in mind for that role?",
     waitForAnswer: true,
-    tip: "FIX #5 — pre-empt the two universal objections here (price came up on 100% of calls, offshore on 93%) so they never derail the close. The '$3 to $9 an hour' range and 'Forbes and Harvard Business Review, 4,000+ partners' are approved, QA-gold lines — the exact wording that flipped skeptical leads. Capture the experience level to personalise the rest of the call; any answer moves you forward.",
+    tip: "FIX #5 — pre-empt the two universal objections here (price came up on 100% of calls, offshore on 93%) so they never derail the close. The '$3 to $9 an hour' range and 'Forbes and Harvard Business Review, 4,000+ partners' are approved, QA-gold lines — the exact wording that flipped skeptical leads. Capture the experience level to personalise the rest of the call; any answer moves you forward. ANALYZER: this sets up Gate 2 (offshore) — later you'll need 'yes, open to offshore' or 'the Philippines is fine' in the buyer's own voice for it to count.",
     options: [
       { label: 'Gives an experience level', next: 'two_meeting', type: 'positive' },
       { label: 'Not sure / open to any', next: 'two_meeting', type: 'positive' },
@@ -239,7 +239,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     script: "Totally fair, honestly most people feel that way until they actually see it. Every partner we work with is already vetted, and you'd get to look through real profiles before committing to anyone, so you're never going in blind. And on the language side, English is an official business language in the Philippines, and a lot of these partners work almost entirely with US, UK and Aussie companies, so it's genuinely built for your market. Would it be worth just seeing a few profiles and the pricing side by side before you make any call on it?",
     waitForAnswer: true,
-    tip: "Offshore is raised on 93% of calls — handle it as a normal step, not a crisis. Lead with the profile preview (they're not hiring blind) and the English / market-fit proof. Your goal is just to get a yes to SEE the comparison.",
+    tip: "Offshore is raised on 93% of calls — handle it as a normal step, not a crisis. Lead with the profile preview (they're not hiring blind) and the English / market-fit proof. Your goal is just to get a yes to SEE the comparison. ANALYZER: Gate 2 needs a spoken 'yes, open to offshore' / 'the Philippines is fine.' A hard 'must be local / on-site only' kills it — if the role is genuinely physically on-site, disqualify honestly rather than force it.",
     options: [
       { label: 'Open to seeing it', next: 'two_meeting', type: 'positive' },
       { label: 'Genuinely needs someone on-site', next: 'obj_need_inoffice', type: 'objection' },
@@ -294,7 +294,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Timeline Capture & Close (4 Criteria)',
     script: "Quick recap so we're on the same page: we've got the discovery call locked in with our sourcing partners, for a full-time, dedicated, offshore hire built right into your team.\n\nAnd realistically, if the talent and the pricing make sense, what's your window for actually bringing someone on?\n\n(let THEM say the number, then repeat their exact words back)\n\nPerfect, so [their exact timeline]. And since you're one of the people who'd make that call, can I count on you to be there on [Day]?",
     waitForAnswer: true,
-    tip: "FIX #3 + the Clean-Pass Checklist. Capture all 4 core criteria HERE, in their words, no re-qualifying: (1) open to offshore, (2) full-time dedicated, (3) 1-2 month window, (4) decision-maker in the room. Say 'within the next 1 to 2 months' — NEVER '30-60 days' or '1-3 months.' Let them state the timeline, then mirror it verbatim. If any criterion is fuzzy, tighten it before you hang up — that is what eliminates the QA callback.",
+    tip: "THE RECAP IS THE RECORD — this is what the analyzer reads. Recap the three gates and END ON A QUESTION ('did I get that right?'), then WAIT for an audible 'yes.' A nod or 'mhmm' isn't evidence on the recording; the analyzer credits what the BUYER says, not your summary. Name the window out loud — 'one to two months' (or 'thirty to sixty days'), NEVER '1-3 months', '2-3 months' or '90 days.' Get a spoken yes on all three — timeline, offshore, full-time; miss one and it's disqualified. Keep it to two sentences and one question, then book — don't talk for the buyer.",
     options: [
       { label: 'Clean — 1-2 months, full-time, offshore, in the room', next: 'end_booked', type: 'positive' },
       { label: 'Timeline is 3+ months / no firm date', next: 'obj_timeline_far', type: 'objection' },
@@ -310,7 +310,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     script: "Yeah, I get wanting to dip a toe in first. Here's the thing though, because the rates are up to 80% lower, a lot of folks end up getting a dedicated full-time person for what they'd have spent on part-time help locally. It's a full 40-hour week over there, so you're getting all eight hours a day and still saving. If the numbers actually stacked up, would you be open to just keeping it as a full-time seat?",
     waitForAnswer: true,
-    tip: "We only place full-time, dedicated talent — part-time/project reads as a non-dedicated (disqualified) lead. Approved reframe (Summer / Jimmy): 'eight hours paid anyway, you still save.' Convert to a full-time yes; if they'll only ever do part-time, they don't qualify.",
+    tip: "We only place full-time, dedicated talent — part-time/project reads as a non-dedicated (disqualified) lead. Approved reframe (Summer / Jimmy): 'eight hours paid anyway, you still save.' Convert to a full-time yes; if they'll only ever do part-time, they don't qualify. ANALYZER: Gate 3 needs 'full-time, dedicated, just for me' from the buyer's mouth — 'shared / project / a few hours' kills it.",
     options: [
       { label: 'Open to a full-time seat', next: 'qualify_volume', type: 'positive' },
       { label: 'Still only wants part-time', next: 'obj_not_interested_late', type: 'objection' },
@@ -369,7 +369,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Booked!',
     script: "Done — sending the invite now. Once you accept, a $10 Amazon voucher lands as a thank-you for confirming, and the $100 comes right after the call. Looking forward to it, {leadName} — talk soon!",
     isEnd: true,
-    tip: "VOUCHER DISCIPLINE (FIX #6): mention it last, framed as thanks — never as the hook. With a skeptical or experienced offshore buyer, drop it entirely. $10 on accept, $100 after the call.",
+    tip: "VOUCHER DISCIPLINE (FIX #6): mention it last, framed as thanks — never as the hook. With a skeptical or experienced offshore buyer, drop it entirely. $10 on accept, $100 after the call. ANALYZER: leads who only chase the voucher get flagged as voucher-motivated — keep it a footnote, anchor on solving the role.",
     options: [],
   },
   end_callback: {
@@ -432,7 +432,7 @@ export const flow: Record<string, FlowNode> = {
     title: "Objection: Not Hiring Right Now",
     script: "Totally fair, you might not be hiring right now and that's completely fine. Honestly I'd just love to be on your radar for when you are. In about 30 minutes we'd show you a side-by-side on pricing for any role you might need down the line, so when the time comes you're not starting from zero, you've already got CVs and a cost breakdown in hand.\n\nJust out of curiosity, what kind of roles do you usually bring on when things pick back up? Even on the sales side?",
     isObjection: true,
-    tip: "Approved (Ben / Mark, Frame Homes): 'we would love to be part of your hiring evaluation for the near future.' Always probe for a specific role after this — Ben's 'even in sales side?' probe is what flipped Mark from 'no point' to a booking. Once they name a role, go straight into the must-knows (you'll pick up at the full-time question).",
+    tip: "Approved (Ben / Mark, Frame Homes): 'we would love to be part of your hiring evaluation for the near future.' Always probe for a specific role after this — Ben's 'even in sales side?' probe is what flipped Mark from 'no point' to a booking. Once they name a role, go straight into the must-knows (you'll pick up at the full-time question). ANALYZER: 'not hiring' is almost never a true no — read it as 'not right now.' The win is landing an explicit 'one to two months' in their words; don't book on 'sometime.'",
     options: [
       { label: 'They share a role / future plan', next: 'qualify_fulltime', type: 'positive' },
       { label: 'Nothing planned / not relevant', next: 'end_not_interested', type: 'end' },
@@ -444,7 +444,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Objection: Budget / Cost / Rates',
     script: "I hear you, and honestly that's the whole reason I'm calling, we're not adding to your costs, we're cutting them.\n\nFor talent in the Philippines you're usually looking at $3 to $9 an hour depending on the role and experience, and for what you mentioned you'd land somewhere in the middle. The exact number we nail down on the call. But to make it real, if you're paying around $60K locally, that same role offshore is often $12 to 18K. Have two or three of those and that's over $100K a year back in your pocket.\n\nWorth 30 minutes just to see the actual numbers for your roles?",
     isObjection: true,
-    tip: "The $3-$9/hr range is a verbatim approved line (Vince / Paul, 465 Office) — use it, convert for UK/EU (£2.25–£7.65). Never fully deflect pricing. Then quantify the gap in dollars, not percentages: '$100K a year back' beats '80% savings.'",
+    tip: "The $3-$9/hr range is a verbatim approved line (Vince / Paul, 465 Office) — use it, convert for UK/EU (£2.25–£7.65). Never fully deflect pricing. Then quantify the gap in dollars, not percentages: '$100K a year back' beats '80% savings.' ANALYZER: if they only care about the $100 voucher, that flags as voucher-motivated — anchor on the role and the savings, not the gift card.",
     options: [
       { label: "They're open to hearing the numbers", next: 'two_meeting', type: 'positive' },
       { label: 'Still not interested', next: 'end_not_interested', type: 'end' },
@@ -504,7 +504,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Objection: Not Interested (Late Stage)',
     script: "That's completely fair, and I appreciate you giving me the time.\n\nCan I just ask, is it more that the timing's off right now, or is it genuinely not something you'd ever look at?\n\nOnly reason I ask, if it's timing, I'd much rather circle back when it actually suits you than push it now.",
     isObjection: true,
-    tip: "Separate timing from a hard no — they have very different follow-up paths. A timing issue is a future pipeline entry; a hard no is a closed door. Don't chase a hard no. Do lock a specific callback date if it's timing: 'When would be the right time — Q3, end of year?'",
+    tip: "Separate timing from a hard no — they have very different follow-up paths. A timing issue is a future pipeline entry; a hard no is a closed door. Don't chase a hard no. Do lock a specific callback date if it's timing: 'When would be the right time — Q3, end of year?' ANALYZER: if a lead genuinely fails a gate, that's an honest disqualification — set a callback, don't manufacture a yes or lean on an override. A faked pass becomes a no-show and flags anyway.",
     options: [
       { label: 'Timing issue — set a callback', next: 'end_callback', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
@@ -516,7 +516,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Objection: Need to Think About It',
     script: "Of course, totally respect that. Can I ask what specifically you'd want to chew on? Is it the timing, whether it's the right fit, or something else?\n\nReason I ask is the partners actually answer most of that on the call itself, they'll put real CVs and real pricing for your roles right in front of you. It's 30 minutes of straight info, not a pitch, and you walk away with something useful whether you go ahead or not.\n\nWould [Tuesday] or [Thursday] this week work just to get that in front of you?",
     isObjection: true,
-    tip: "Schiffman + SPIN: diagnose what they're thinking about before re-pitching. Then reframe the consultation as information-gathering, not a sales meeting — 'it answers the questions you're thinking through.' Offer two specific days. Then capture the 4 criteria at the close.",
+    tip: "Schiffman + SPIN: diagnose what they're thinking about before re-pitching. Then reframe the consultation as information-gathering, not a sales meeting — 'it answers the questions you're thinking through.' Offer two specific days. Then capture the 4 criteria at the close. ANALYZER: 'I'll do my best / I'll try' is a show-up flag — pin a specific day and time and get a clean 'yes, I'll be on.'",
     options: [
       { label: 'Yes, books a time', next: 'close_recap', type: 'positive' },
       { label: 'Wants a follow-up / not ready yet', next: 'end_callback', type: 'positive' },
