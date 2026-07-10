@@ -430,12 +430,26 @@ export const flow: Record<string, FlowNode> = {
   obj_not_hiring: {
     id: 'obj_not_hiring',
     title: "Objection: Not Hiring Right Now",
-    script: "Totally fair, you might not be hiring right now and that's completely fine. Honestly I'd just love to be on your radar for when you are. In about 30 minutes we'd show you a side-by-side on pricing for any role you might need down the line, so when the time comes you're not starting from zero, you've already got CVs and a cost breakdown in hand.\n\nJust out of curiosity, what kind of roles do you usually bring on when things pick back up? Even on the sales side?",
+    script: "Totally fair, you might not be hiring this exact minute and that's completely fine, I'm not trying to fill a seat this week. Honestly I'd just love to be a resource for you.\n\nJust out of curiosity, what kind of roles do you usually bring on when you do add people? Even on the sales side?\n\n(once they name one) And if the right person was ready to go, could you see bringing them on in the next month or two?",
     isObjection: true,
-    tip: "Approved (Ben / Mark, Frame Homes): 'we would love to be part of your hiring evaluation for the near future.' Always probe for a specific role after this — Ben's 'even in sales side?' probe is what flipped Mark from 'no point' to a booking. Once they name a role, go straight into the must-knows (you'll pick up at the full-time question). ANALYZER: 'not hiring' is almost never a true no — read it as 'not right now.' The win is landing an explicit 'one to two months' in their words; don't book on 'sometime.'",
+    tip: "Approved (Ben / Mark, Frame Homes): probe for a specific role — Ben's 'even in sales side?' probe is what flipped Mark from 'no point' to a booking. Then nudge toward the next month or two so you're not anchoring them far out. ANALYZER: 'not hiring' is almost never a true no — read it as 'not right now.' The win is a named role plus an explicit 'one to two months' in their words; don't book on 'sometime,' and don't manufacture a role that isn't there.",
     options: [
-      { label: 'They share a role / future plan', next: 'qualify_fulltime', type: 'positive' },
-      { label: 'Nothing planned / not relevant', next: 'end_not_interested', type: 'end' },
+      { label: 'They share a role / plan', next: 'qualify_fulltime', type: 'positive' },
+      { label: 'Not sure / nothing obvious yet', next: 'obj_not_hiring_probe', type: 'objection' },
+      { label: 'Genuinely nothing planned', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_not_hiring_probe: {
+    id: 'obj_not_hiring_probe',
+    title: 'Not Hiring — Rescue Probe',
+    isObjection: true,
+    script: "No worries at all. Let me ask it a different way — when things do get busy, where does the squeeze usually hit first? Admin piling up, sales follow-ups slipping, support backing up?",
+    waitForAnswer: true,
+    tip: "The rescue probe — 'not hiring' is almost never a true never. Surface the task that keeps slipping; that's the role hiding in plain sight, and it gives you a real, near-term reason. If something lands, run it into the must-knows. If it's genuinely nothing, let them go clean — never force a role that isn't there (a manufactured lead flags and no-shows).",
+    options: [
+      { label: 'They name a pain / task', next: 'qualify_fulltime', type: 'positive' },
+      { label: 'Genuinely nothing', next: 'end_not_interested', type: 'end' },
     ],
   },
 
