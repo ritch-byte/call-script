@@ -292,7 +292,7 @@ export const flow: Record<string, FlowNode> = {
   close_recap: {
     id: 'close_recap',
     title: 'Timeline Capture & Close (4 Criteria)',
-    script: "Quick recap so we're on the same page: we've got the discovery call locked in with our sourcing partners, for a full-time, dedicated, offshore hire built right into your team.\n\nAnd realistically, if the talent and the pricing make sense, what's your window for actually bringing someone on?\n\n(let THEM say the number, then repeat their exact words back)\n\nPerfect, so [their exact timeline]. And since you're one of the people who'd make that call, can I count on you to be there on [Day]?",
+    script: "Quick recap so we're on the same page: we've got the discovery call locked in with our sourcing partners, for a full-time, dedicated, offshore hire built right into your team. Okay?\n\nPerfect, so [their exact timeline]. And since you're one of the people who'd make that call, can I count on you to be there on [Day]?",
     waitForAnswer: true,
     tip: "THE RECAP IS THE RECORD — this is what the analyzer reads. Recap the three gates and END ON A QUESTION ('did I get that right?'), then WAIT for an audible 'yes.' A nod or 'mhmm' isn't evidence on the recording; the analyzer credits what the BUYER says, not your summary. Name the window out loud — 'one to two months' (or 'thirty to sixty days'), NEVER '1-3 months', '2-3 months' or '90 days.' Get a spoken yes on all three — timeline, offshore, full-time; miss one and it's disqualified. Keep it to two sentences and one question, then book — don't talk for the buyer.",
     options: [
