@@ -179,7 +179,7 @@ export const flow: Record<string, FlowNode> = {
   qualify_dm: {
     id: 'qualify_dm',
     title: 'Qualify ⑤ Decision-Maker',
-    script: "Perfect. And are you the one who'd sign off on this, or is there someone else involved in that call?",
+    script: "Perfect. And you're one of the decision makers for this, right?",
     waitForAnswer: true,
     tip: "Must-Know 5 of 5 (decision-maker). 'Are you the one who'd sign off, or is someone else involved?' is clean and doesn't read as interrogation. A collaborative answer still qualifies as long as they're in the room. If it's entirely someone else, get a name. ANALYZER: not being the decision-maker doesn't kill the call but it flags a reviewer — clear it by getting the actual sign-off person onto the invite.",
     options: [
