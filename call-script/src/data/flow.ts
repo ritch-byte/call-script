@@ -207,7 +207,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_no_role',
     title: "No Role — Value Pitch + Research",
     isObjection: true,
-    script: "No worries at all!\n\nThe only reason I ask is we help leaders like you bring down salary costs by up to 80% with really strong global talent, and I actually did a bit of homework on you before I called...\n\n{geminiResearch}",
+    script: "No worries at all! I actually did a bit of homework on you before I called...\n\n{geminiResearch}",
     tip: "Gap Selling: even without a named role, lead with the cost problem — 'salary costs by up to 80%' creates instant curiosity. The research insert lets you surface a role for them. A general direction is enough to keep going into the value and offer.",
     options: [
       { label: 'Lead is engaged / curious', next: 'value_offer', type: 'positive' },
