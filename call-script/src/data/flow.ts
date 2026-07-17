@@ -104,8 +104,23 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Move 3 bridge question — keep it open and curious, you're just getting them talking about their world. Whatever they name here is the thread you pull into the five must-knows.",
     options: [
-      { label: 'They open up about their hiring', next: 'qualify_role', type: 'positive' },
+      { label: 'They open up about their hiring', next: 'priority_cta', type: 'positive' },
       { label: 'Not really hiring / no priorities', next: 'obj_not_hiring', type: 'objection' },
+    ],
+  },
+
+  // ── EARLY CTA — BOOK THE CONSULT, THEN QUALIFY ───────────────────────────
+
+  priority_cta: {
+    id: 'priority_cta',
+    title: 'Early CTA · Book the Consult',
+    script: "That's perfect, especially since you're looking for that specific role. We can dive this deeper with our sourcing partners for a brief consultation. They'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours 80% on salary costs. How's your calendar look in the next 3 days?",
+    waitForAnswer: true,
+    tip: "Early soft CTA — plant the meeting while interest is hot, right after they open up about a role. Don't hard-lock the slot yet; this gauges warmth and frames the consult as the next step. If they float a day, note it and lock it properly at the recap. Either way, proceed into the must-knows to qualify.",
+    options: [
+      { label: 'Engages / floats a day', next: 'qualify_role', type: 'positive' },
+      { label: 'Has questions / wants more first', next: 'qualify_role', type: 'positive' },
+      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
 

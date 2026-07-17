@@ -22,6 +22,7 @@ const MAIN_FLOW = [
   'pitch_q1',
   'discovery_q2',
   'discovery_priority',
+  'priority_cta',
   'qualify_role',
   'qualify_fulltime',
   'qualify_volume',
