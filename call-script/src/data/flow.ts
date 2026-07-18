@@ -109,21 +109,6 @@ export const flow: Record<string, FlowNode> = {
     ],
   },
 
-  // ── EARLY CTA — BOOK THE CONSULT, THEN QUALIFY ───────────────────────────
-
-  priority_cta: {
-    id: 'priority_cta',
-    title: 'Early CTA · Book the Consult',
-    script: "That's perfect, especially since you're looking for that specific role. We can dive this deeper with our sourcing partners for a brief consultation. They'll show you curated CVs and a pricing breakdown so you can see how we save businesses like yours 80% on salary costs. How's your calendar look in the next 3 days?",
-    waitForAnswer: true,
-    tip: "Early soft CTA — plant the meeting while interest is hot, right after they open up about a role. Don't hard-lock the slot yet; this gauges warmth and frames the consult as the next step. If they float a day, note it and lock it properly at the recap. Either way, proceed into the must-knows to qualify.",
-    options: [
-      { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive' },
-      { label: 'Has questions / wants more first', next: 'qualify_fulltime', type: 'positive' },
-      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
-    ],
-  },
-
   // ── QUALIFY — THE FIVE MUST-KNOWS (Move 4) ───────────────────────────────
 
   qualify_role: {
@@ -133,7 +118,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Must-Know 1 of 5 (role fit). Frame it hypothetically — 'if you did add support' — so it feels like planning, not pressure. Whatever they name becomes 'that role' for the rest of the call. If they can't name one, pivot to the value pitch with your research.",
     options: [
-      { label: 'They name a role', next: 'priority_cta', type: 'positive' },
+      { label: 'They name a role', next: 'value_offer', type: 'positive' },
       { label: "Can't name a role", next: 'obj_no_role', type: 'objection' },
     ],
   },
@@ -198,7 +183,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Must-Know 5 of 5 (decision-maker). 'Are you the one who'd sign off, or is someone else involved?' is clean and doesn't read as interrogation. A collaborative answer still qualifies as long as they're in the room. If it's entirely someone else, get a name. ANALYZER: not being the decision-maker doesn't kill the call but it flags a reviewer — clear it by getting the actual sign-off person onto the invite.",
     options: [
-      { label: 'They sign off / involved in it', next: 'value_offer', type: 'positive' },
+      { label: 'They sign off / involved in it', next: 'two_meeting', type: 'positive' },
       { label: 'Someone else entirely decides', next: 'obj_wrong_person', type: 'objection' },
     ],
   },
@@ -211,7 +196,7 @@ export const flow: Record<string, FlowNode> = {
     tip: "Always get a name before you hang up — a warm referral converts far faster than a cold dial. If they'll still be in the room when the decision is made, you can carry on; just get the other decision-maker onto the same invite. ANALYZER: authority is a flag, not an instant kill — clear it by getting the real sign-off person onto the invite or confirmed as attending.",
     options: [
       { label: 'Gives a name / warm intro', next: 'end_callback', type: 'positive' },
-      { label: "They're still in the room for the decision", next: 'value_offer', type: 'positive' },
+      { label: "They're still in the room for the decision", next: 'two_meeting', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -238,10 +223,10 @@ export const flow: Record<string, FlowNode> = {
     title: 'Value & Offer (Pre-empt Price + Offshore)',
     script: "Perfect, that's honestly the kind of role we place all the time. I work with a couple of partners who specialise in exactly that, and on the call they'll put real CVs and a full pricing breakdown in front of you so you can see the savings for yourself.\n\nAnd just so it's out in the open early, talent in the Philippines is highly cost-effective, typically running at a fraction of standard local rates, often a 70% to 80% reduction in cost depending on the role and experience. The exact number gets pinned down on the call. Quick thing to know, we're a marketplace, not a recruiter, the biggest one in the world for offshore staffing actually, backed by Forbes and Harvard Business Review, with over 4,000 vetted partners. They bring the CVs and the pricing, you just decide.\n\nSo how's your calendar looking in the next 3 days or this week?",
     waitForAnswer: true,
-    tip: "FIX #5 — pre-empt the two universal objections here (price on 100% of calls, offshore on 93%) with the approved '$3 to $9 an hour' range and 'Forbes and Harvard Business Review, 4,000+ partners' lines, then go straight for the calendar. If they hand you a day/time, lock it and jump to the recap — mention the two-partner format as you confirm. If they're not ready to pick a slot, walk the two-meeting explainer and book from there. ANALYZER: you still need 'yes, open to offshore' / 'the Philippines is fine' in the buyer's own voice — capture it here or in the recap for Gate 2 to count.",
+    tip: "The value + offer CTA, fired right after they name the role. Pre-empt price (70-80% cost reduction) and offshore with the Forbes / Harvard Business Review + 4,000 partners proof, then float the calendar to gauge warmth. Whatever they say, note any date they float and proceed into the must-knows — you'll lock the slot properly at the recap. ANALYZER: capture 'yes, open to offshore' / 'the Philippines is fine' in their own voice here or in the recap for Gate 2 to count.",
     options: [
-      { label: 'Gives a day / time', next: 'close_recap', type: 'positive' },
-      { label: 'Open, but no date yet', next: 'two_meeting', type: 'positive' },
+      { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive' },
+      { label: 'Open / has questions', next: 'qualify_fulltime', type: 'positive' },
       { label: 'Pushes back on price', next: 'obj_budget', type: 'objection' },
       { label: 'Hesitant on offshore', next: 'obj_offshore', type: 'objection' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
