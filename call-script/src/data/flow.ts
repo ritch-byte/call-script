@@ -114,7 +114,7 @@ export const flow: Record<string, FlowNode> = {
   qualify_role: {
     id: 'qualify_role',
     title: 'Qualify ① Role Fit',
-    script: "Got it. So if you did add some support, what role would you want to fill first?",
+    script: "Got it, so down the road, what kind of roles are you looking to add to the team?",
     waitForAnswer: true,
     tip: "Must-Know 1 of 5 (role fit). Frame it hypothetically — 'if you did add support' — so it feels like planning, not pressure. Whatever they name becomes 'that role' for the rest of the call. If they can't name one, pivot to the value pitch with your research.",
     options: [
