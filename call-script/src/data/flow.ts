@@ -255,7 +255,7 @@ export const flow: Record<string, FlowNode> = {
     script: "So here's how it'll work, I'll set you up with two quick back-to-back sessions, each with a different partner, slightly different pricing and approach, so you get a proper apples-to-apples comparison in one 30-minute block instead of having to chase it all down yourself.",
     tip: "Say the two-meeting explainer BEFORE the calendar ask, every call — it pre-empts the 'why two meetings?' objection that hit 5 of 18 scripts. 'Apples to apples, one 30-minute block' is the cleanest framing. Then go straight into the trial close.",
     options: [
-      { label: 'Makes sense', next: 'booking', type: 'positive' },
+      { label: 'Makes sense', next: 'close_recap', type: 'positive' },
       { label: '"Why two meetings? / just one?"', next: 'obj_two_meetings', type: 'objection' },
     ],
   },
@@ -267,38 +267,24 @@ export const flow: Record<string, FlowNode> = {
     script: "Yeah, good question. So we're a marketplace, not just one agency, so I line you up with two partners back to back. Each one shows you their pricing and a few sample CVs, and they go about it a little differently, so you basically get an apples-to-apples comparison in one 30-minute sitting instead of chasing it all down yourself. It's meant to save you time, not eat more of it.",
     tip: "Approved pattern (Mickey / Jamar, Seashell Group): 'Oh, for comparison — that makes sense.' Frame the second partner as more choice, not more work. Don't lose the booking over it — if they insist on one, accommodate and keep moving.",
     options: [
-      { label: 'Understood — open to it', next: 'booking', type: 'positive' },
-      { label: 'Still only wants one', next: 'booking', type: 'positive' },
+      { label: 'Understood — open to it', next: 'close_recap', type: 'positive' },
+      { label: 'Still only wants one', next: 'close_recap', type: 'positive' },
     ],
   },
 
-  // ── BOOKING ──────────────────────────────────────────────────────────────
-
-  booking: {
-    id: 'booking',
-    title: 'Lock the Slot',
-    script: "Perfect — let's lock it in.\n\n(Confirm the day/time they floated earlier — or grab one over the next couple of days if they didn't — and pin the exact 30-minute block.)\n\nAnd what timezone are you in, so the invite lands right? Awesome, I'll get that set up with our sourcing partners.",
-    waitForAnswer: true,
-    tip: "You already floated the calendar back at the value & offer step, so don't re-ask it from scratch — just confirm and lock the specific slot, then pin the timezone. Schiffman: after the ask, whoever speaks first loses — stay silent. Hold the voucher; it comes at the very end as thanks.",
-    options: [
-      { label: 'Books a slot', next: 'close_recap', type: 'positive' },
-      { label: 'Not sure / need to think', next: 'obj_think_about_it', type: 'objection' },
-      { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
-    ],
-  },
-
-  // ── TIMELINE CAPTURE & CLOSE — CAPTURE ALL 4 CRITERIA (v5 FIX #3) ─────────
+  // ── RECAP + COMMITMENT — CAPTURE ALL 4 CRITERIA (v5 FIX #3) ──────────────
 
   close_recap: {
     id: 'close_recap',
-    title: 'Timeline Capture & Close (4 Criteria)',
-    script: "Quick recap so we're on the same page: we've got the discovery call locked in with our sourcing partners, for a full-time, dedicated, offshore hire built right into your team. Okay?\n\nPerfect, so [their exact timeline]. And since you're one of the people who'd make that call, can I count on you to be there on [Day]?",
+    title: 'Recap + Commitment (4 Criteria)',
+    script: "Quick recap so we're on the same page: we've got the discovery call locked in with our sourcing partners, for a full-time, dedicated, offshore hire built right into your team. Okay?\n\nPerfect, so [their exact timeline]. And since you're one of the people who'd make that call, can I count on you to attend the meeting?",
     waitForAnswer: true,
-    tip: "THE RECAP IS THE RECORD — this is what the analyzer reads. Recap the three gates and END ON A QUESTION ('did I get that right?'), then WAIT for an audible 'yes.' A nod or 'mhmm' isn't evidence on the recording; the analyzer credits what the BUYER says, not your summary. Name the window out loud — 'one to two months' (or 'thirty to sixty days'), NEVER '1-3 months', '2-3 months' or '90 days.' Get a spoken yes on all three — timeline, offshore, full-time; miss one and it's disqualified. Keep it to two sentences and one question, then book — don't talk for the buyer.",
+    tip: "THE RECAP IS THE RECORD — this is what the analyzer reads. Recap the three gates and END ON A QUESTION ('did I get that right?'), then WAIT for an audible 'yes.' A nod or 'mhmm' isn't evidence on the recording; the analyzer credits what the BUYER says, not your summary. Name the window out loud — 'one to two months' (or 'thirty to sixty days'), NEVER '1-3 months', '2-3 months' or '90 days.' Get a spoken yes on all three — timeline, offshore, full-time; miss one and it's disqualified. The calendar was already floated earlier, so just confirm the day here and get the commitment to attend.",
     options: [
-      { label: 'Clean — 1-2 months, full-time, offshore, in the room', next: 'end_booked', type: 'positive' },
+      { label: 'Clean — commits, 1-2 months, full-time, offshore, in the room', next: 'end_booked', type: 'positive' },
       { label: 'Timeline is 3+ months / no firm date', next: 'obj_timeline_far', type: 'objection' },
       { label: 'Needs to check with a partner / boss', next: 'obj_authority_late', type: 'objection' },
+      { label: 'Not sure / wants to think', next: 'obj_think_about_it', type: 'objection' },
     ],
   },
 
@@ -484,7 +470,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Reciprocity: frame the consultation as giving them something useful regardless of outcome — real salary benchmarking data. Lower the stakes: 'even if you don't change anything, you'll know your number.' Hold the voucher unless they're wavering — it comes at the end.",
     options: [
-      { label: "They're open to it", next: 'booking', type: 'positive' },
+      { label: "They're open to it", next: 'close_recap', type: 'positive' },
       { label: 'Not relevant / hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -508,7 +494,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Smart Calling: they're already sold on the concept — the hard part's done. Make them curious whether their setup is optimal. 'Happy with both quality AND cost?' is a double-gate — most people are happy with one but not both. This is a warm prospect, not a dead one.",
     options: [
-      { label: "They're open to a comparison call", next: 'booking', type: 'positive' },
+      { label: "They're open to a comparison call", next: 'close_recap', type: 'positive' },
       { label: 'Happy with current setup / not interested', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -547,7 +533,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "The profile preview is your strongest quality proof point — lead with it (you're not hiring blind). SPIN — Problem Question: 'What does quality mean for this role?' gets them to define their own standard, which you can then address specifically or agree it's not a fit.",
     options: [
-      { label: 'They define their standard — sounds achievable', next: 'booking', type: 'positive' },
+      { label: 'They define their standard — sounds achievable', next: 'close_recap', type: 'positive' },
       { label: 'Still unconvinced / hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -559,7 +545,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Answer with a fact that surprises — 'third-largest English-speaking country' lands because they didn't expect it. Pair it with a specific example: 'a lot of clients say their offshore team communicates better in writing than some local hires.' Then narrow the concern: internal vs customer-facing.",
     options: [
-      { label: "They're reassured / want to explore", next: 'booking', type: 'positive' },
+      { label: "They're reassured / want to explore", next: 'close_recap', type: 'positive' },
       { label: 'Still a concern — not convinced', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -571,7 +557,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Diagnose before defending. Real-time vs async are completely different scenarios. Task-based roles (finance, admin, design, dev) work excellently async. High-communication roles need a different conversation about US-hours partners. Ask first.",
     options: [
-      { label: "Mostly task-based / they're open to it", next: 'booking', type: 'positive' },
+      { label: "Mostly task-based / they're open to it", next: 'close_recap', type: 'positive' },
       { label: 'Needs constant real-time — not open', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -583,7 +569,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "'Tried before' is your best lead — they've validated the concept, they just had a bad experience. Diagnose what broke, then differentiate OA's vetting model as the specific fix. Listen more than you talk in this one.",
     options: [
-      { label: "They're open to trying again", next: 'booking', type: 'positive' },
+      { label: "They're open to trying again", next: 'close_recap', type: 'positive' },
       { label: 'Not willing to try again', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -595,7 +581,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Narrow the concern — 'confidential' means different things. Customer data (SOC2 partners), IP (NDA-first workflows), financial data (finance-specialist partners) all have different solutions. The specific answer tells you which partner to match them with.",
     options: [
-      { label: "They're reassured / want to explore", next: 'booking', type: 'positive' },
+      { label: "They're reassured / want to explore", next: 'close_recap', type: 'positive' },
       { label: 'Needs more info — set a follow-up', next: 'end_callback', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
@@ -620,7 +606,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Fear of the unknown is the real objection. Reduce it by making the process visible and simple. If they've managed remote workers before — even locally — draw the parallel. The consultation is where this fear dissolves, so get them there.",
     options: [
-      { label: "Yes / they're reassured — open to a call", next: 'booking', type: 'positive' },
+      { label: "Yes / they're reassured — open to a call", next: 'close_recap', type: 'positive' },
       { label: 'No remote experience / still unsure', next: 'end_callback', type: 'positive' },
     ],
   },
@@ -632,7 +618,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Answer directly and confidently — hesitation on legal questions destroys trust. The structure is simple: service contract, not employment. If they have a legal team to consult, offer to send information and set a follow-up. That's a slower yes, not a no.",
     options: [
-      { label: "They're reassured — open to a call", next: 'booking', type: 'positive' },
+      { label: "They're reassured — open to a call", next: 'close_recap', type: 'positive' },
       { label: 'Need legal review first — set follow-up', next: 'end_callback', type: 'positive' },
     ],
   },
