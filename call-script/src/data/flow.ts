@@ -276,10 +276,10 @@ export const flow: Record<string, FlowNode> = {
 
   booking: {
     id: 'booking',
-    title: 'Booking',
-    script: "Perfect — let's grab you a time while it's fresh. How does your calendar look over the next couple of days — are you more a morning or an afternoon person?\n\n(they give a day/time — lock a specific 30-minute block and confirm the timezone)\n\nAwesome, I'll get that set up with our sourcing partners.",
+    title: 'Lock the Slot',
+    script: "Perfect — let's lock it in.\n\n(Confirm the day/time they floated earlier — or grab one over the next couple of days if they didn't — and pin the exact 30-minute block.)\n\nAnd what timezone are you in, so the invite lands right? Awesome, I'll get that set up with our sourcing partners.",
     waitForAnswer: true,
-    tip: "Schiffman: after the CTA, whoever speaks first loses — stay silent. 'Morning or afternoon?' assumes the yes. Pin a specific date, time AND timezone before you move on. Hold the voucher — it comes at the very end, framed as thanks.",
+    tip: "You already floated the calendar back at the value & offer step, so don't re-ask it from scratch — just confirm and lock the specific slot, then pin the timezone. Schiffman: after the ask, whoever speaks first loses — stay silent. Hold the voucher; it comes at the very end as thanks.",
     options: [
       { label: 'Books a slot', next: 'close_recap', type: 'positive' },
       { label: 'Not sure / need to think', next: 'obj_think_about_it', type: 'objection' },
