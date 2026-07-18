@@ -104,7 +104,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Move 3 bridge question — keep it open and curious, you're just getting them talking about their world. Whatever they name here is the thread you pull into the five must-knows.",
     options: [
-      { label: 'They open up about their hiring', next: 'priority_cta', type: 'positive' },
+      { label: 'They open up about their hiring', next: 'qualify_role', type: 'positive' },
       { label: 'Not really hiring / no priorities', next: 'obj_not_hiring', type: 'objection' },
     ],
   },
@@ -118,8 +118,8 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Early soft CTA — plant the meeting while interest is hot, right after they open up about a role. Don't hard-lock the slot yet; this gauges warmth and frames the consult as the next step. If they float a day, note it and lock it properly at the recap. Either way, proceed into the must-knows to qualify.",
     options: [
-      { label: 'Engages / floats a day', next: 'qualify_role', type: 'positive' },
-      { label: 'Has questions / wants more first', next: 'qualify_role', type: 'positive' },
+      { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive' },
+      { label: 'Has questions / wants more first', next: 'qualify_fulltime', type: 'positive' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
@@ -133,7 +133,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Must-Know 1 of 5 (role fit). Frame it hypothetically — 'if you did add support' — so it feels like planning, not pressure. Whatever they name becomes 'that role' for the rest of the call. If they can't name one, pivot to the value pitch with your research.",
     options: [
-      { label: 'They name a role', next: 'qualify_fulltime', type: 'positive' },
+      { label: 'They name a role', next: 'priority_cta', type: 'positive' },
       { label: "Can't name a role", next: 'obj_no_role', type: 'objection' },
     ],
   },
