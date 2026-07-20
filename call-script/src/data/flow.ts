@@ -166,7 +166,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_timeline_disco',
     title: 'Qualify: Timeline Further Out',
     isObjection: true,
-    script: "That's totally okay, I'm not trying to rush you into anything. Honestly, even a couple months out this is really just planning, so you'd have options and names ready for when you actually need them. That said, if someone genuinely great landed in front of you, would you be open to moving in the next month or two rather than sitting on it?",
+    script: "Got it, thanks for sharing! I understand you're planning to hire in about three months, but I believe it's best to start now. The first month is typically spent on onboarding, reviewing the terms, and signing the contract. After that, recruiting and onboarding the right candidate usually takes another 1 to 2 months, so starting now helps keep everything on track.\n\nNow when the right candidate shows up for you, will you be hiring that person as soon as possible or within 1 to 2 months?",
     waitForAnswer: true,
     tip: "Pull the timeline into the ~1-2 month window so the call qualifies. Approved line (Vince / Kaito): 'Even if it's two months, it's planning.' Don't argue, reframe it as 'options ready when you are.' HARD STOP: if they're firmly 4+ months with no flexibility, they don't qualify — note it and let them go rather than manufacture a false yes. ANALYZER: '2-3 months / 90 days' scores just outside the window and flags, and 'maybe / possibly / probably' reads as UNCLEAR — convert it to an explicit 'yes, one to two months' in their words before you book.",
     options: [
