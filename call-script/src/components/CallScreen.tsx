@@ -26,6 +26,7 @@ const MAIN_FLOW = [
   'value_offer',
   'qualify_fulltime',
   'qualify_volume',
+  'qualify_offshore',
   'qualify_timeline',
   'qualify_dm',
   'two_meeting',

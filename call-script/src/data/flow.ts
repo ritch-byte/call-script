@@ -142,8 +142,20 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Must-Know 3 of 5 (volume). A quick sizing question — it tells the partners what to prep and hints at deal size. One is plenty to book; a team is a bonus. Keep it light.",
     options: [
-      { label: 'One to start', next: 'qualify_timeline', type: 'positive' },
-      { label: 'A small team / a few', next: 'qualify_timeline', type: 'positive' },
+      { label: 'One to start', next: 'qualify_offshore', type: 'positive' },
+      { label: 'A small team / a few', next: 'qualify_offshore', type: 'positive' },
+    ],
+  },
+
+  qualify_offshore: {
+    id: 'qualify_offshore',
+    title: 'Qualify · Open to Offshore',
+    script: "And, you're open to an offshore setup, talent typically based in the Philippines, right?",
+    waitForAnswer: true,
+    tip: "The offshore gate (Gate 2). Ask it directly and get a spoken 'yes' — the analyzer credits it in the buyer's own voice. A clear yes qualifies. If they lean local or on-site only, handle it; don't just roll past it.",
+    options: [
+      { label: 'Yes — open to offshore', next: 'qualify_timeline', type: 'positive' },
+      { label: 'Hesitant / prefers local', next: 'obj_offshore', type: 'objection' },
     ],
   },
 
@@ -228,7 +240,6 @@ export const flow: Record<string, FlowNode> = {
       { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive' },
       { label: 'Open / has questions', next: 'qualify_fulltime', type: 'positive' },
       { label: 'Pushes back on price', next: 'obj_budget', type: 'objection' },
-      { label: 'Hesitant on offshore', next: 'obj_offshore', type: 'objection' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
@@ -241,7 +252,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Offshore is raised on 93% of calls — handle it as a normal step, not a crisis. Lead with the profile preview (they're not hiring blind) and the English / market-fit proof. Your goal is just to get a yes to SEE the comparison. ANALYZER: Gate 2 needs a spoken 'yes, open to offshore' / 'the Philippines is fine.' A hard 'must be local / on-site only' kills it — if the role is genuinely physically on-site, disqualify honestly rather than force it.",
     options: [
-      { label: 'Open to seeing it', next: 'two_meeting', type: 'positive' },
+      { label: 'Open to seeing it', next: 'qualify_timeline', type: 'positive' },
       { label: 'Genuinely needs someone on-site', next: 'obj_need_inoffice', type: 'objection' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
