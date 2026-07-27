@@ -232,10 +232,10 @@ export const flow: Record<string, FlowNode> = {
 
   value_offer: {
     id: 'value_offer',
-    title: 'Value & Offer (Pre-empt Price + Offshore)',
+    title: 'Value & Offer + CTA',
     script: "Perfect, that's exactly the kind of role they fill all the time, so I'll skip the sales pitch and get straight to it.\n\nHere's how it works. I connect you with the right sourcing partners. We have over 4,700 partners in our network, and based on what you've shared, I'll handpick the top two that specialize in your industry and the role you're interested in.\n\nThey already have candidates on their bench. On the call, they'll bring curated CVs, not generic profiles, along with the pricing for each candidate, so you can review the people and the costs side by side.\n\nIf the candidates aren't the right fit or the pricing doesn't work for you, that's completely fine, there's absolutely no obligation.\n\nThe call takes about 15 to 30 minutes. If I can be honest, can we do this on Wed or Thursday if you're busy on Mondays and Tuesdays?",
     waitForAnswer: true,
-    tip: "The value + offer CTA, fired right after they name the role. Pre-empt price (70-80% cost reduction) and offshore with the Forbes / Harvard Business Review + 4,000 partners proof, then float the calendar to gauge warmth. Whatever they say, note any date they float and proceed into the must-knows — you'll lock the slot properly at the recap. ANALYZER: capture 'yes, open to offshore' / 'the Philippines is fine' in their own voice here or in the recap for Gate 2 to count.",
+    tip: "The value + offer CTA, fired right after they name the role. Skip the pitch — frame the mechanics: you handpick the top two of 4,700+ partners for their industry and role, partners bring bench candidates with curated CVs and pricing side by side, zero obligation, 15 to 30 minutes. Then go for a specific day (offer Wed/Thu). Note any date they float and proceed into the must-knows — you'll firm up attendance at the recap. ANALYZER: capture 'yes, open to offshore' in their own voice at the offshore gate or the recap for Gate 2 to count.",
     options: [
       { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive' },
       { label: 'Open / has questions', next: 'qualify_fulltime', type: 'positive' },
