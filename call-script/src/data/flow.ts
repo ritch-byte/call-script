@@ -364,9 +364,9 @@ export const flow: Record<string, FlowNode> = {
   end_booked: {
     id: 'end_booked',
     title: 'Booked!',
-    script: "Done — sending the invite now. Once you accept, a $10 Amazon voucher lands as a thank-you for confirming, and the $100 comes right after the call. Looking forward to it, {leadName} — talk soon!",
+    script: "Done — sending the invite now. Go ahead and accept it when it lands so your spot's locked in. Looking forward to it, {leadName} — talk soon!",
     isEnd: true,
-    tip: "VOUCHER DISCIPLINE (FIX #6): mention it last, framed as thanks — never as the hook. With a skeptical or experienced offshore buyer, drop it entirely. $10 on accept, $100 after the call. ANALYZER: leads who only chase the voucher get flagged as voucher-motivated — keep it a footnote, anchor on solving the role.",
+    tip: "Close warm and specific — confirm the invite is on its way and they should accept it to lock the spot. Reference the exact role and day so it feels real. ANALYZER: a booked call is only as good as its qualification — make sure the recap captured offshore, full-time and the 1-2 month window in their own words.",
     options: [],
   },
   end_callback: {
@@ -455,7 +455,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Objection: Budget / Cost / Rates',
     script: "I hear you, and honestly that's the whole reason I'm calling, we're not adding to your costs, we're cutting them.\n\nFor talent in the Philippines you're usually looking at $3 to $9 an hour depending on the role and experience, and for what you mentioned you'd land somewhere in the middle. The exact number we nail down on the call. But to make it real, if you're paying around $60K locally, that same role offshore is often $12 to 18K. Have two or three of those and that's over $100K a year back in your pocket.\n\nWorth 30 minutes just to see the actual numbers for your roles?",
     isObjection: true,
-    tip: "The $3-$9/hr range is a verbatim approved line (Vince / Paul, 465 Office) — use it, convert for UK/EU (£2.25–£7.65). Never fully deflect pricing. Then quantify the gap in dollars, not percentages: '$100K a year back' beats '80% savings.' ANALYZER: if they only care about the $100 voucher, that flags as voucher-motivated — anchor on the role and the savings, not the gift card.",
+    tip: "The $3-$9/hr range is a verbatim approved line (Vince / Paul, 465 Office) — use it, convert for UK/EU (£2.25–£7.65). Never fully deflect pricing. Then quantify the gap in dollars, not percentages: '$100K a year back' beats '80% savings.'",
     options: [
       { label: "They're open to hearing the numbers", next: 'two_meeting', type: 'positive' },
       { label: 'Still not interested', next: 'end_not_interested', type: 'end' },
@@ -479,7 +479,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Objection: No Hiring Challenges',
     script: "That's genuinely impressive, sounds like you've built a really solid team and setup.\n\nI'd still love to show you what we do, even just as a benchmarking thing. Whether or not you ever change anything, seeing a real cost comparison for your roles takes about 30 minutes and you walk away with useful data either way.\n\nZero commitment. Worth a quick look?",
     isObjection: true,
-    tip: "Reciprocity: frame the consultation as giving them something useful regardless of outcome — real salary benchmarking data. Lower the stakes: 'even if you don't change anything, you'll know your number.' Hold the voucher unless they're wavering — it comes at the end.",
+    tip: "Reciprocity: frame the consultation as giving them something useful regardless of outcome — real salary benchmarking data. Lower the stakes: 'even if you don't change anything, you'll know your number.'",
     options: [
       { label: "They're open to it", next: 'close_recap', type: 'positive' },
       { label: 'Not relevant / hard no', next: 'end_not_interested', type: 'end' },
