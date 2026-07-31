@@ -77,7 +77,23 @@ export const flow: Record<string, FlowNode> = {
     tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'Grow headcount without growing the expense' is the v5 hook. Keep the discovery question binary; don't stack more on top of it.",
     options: [
       { label: 'They answer (in-house / external / mix)', next: 'discovery_q2', type: 'positive' },
-      { label: "Not interested / not hiring / budget concern", next: 'obj_not_hiring', type: 'objection' },
+      { label: 'Not interested', next: 'obj_pitch_recover', type: 'objection' },
+      { label: 'Not hiring / budget concern', next: 'obj_not_hiring', type: 'objection' },
+    ],
+  },
+
+  // ── RECOVERY — NOT INTERESTED (PITCH) ────────────────────────────────────
+
+  obj_pitch_recover: {
+    id: 'obj_pitch_recover',
+    title: 'Recovery: Not Interested (Pitch)',
+    isObjection: true,
+    script: "Yeah, no worries, I know you're not interested. Just curious though, for any of your hiring, do you keep everything in-house, or do you ever work with external partners for anything?",
+    waitForAnswer: true,
+    tip: "Schiffman's Ledge — don't fight the 'not interested,' acknowledge it and pivot with one soft question. If they answer at all, you're back in the conversation and into discovery. Stay calm and curious, not pushy.",
+    options: [
+      { label: 'They answer — back in the conversation', next: 'discovery_q2', type: 'positive' },
+      { label: 'Hard no / hangs up', next: 'end_not_interested', type: 'end' },
     ],
   },
 
