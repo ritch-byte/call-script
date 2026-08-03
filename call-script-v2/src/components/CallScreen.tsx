@@ -4,6 +4,9 @@ import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
 import { callAI, buildResearchPrompt } from '../lib/ai'
+import Scorecard from './Scorecard'
+import { newState, applyAnswer } from '../lib/score'
+import type { ScoreState } from '../lib/score'
 
 interface Props {
   callData: CallData
@@ -70,6 +73,8 @@ export default function CallScreen({ onReset }: Props) {
   const [sharedTime2, setSharedTime2] = useState('')
   const [sharedLink2, setSharedLink2] = useState('')
   const activeRef = useRef<HTMLDivElement>(null)
+  const [scoreStack, setScoreStack] = useState<ScoreState[]>(() => [newState()])
+  const [showScore, setShowScore] = useState(true)
 
   const generateSpiel = async () => {
     setIsGenerating(true)
@@ -89,6 +94,8 @@ export default function CallScreen({ onReset }: Props) {
   }
 
   const goTo = (option: FlowOption) => {
+    const answeredNode = flow[steps[activeIdx]?.nodeId]
+    setScoreStack(prev => [...prev, applyAnswer(prev[prev.length - 1], option, answeredNode?.topic, answeredNode?.isObjection)])
     if (option.capture) setContext(prev => ({ ...prev, ...option.capture }))
     const nextId = option.next
     const updatedSteps = [...steps]
@@ -109,6 +116,7 @@ export default function CallScreen({ onReset }: Props) {
 
   const goBack = () => {
     if (activeIdx <= 0) return
+    setScoreStack(prev => (prev.length > 1 ? prev.slice(0, -1) : prev))
     const updatedSteps = [...steps]
     const isInjected = !MAIN_FLOW.includes(updatedSteps[activeIdx].nodeId)
     if (isInjected) updatedSteps.splice(activeIdx, 1)
@@ -221,6 +229,12 @@ export default function CallScreen({ onReset }: Props) {
             onClick={() => { setShowGates(v => !v); setShowRates(false); setShowResearch(false) }}
           >
             Gates
+          </button>
+          <button
+            className={`btn-header-ghost${showScore ? ' btn-header-active' : ''}`}
+            onClick={() => setShowScore(v => !v)}
+          >
+            Scorecard
           </button>
           <button
             className="btn-header-ghost"
@@ -511,6 +525,11 @@ export default function CallScreen({ onReset }: Props) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Live QC Scorecard ── */}
+      {showScore && (
+        <Scorecard state={scoreStack[scoreStack.length - 1]} onClose={() => setShowScore(false)} />
       )}
     </div>
   )

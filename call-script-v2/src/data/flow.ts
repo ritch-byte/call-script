@@ -7,6 +7,7 @@ export interface FlowNode {
   options: FlowOption[]
   isObjection?: boolean
   isEnd?: boolean
+  topic?: string          // scorecard: feeds conversation depth
 }
 
 export interface FlowOption {
@@ -14,6 +15,13 @@ export interface FlowOption {
   next: string
   capture?: Record<string, string>
   type?: 'positive' | 'objection' | 'end'
+  // ── Live scorecard tags (all optional) ──
+  banks?: string[]        // QC items this answer confirms
+  refuses?: string[]      // QC items the lead ruled out (heavier penalty)
+  elaborated?: boolean    // lead gave real substance (feeds engagement)
+  buyingSignal?: boolean  // asked about cost/process/next steps, or accepted
+  passiveRisk?: boolean   // bare "yeah" — fires the passive-agreement penalty
+  vague?: boolean         // don't credit topic/objection for this answer
 }
 
 export interface SalaryRow {
@@ -71,12 +79,13 @@ export const flow: Record<string, FlowNode> = {
 
   pitch_q1: {
     id: 'pitch_q1',
+    topic: 'current_setup',
     title: 'Value Hook + Discovery Q1',
     script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah we are just trying to reach out to all businesses across different industries, mainly because salaries for specialized local talent is really getting expensive. Right? So I work with a team that focuses on helping leaders like you handle their growth without increasing their expenses, usually by connecting you with our global talent network that provide world class talent at 80% less than local hiring.\n\nJust out of curiosity — for your hiring right now, do you keep everything in-house, or do you ever work with external partners for anything?",
     waitForAnswer: true,
     tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'Grow headcount without growing the expense' is the v5 hook. Keep the discovery question binary; don't stack more on top of it.",
     options: [
-      { label: 'They answer (in-house / external / mix)', next: 'discovery_q2', type: 'positive' },
+      { label: 'They answer (in-house / external / mix)', next: 'discovery_q2', type: 'positive', banks: ['company'], elaborated: true },
       { label: 'Not interested', next: 'obj_pitch_recover', type: 'objection' },
       { label: 'Not hiring / budget concern', next: 'obj_not_hiring', type: 'objection' },
     ],
@@ -106,8 +115,8 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "SPIN — Implication: if they share any friction, multiply it before moving on. Try: 'When a key role sits open longer than expected, what does that cost you — project delays, the team absorbing extra load, or lost revenue?' Get them to say the cost out loud. A gap they can quantify is a gap worth closing.",
     options: [
-      { label: 'They share friction / challenges', next: 'discovery_priority', type: 'positive' },
-      { label: 'Team is doing fine / no real issues', next: 'discovery_priority', type: 'positive' },
+      { label: 'They share friction / challenges', next: 'discovery_priority', type: 'positive', banks: ['need'], elaborated: true },
+      { label: 'Team is doing fine / no real issues', next: 'discovery_priority', type: 'positive', elaborated: true },
     ],
   },
 
@@ -115,12 +124,13 @@ export const flow: Record<string, FlowNode> = {
 
   discovery_priority: {
     id: 'discovery_priority',
+    topic: 'role',
     title: 'Discovery: What They Prioritize',
     script: "Thanks for sharing that. And what type of talent do you usually prioritize when you're bringing people on?",
     waitForAnswer: true,
     tip: "Move 3 bridge question — keep it open and curious, you're just getting them talking about their world. Whatever they name here is the thread you pull into the five must-knows.",
     options: [
-      { label: 'They open up about their hiring', next: 'qualify_role', type: 'positive' },
+      { label: 'They open up about their hiring', next: 'qualify_role', type: 'positive', elaborated: true },
       { label: 'Not really hiring / no priorities', next: 'obj_not_hiring', type: 'objection' },
     ],
   },
@@ -134,25 +144,27 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Must-Know 1 of 5 (role fit). Frame it hypothetically — 'if you did add support' — so it feels like planning, not pressure. Whatever they name becomes 'that role' for the rest of the call. If they can't name one, pivot to the value pitch with your research.",
     options: [
-      { label: 'They name a role', next: 'value_offer', type: 'positive' },
+      { label: 'They name a role', next: 'value_offer', type: 'positive', banks: ['offshorable'] },
       { label: "Can't name a role", next: 'obj_no_role', type: 'objection' },
     ],
   },
 
   qualify_fulltime: {
     id: 'qualify_fulltime',
+    topic: 'full_time',
     title: 'Qualify ② Full-Time',
     script: "Makes sense. And I assume this'd be a full-time position, like thirty to forty hours a week, right?",
     waitForAnswer: true,
     tip: "Must-Know 2 of 5 (full-time). Frame it assumptively as full-time (thirty to forty hours) — don't plant the part-time idea. If they push back to part-time, handle it; don't just roll on. ANALYZER: Gate 3 counts only when the buyer says 'full-time' or 'dedicated' out loud — 'part-time / project / shared / ad hoc' kills it.",
     options: [
-      { label: 'Full-time / dedicated', next: 'qualify_volume', type: 'positive' },
+      { label: 'Full-time / dedicated', next: 'qualify_volume', type: 'positive', banks: ['full_time'] },
       { label: 'Part-time / project', next: 'obj_parttime', type: 'objection' },
     ],
   },
 
   qualify_volume: {
     id: 'qualify_volume',
+    topic: 'team_size',
     title: 'Qualify ③ Volume',
     script: "And how many are we talking, one to start with, or more of a small team?",
     waitForAnswer: true,
@@ -165,25 +177,27 @@ export const flow: Record<string, FlowNode> = {
 
   qualify_offshore: {
     id: 'qualify_offshore',
+    topic: 'offshore',
     title: 'Qualify · Open to Offshore',
     script: "And, you're open to an offshore setup, talent typically based in the Philippines, right?",
     waitForAnswer: true,
     tip: "The offshore gate (Gate 2). Ask it directly and get a spoken 'yes' — the analyzer credits it in the buyer's own voice. A clear yes qualifies. If they lean local or on-site only, handle it; don't just roll past it.",
     options: [
-      { label: 'Yes — open to offshore', next: 'qualify_timeline', type: 'positive' },
+      { label: 'Yes — open to offshore', next: 'qualify_timeline', type: 'positive', banks: ['offshore'] },
       { label: 'Hesitant / prefers local', next: 'obj_offshore', type: 'objection' },
     ],
   },
 
   qualify_timeline: {
     id: 'qualify_timeline',
+    topic: 'timeline',
     title: 'Qualify ④ Timeline',
     script: "And if the right person showed up, would you be looking to bring them on within a few weeks, or more like one to two months?",
     waitForAnswer: true,
     tip: "Must-Know 4 of 5 (timeline). Give them a choice between two in-window options — a few weeks or one to two months — so either answer keeps them inside the qualifying window. If they push further out than that, don't gate it here; you'll firm it up in the recap. ANALYZER: timeline is the #1 flag reason — it credits the window in the buyer's OWN words, inside ~1-2 months. '2-3 months / 90 days / next year / no timeframe' flags or kills, and 'maybe / possibly / probably' reads as UNCLEAR. Land an explicit 'one to two months.'",
     options: [
-      { label: 'Within a few weeks', next: 'qualify_dm', type: 'positive' },
-      { label: 'One to two months', next: 'qualify_dm', type: 'positive' },
+      { label: 'Within a few weeks', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
+      { label: 'One to two months', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
       { label: 'More than 2 months / further out', next: 'obj_timeline_disco', type: 'objection' },
     ],
   },
@@ -198,20 +212,21 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Pull the timeline into the ~1-2 month window so the call qualifies. Approved line (Vince / Kaito): 'Even if it's two months, it's planning.' Don't argue, reframe it as 'options ready when you are.' HARD STOP: if they're firmly 4+ months with no flexibility, they don't qualify — note it and let them go rather than manufacture a false yes. ANALYZER: '2-3 months / 90 days' scores just outside the window and flags, and 'maybe / possibly / probably' reads as UNCLEAR — convert it to an explicit 'yes, one to two months' in their words before you book.",
     options: [
-      { label: 'Open to the next month or two after all', next: 'qualify_dm', type: 'positive' },
-      { label: 'Maybe, if the fit is right', next: 'qualify_dm', type: 'positive' },
-      { label: 'Firmly 3+ months, no flexibility', next: 'obj_not_interested_late', type: 'objection' },
+      { label: 'Open to the next month or two after all', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
+      { label: 'Maybe, if the fit is right', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
+      { label: 'Firmly 3+ months, no flexibility', next: 'obj_not_interested_late', type: 'objection', refuses: ['hiring'] },
     ],
   },
 
   qualify_dm: {
     id: 'qualify_dm',
+    topic: 'decision',
     title: 'Qualify ⑤ Decision-Maker',
     script: "Perfect. And you're one of the decision makers for this, right?",
     waitForAnswer: true,
     tip: "Must-Know 5 of 5 (decision-maker). 'Are you the one who'd sign off, or is someone else involved?' is clean and doesn't read as interrogation. A collaborative answer still qualifies as long as they're in the room. If it's entirely someone else, get a name. ANALYZER: not being the decision-maker doesn't kill the call but it flags a reviewer — clear it by getting the actual sign-off person onto the invite.",
     options: [
-      { label: 'They sign off / involved in it', next: 'two_meeting', type: 'positive' },
+      { label: 'They sign off / involved in it', next: 'two_meeting', type: 'positive', banks: ['decision_maker', 'authority'] },
       { label: 'Someone else entirely decides', next: 'obj_wrong_person', type: 'objection' },
     ],
   },
@@ -223,9 +238,9 @@ export const flow: Record<string, FlowNode> = {
     script: "No worries at all, and thanks for being upfront. Who's usually the one who'd own something like this over there? I'd just hate for the right person to miss it. Happy to reach out myself, or if it's easier you can point me their way and I'll mention we spoke.\n\n(if they'd still be in on the decision: honestly, then it's still worth your while, we can just get both of you on the same call.)",
     tip: "Always get a name before you hang up — a warm referral converts far faster than a cold dial. If they'll still be in the room when the decision is made, you can carry on; just get the other decision-maker onto the same invite. ANALYZER: authority is a flag, not an instant kill — clear it by getting the real sign-off person onto the invite or confirmed as attending.",
     options: [
-      { label: 'Gives a name / warm intro', next: 'end_callback', type: 'positive' },
-      { label: "They're still in the room for the decision", next: 'two_meeting', type: 'positive' },
-      { label: 'Hard no', next: 'end_not_interested', type: 'end' },
+      { label: 'Gives a name / warm intro', next: 'end_callback', type: 'positive', banks: ['authority'] },
+      { label: "They're still in the room for the decision", next: 'two_meeting', type: 'positive', banks: ['decision_maker', 'authority'] },
+      { label: 'Hard no', next: 'end_not_interested', type: 'end', refuses: ['decision_maker'] },
     ],
   },
 
@@ -253,8 +268,8 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "The value + offer CTA, fired right after they name the role. Skip the pitch — frame the mechanics: you handpick the top two of 4,700+ partners for their industry and role, partners bring bench candidates with curated CVs and pricing side by side, zero obligation, 15 to 30 minutes. Then go for a specific day (offer Wed/Thu). Note any date they float and proceed into the must-knows — you'll firm up attendance at the recap. ANALYZER: capture 'yes, open to offshore' in their own voice at the offshore gate or the recap for Gate 2 to count.",
     options: [
-      { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive' },
-      { label: 'Open / has questions', next: 'qualify_fulltime', type: 'positive' },
+      { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive', buyingSignal: true },
+      { label: 'Open / has questions', next: 'qualify_fulltime', type: 'positive', buyingSignal: true },
       { label: 'Pushes back on price', next: 'obj_budget', type: 'objection' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
@@ -268,9 +283,9 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Offshore is raised on 93% of calls — handle it as a normal step, not a crisis. Lead with the profile preview (they're not hiring blind) and the English / market-fit proof. Your goal is just to get a yes to SEE the comparison. ANALYZER: Gate 2 needs a spoken 'yes, open to offshore' / 'the Philippines is fine.' A hard 'must be local / on-site only' kills it — if the role is genuinely physically on-site, disqualify honestly rather than force it.",
     options: [
-      { label: 'Open to seeing it', next: 'qualify_timeline', type: 'positive' },
+      { label: 'Open to seeing it', next: 'qualify_timeline', type: 'positive', banks: ['offshore'] },
       { label: 'Genuinely needs someone on-site', next: 'obj_need_inoffice', type: 'objection' },
-      { label: 'Hard no', next: 'end_not_interested', type: 'end' },
+      { label: 'Hard no', next: 'end_not_interested', type: 'end', refuses: ['offshore'] },
     ],
   },
 
@@ -308,7 +323,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "THE RECAP IS THE RECORD — this is what the analyzer reads. Recap the three gates and END ON A QUESTION ('did I get that right?'), then WAIT for an audible 'yes.' A nod or 'mhmm' isn't evidence on the recording; the analyzer credits what the BUYER says, not your summary. Name the window out loud — 'one to two months' (or 'thirty to sixty days'), NEVER '1-3 months', '2-3 months' or '90 days.' Get a spoken yes on all three — timeline, offshore, full-time; miss one and it's disqualified. The calendar was already floated earlier, so just confirm the day here and get the commitment to attend.",
     options: [
-      { label: 'Clean — commits, 1-2 months, full-time, offshore, in the room', next: 'end_booked', type: 'positive' },
+      { label: 'Clean — commits, 1-2 months, full-time, offshore, in the room', next: 'end_booked', type: 'positive', banks: ['dc_agreed'], elaborated: true, buyingSignal: true },
       { label: 'Timeline is 3+ months / no firm date', next: 'obj_timeline_far', type: 'objection' },
       { label: 'Needs to check with a partner / boss', next: 'obj_authority_late', type: 'objection' },
       { label: 'Not sure / wants to think', next: 'obj_think_about_it', type: 'objection' },
@@ -325,8 +340,8 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "We only place full-time, dedicated talent — part-time/project reads as a non-dedicated (disqualified) lead. Approved reframe (Summer / Jimmy): 'eight hours paid anyway, you still save.' Convert to a full-time yes; if they'll only ever do part-time, they don't qualify. ANALYZER: Gate 3 needs 'full-time, dedicated, just for me' from the buyer's mouth — 'shared / project / a few hours' kills it.",
     options: [
-      { label: 'Open to a full-time seat', next: 'qualify_volume', type: 'positive' },
-      { label: 'Still only wants part-time', next: 'obj_not_interested_late', type: 'objection' },
+      { label: 'Open to a full-time seat', next: 'qualify_volume', type: 'positive', banks: ['full_time'] },
+      { label: 'Still only wants part-time', next: 'obj_not_interested_late', type: 'objection', refuses: ['full_time'] },
     ],
   },
 
@@ -340,7 +355,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "AQPC: Acknowledge their standards, Question to surface the real concern (skills, experience, culture fit, or pricing), Pivot to the discovery call as where it all gets answered, then Close for attendance. A '3+ months' stall is usually a smokescreen for one of those four — surface it, then drive straight back to the meeting.",
     options: [
-      { label: "Yes — I'll be there", next: 'end_booked', type: 'positive' },
+      { label: "Yes — I'll be there", next: 'end_booked', type: 'positive', banks: ['dc_agreed'] },
       { label: 'Still not ready / firmly 3+ months', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
@@ -355,8 +370,8 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "QA accepts a collaborative decision as long as the lead confirms they're IN the final decision. Get the other decision-maker onto the SAME invite rather than losing the booking — 'when you decide together, nothing's lost in translation.'",
     options: [
-      { label: "They'll bring the other decision-maker", next: 'end_booked', type: 'positive' },
-      { label: "They're in the room anyway", next: 'end_booked', type: 'positive' },
+      { label: "They'll bring the other decision-maker", next: 'end_booked', type: 'positive', banks: ['decision_maker', 'authority', 'dc_agreed'] },
+      { label: "They're in the room anyway", next: 'end_booked', type: 'positive', banks: ['decision_maker', 'authority', 'dc_agreed'] },
       { label: 'Not a decider / hard stall', next: 'obj_not_interested_late', type: 'objection' },
     ],
   },
@@ -545,7 +560,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Schiffman + SPIN: diagnose what they're thinking about before re-pitching. Then reframe the consultation as information-gathering, not a sales meeting — 'it answers the questions you're thinking through.' Offer two specific days. Then capture the 4 criteria at the close. ANALYZER: 'I'll do my best / I'll try' is a show-up flag — pin a specific day and time and get a clean 'yes, I'll be on.'",
     options: [
-      { label: 'Yes, books a time', next: 'close_recap', type: 'positive' },
+      { label: 'Yes, books a time', next: 'close_recap', type: 'positive', banks: ['dc_agreed'] },
       { label: 'Wants a follow-up / not ready yet', next: 'end_callback', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
