@@ -284,8 +284,8 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "The value + offer CTA, fired right after they name the role. Skip the pitch — frame the mechanics: you handpick the top two of 4,700+ partners for their industry and role, partners bring bench candidates with curated CVs and pricing side by side, zero obligation, 15 to 30 minutes. Then go for a specific day (offer Wed/Thu). Note any date they float and proceed into the must-knows — you'll firm up attendance at the recap. ANALYZER: capture 'yes, open to offshore' in their own voice at the offshore gate or the recap for Gate 2 to count.",
     options: [
-      { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive', buyingSignal: true },
-      { label: 'Open / has questions', next: 'qualify_fulltime', type: 'positive', buyingSignal: true },
+      { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive', banks: ['offshorable'], buyingSignal: true },
+      { label: 'Open / has questions', next: 'qualify_fulltime', type: 'positive', banks: ['offshorable'], buyingSignal: true },
       { label: 'Pushes back on price', next: 'obj_budget', type: 'objection' },
       { label: 'Not interested', next: 'obj_not_interested_late', type: 'objection' },
     ],
@@ -478,7 +478,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Approved (Ben / Mark, Frame Homes): probe for a specific role — Ben's 'even in sales side?' probe is what flipped Mark from 'no point' to a booking. Then nudge toward the next month or two so you're not anchoring them far out. ANALYZER: 'not hiring' is almost never a true no — read it as 'not right now.' The win is a named role plus an explicit 'one to two months' in their words; don't book on 'sometime,' and don't manufacture a role that isn't there.",
     options: [
-      { label: 'They share a role / plan', next: 'qualify_fulltime', type: 'positive' },
+      { label: 'They share a role / plan', next: 'qualify_fulltime', type: 'positive', banks: ['offshorable'] },
       { label: 'Not sure / nothing obvious yet', next: 'obj_not_hiring_probe', type: 'objection' },
       { label: 'Genuinely nothing planned', next: 'end_not_interested', type: 'end' },
     ],
@@ -492,7 +492,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "The rescue probe — 'not hiring' is almost never a true never. Surface the task that keeps slipping; that's the role hiding in plain sight, and it gives you a real, near-term reason. If something lands, run it into the must-knows. If it's genuinely nothing, let them go clean — never force a role that isn't there (a manufactured lead flags and no-shows).",
     options: [
-      { label: 'They name a pain / task', next: 'qualify_fulltime', type: 'positive' },
+      { label: 'They name a pain / task', next: 'qualify_fulltime', type: 'positive', banks: ['offshorable'] },
       { label: 'Genuinely nothing', next: 'end_not_interested', type: 'end' },
     ],
   },
