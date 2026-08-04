@@ -32,6 +32,7 @@ const MAIN_FLOW = [
   'qualify_offshore',
   'qualify_timeline',
   'qualify_dm',
+  'qualify_budget',
   'two_meeting',
   'close_recap',
   'end_booked',

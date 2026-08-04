@@ -227,8 +227,23 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Must-Know 5 of 5 (decision-maker). 'Are you the one who'd sign off, or is someone else involved?' is clean and doesn't read as interrogation. A collaborative answer still qualifies as long as they're in the room. If it's entirely someone else, get a name. ANALYZER: not being the decision-maker doesn't kill the call but it flags a reviewer — clear it by getting the actual sign-off person onto the invite.",
     options: [
-      { label: 'They sign off / involved in it', next: 'two_meeting', type: 'positive', banks: ['decision_maker', 'authority'] },
+      { label: 'They sign off / involved in it', next: 'qualify_budget', type: 'positive', banks: ['decision_maker', 'authority'] },
       { label: 'Someone else entirely decides', next: 'obj_wrong_person', type: 'objection' },
+    ],
+  },
+
+  // ── QUALIFY · BUDGET (BANT) ──────────────────────────────────────────────
+
+  qualify_budget: {
+    id: 'qualify_budget',
+    title: 'Qualify · Budget',
+    script: "And do you have a budget range in mind for this specific role, or is that something you'd rather work out on the call?",
+    waitForAnswer: true,
+    tip: "Low-friction budget check (BANT). Either answer banks it — a range, OR 'let's work it out on the call.' Only a flat refusal to engage leaves it unclear. Don't push for a hard number; the point is just to get budget on the record.",
+    options: [
+      { label: 'Gives a range', next: 'two_meeting', type: 'positive', banks: ['budget'] },
+      { label: "Prefers to work it out on the call", next: 'two_meeting', type: 'positive', banks: ['budget'] },
+      { label: "Won't engage on budget", next: 'two_meeting', type: 'objection' },
     ],
   },
 
@@ -240,7 +255,7 @@ export const flow: Record<string, FlowNode> = {
     tip: "Always get a name before you hang up — a warm referral converts far faster than a cold dial. If they'll still be in the room when the decision is made, you can carry on; just get the other decision-maker onto the same invite. ANALYZER: authority is a flag, not an instant kill — clear it by getting the real sign-off person onto the invite or confirmed as attending.",
     options: [
       { label: 'Gives a name / warm intro', next: 'end_callback', type: 'positive', banks: ['authority'] },
-      { label: "They're still in the room for the decision", next: 'two_meeting', type: 'positive', banks: ['decision_maker', 'authority'] },
+      { label: "They're still in the room for the decision", next: 'qualify_budget', type: 'positive', banks: ['decision_maker', 'authority'] },
       { label: 'Hard no', next: 'end_not_interested', type: 'end', refuses: ['decision_maker'] },
     ],
   },
