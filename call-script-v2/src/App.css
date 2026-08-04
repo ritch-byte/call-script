@@ -42,6 +42,11 @@ body {
 
 .app { min-height: 100vh; }
 
+/* Reserve room on the right for the live scorecard so it never overlaps the cards.
+   The .call-screen column is margin:0 auto, so padding the .app shifts it left. */
+body.scorecard-open .app { padding-right: 330px; transition: padding-right .18s ease; }
+@media (max-width: 720px) { body.scorecard-open .app { padding-right: 0; } }
+
 /* ─────────────────────────────────────────
    CALL SCREEN
 ───────────────────────────────────────── */

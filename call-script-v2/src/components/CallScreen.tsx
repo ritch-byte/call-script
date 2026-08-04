@@ -132,6 +132,13 @@ export default function CallScreen({ onReset }: Props) {
     activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [activeIdx])
 
+  // Reserve space for the fixed scorecard so it never overlaps the cards.
+  useEffect(() => {
+    const on = showScore && !emailPageOpen
+    document.body.classList.toggle('scorecard-open', on)
+    return () => document.body.classList.remove('scorecard-open')
+  }, [showScore, emailPageOpen])
+
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
   // ── Sync SP name, date, time, link from intro email panels back to shared booking state ──
