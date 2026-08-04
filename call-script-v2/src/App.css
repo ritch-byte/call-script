@@ -43,9 +43,13 @@ body {
 .app { min-height: 100vh; }
 
 /* Reserve room on the right for the live scorecard so it never overlaps the cards.
-   The .call-screen column is margin:0 auto, so padding the .app shifts it left. */
+   Belt-and-suspenders: pad the parent AND cap the column width directly. */
 body.scorecard-open .app { padding-right: 330px; transition: padding-right .18s ease; }
-@media (max-width: 720px) { body.scorecard-open .app { padding-right: 0; } }
+body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
+@media (max-width: 720px) {
+  body.scorecard-open .app { padding-right: 0; }
+  body.scorecard-open .call-screen { max-width: 760px; }
+}
 
 /* ─────────────────────────────────────────
    CALL SCREEN
