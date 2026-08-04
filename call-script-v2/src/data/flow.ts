@@ -198,6 +198,7 @@ export const flow: Record<string, FlowNode> = {
     options: [
       { label: 'Within a few weeks', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
       { label: 'One to two months', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
+      { label: 'Just a bare "yeah / yes" (no real window)', next: 'obj_timeline_disco', type: 'objection', passiveRisk: true },
       { label: 'More than 2 months / further out', next: 'obj_timeline_disco', type: 'objection' },
     ],
   },
