@@ -69,7 +69,7 @@ export const BEATS: Array<Omit<Beat, 'text'>> = [
 
 export const DEFAULT_OA: OAProfile = {
   positioning:
-    "the world's leading marketplace for offshore staffing, built specifically for connecting businesses to vetted offshore firms",
+    'the leading marketplace for global talent networks, built specifically for connecting businesses to vetted offshore firms',
   network: '4,000+ pre-vetted BPO and staffing firms',
   savings: 'up to 70% less than local hiring cost',
   proof:
@@ -88,6 +88,7 @@ export const DEFAULT_OA: OAProfile = {
  */
 export const SUPERSEDED_POSITIONING = [
   "the world's leading outsourcing marketplace, built specifically for connecting businesses to vetted offshore staffing firms",
+  "the world's leading marketplace for offshore staffing, built specifically for connecting businesses to vetted offshore firms",
 ]
 
 /**
