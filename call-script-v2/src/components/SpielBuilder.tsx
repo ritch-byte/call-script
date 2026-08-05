@@ -6,6 +6,7 @@ import {
   verifyReceipts, wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
+  openingBeats, fillLeadName,
 } from '../lib/spiel'
 import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
 import { GATE_COPY, CORE_ORDER, gateAsk, qualificationBanks } from '../data/gates'
@@ -29,13 +30,16 @@ export interface QualifyHandoff {
 }
 
 interface Props {
+  /** Names from the call header, dropped into the fixed opening. */
+  leadName?: string
+  yourName?: string
   /** Push the researched lines into the live call script's {geminiResearch} slot. */
   onUseInCall?: (research: string) => void
   /** Carry the booked role, the slot, and the confirmed gates into the call script. */
   onQualify?: (payload: QualifyHandoff) => void
 }
 
-export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
+export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall, onQualify }: Props) {
   const [raw, setRaw] = useState('')
   const [source, setSource] = useState('')
   const [showSource, setShowSource] = useState(false)
@@ -99,6 +103,10 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
   const inSync = freeText === null
   const fullScript = inSync ? joinBeats(activeBeats) : (freeText as string)
   const totalSeconds = speakSeconds(fullScript)
+  // The window governs the part we can actually shorten. The fixed opening is approved
+  // wording, so counting it would leave the warning permanently lit and meaningless.
+  const writtenSeconds = speakSeconds(activeBeats.filter(b => !b.fixed).map(b => b.text).join(' '))
+  const rerollable = activeBeats.filter(b => !b.fixed)
   const verified = (brief?.receipts || []).filter(r => r.confidence === 'verified')
 
   // Same rule as readyToBook() in lib/score.ts: all four core gates confirmed, none refused.
@@ -221,7 +229,11 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
         }
       }
 
-      setBeats(BEATS.map(x => ({ ...x, text: map[x.id] || '' })))
+      // The fixed opening leads, the generated spiel follows, all in the one box.
+      setBeats([
+        ...openingBeats(leadName, yourName),
+        ...BEATS.map(x => ({ ...x, text: fillLeadName(map[x.id] || '', leadName) })),
+      ])
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
       setErr(`Could not write the spiel: ${msg}. Press build again.`)
@@ -240,7 +252,7 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
         maxTokens: 500,
         messages: [{ role: 'user', content: buildRerollPrompt(beat, fullScript, brief, raw, oa, tone, pacing) }],
       })
-      let next = oneParagraph(stripEmDash(textFrom(res).replace(/^["']|["']$/g, '')))
+      let next = fillLeadName(oneParagraph(stripEmDash(textFrom(res).replace(/^["']|["']$/g, ''))), leadName)
       // Same guard as on a full build: a reroll must not land a verdict either.
       if (readsAccusatory(next)) {
         try {
@@ -435,10 +447,12 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
         <div className="spiel-out">
           <div className="spiel-bar">
             <div className="spiel-bar-time">
-              <span className={`spiel-clock${totalSeconds > WINDOW ? ' spiel-clock-long' : ''}`}>
+              <span className={`spiel-clock${writtenSeconds > WINDOW ? ' spiel-clock-long' : ''}`}>
                 {fmtTime(totalSeconds)}
               </span>
-              <span className="spiel-bar-meta">to speak · {wordCount(fullScript)} words</span>
+              <span className="spiel-bar-meta">
+                to speak · {wordCount(fullScript)} words · opening + spiel
+              </span>
             </div>
             <div className="spiel-bar-actions">
               <button className="spiel-btn-ghost" onClick={() => copy(fullScript, 'all')}>
@@ -467,9 +481,10 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
             </div>
           </div>
 
-          {totalSeconds > WINDOW && (
+          {writtenSeconds > WINDOW && (
             <div className="spiel-warn">
-              Running long for a cold open. Reroll the longest beat or trim it by hand before the rep dials.
+              The written part is running long for a cold open, {fmtTime(writtenSeconds)} after the
+              opening. Reroll the longest beat or trim it by hand before the rep dials.
             </div>
           )}
 
@@ -486,7 +501,7 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
             <span className="spiel-reroll-label">Reroll a beat</span>
             {inSync ? (
               <div className="spiel-reroll-row">
-                {activeBeats.map(b => (
+                {rerollable.map(b => (
                   <button
                     key={b.id}
                     className="spiel-btn-ghost spiel-btn-small"

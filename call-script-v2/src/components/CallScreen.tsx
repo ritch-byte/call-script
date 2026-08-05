@@ -195,6 +195,8 @@ export default function CallScreen({ onReset }: Props) {
 
         <div className="email-page-body">
           <SpielBuilder
+            leadName={leadName}
+            yourName={yourName}
             onUseInCall={research => {
               setGeminiResearch(research)
               setShowResearch(false)

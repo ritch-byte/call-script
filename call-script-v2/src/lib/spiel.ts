@@ -1,6 +1,8 @@
 // Spiel builder: one line in, researched cold-open out.
 // Prompt construction and scoring live here so the component stays presentational.
 
+import { flow } from '../data/flow'
+
 export interface Receipt {
   fact: string
   where: string
@@ -30,6 +32,8 @@ export interface Beat {
   label: string
   hint: string
   text: string
+  /** Approved call-script wording, not model output. Never rerolled, never regenerated. */
+  fixed?: boolean
 }
 
 export interface Objection {
@@ -66,6 +70,49 @@ export const BEATS: Array<Omit<Beat, 'text'>> = [
   { id: 'ask',        label: 'The ask',        hint: 'Soft permission for 15 minutes' },
   { id: 'calendar',   label: 'Calendar',       hint: 'Two options, close it' },
 ]
+
+/**
+ * The opening the rep reads before the spiel: the dial, the half-a-minute permission
+ * ask, "have you heard of us", and the cut-me-off line.
+ *
+ * Taken from the live call script rather than copied, so the floor only maintains one
+ * version of the approved wording. It is the `opening` node plus the first paragraph of
+ * `pitch_q1`, which is where the cut-me-off line lives. Everything after that in
+ * pitch_q1 is the old value hook, which the generated spiel replaces.
+ */
+export function openingParagraphs(leadName: string, yourName: string): string[] {
+  const open = flow.opening?.script ?? ''
+  const cutMeOff = (flow.pitch_q1?.script ?? '').split(/\n{2,}/)[0] ?? ''
+  return [...open.split(/\n{2,}/), cutMeOff]
+    .map(p => p.trim())
+    .filter(Boolean)
+    .map(p =>
+      p
+        .replace(/\{leadName\}/g, leadName.trim() || '[Lead Name]')
+        .replace(/\{yourName\}/g, yourName.trim() || '[BDR Name]'),
+    )
+}
+
+/**
+ * The writer is told to address the person as (Name) so the rep fills it in live. Once
+ * the opening is using a real name, leaving (Name) in the ask reads like a mailmerge
+ * miss, so fill it in too when we know it.
+ */
+export const fillLeadName = (text: string, leadName: string) =>
+  leadName.trim() ? (text || '').replace(/\(Name\)/g, leadName.trim()) : text || ''
+
+const OPENING_LABELS = ['The dial', 'Permission', 'Heard of us', 'Cut me off']
+
+/** The opening as fixed beats, so it sits in the same box as the spiel and edits cleanly. */
+export function openingBeats(leadName: string, yourName: string): Beat[] {
+  return openingParagraphs(leadName, yourName).map((text, i) => ({
+    id: `opening_${i + 1}`,
+    label: OPENING_LABELS[i] ?? `Opening ${i + 1}`,
+    hint: 'Approved call-script opening',
+    text,
+    fixed: true,
+  }))
+}
 
 export const DEFAULT_OA: OAProfile = {
   positioning:
