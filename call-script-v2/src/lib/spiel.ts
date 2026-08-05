@@ -130,6 +130,47 @@ export const wordCount = (s: string) => (s || '').trim().split(/\s+/).filter(Boo
 export const speakSeconds = (s: string) => Math.round(wordCount(s) / 2.6)
 export const fmtTime = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
 
+// ── Intro wording guard ───────────────────────────────────────────────────
+
+/**
+ * The identity clause is everything up to the first comma of the positioning line,
+ * e.g. "the world's leading marketplace for offshore staffing". That exact wording
+ * is a deliberate choice, so it must survive into the thumbnail beat regardless of
+ * which model wrote it.
+ */
+export const identityClause = (positioning: string) =>
+  (positioning || '').split(',')[0].trim()
+
+const flatten = (s: string) =>
+  (s || '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim()
+
+/** True when the thumbnail still carries the positioning line's own identity clause. */
+export function keepsIdentityClause(thumbnail: string, positioning: string): boolean {
+  const clause = flatten(identityClause(positioning))
+  if (clause.length < 8) return true // nothing distinctive to check against
+  return flatten(thumbnail).includes(clause)
+}
+
+/**
+ * Faster models sometimes paraphrase the identity clause away. Rather than accept
+ * that, or pay for a slower model on every beat, rewrite just the thumbnail.
+ */
+export function buildIntroRepairPrompt(thumbnail: string, positioning: string, tone: Tone, pacing: boolean): string {
+  return `Rewrite one line of a cold call opener. It must contain this clause word for word:
+
+"${identityClause(positioning)}"
+
+The current version dropped or reworded it:
+"${thumbnail}"
+
+Keep the same job: say who we are in one breath, then frame it for this company's
+industry in the same sentence. Keep the industry framing that is already there.
+
+${styleRules(tone, pacing)}
+
+Respond with the rewritten line only. No labels, no quotes, no commentary.`
+}
+
 // ── Single-box editing ────────────────────────────────────────────────────
 
 /**
@@ -284,10 +325,12 @@ ${HOMEWORK_RULES}
 ${styleRules(tone, pacing)}
 
 Beat requirements:
-1. thumbnail: who Outsource Accelerator is, one breath. Use the Positioning line's own
-   words for the identity clause. Do not reword it, shorten it to a synonym, or swap in
-   your own phrase for what kind of marketplace we are. Then, in the same breath, frame
-   it for this company's industry, so it lands as specific rather than boilerplate.
+1. thumbnail: who Outsource Accelerator is, one breath. This beat MUST contain the
+   following clause character for character, with nothing swapped, shortened or
+   pluralised: "${identityClause(oa.positioning)}"
+   Do not substitute a synonym for what kind of marketplace we are. After that clause,
+   in the same breath, frame it for this company's industry so it lands as specific
+   rather than boilerplate.
 2. homework: the proof the rep did the work. Lead with the strongest receipt, said plainly, and hedge it if it is marked inferred. Two sentences maximum. This is the beat that buys the next thirty seconds.
 3. observation: the tension inside this person's specific remit, using role_scope and role_kpis. Not a generic market statement.
 4. question: the reframe. Name the actual roles from offshore_roles and the cost angle, and tie it to a metric this person is measured on. Ends in a question mark.

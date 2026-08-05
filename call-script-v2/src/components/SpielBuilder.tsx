@@ -5,12 +5,17 @@ import {
   buildBriefPrompt, buildSpielPrompt, buildRerollPrompt, buildObjectionPrompt,
   verifyReceipts, wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
+  keepsIdentityClause, buildIntroRepairPrompt,
 } from '../lib/spiel'
 import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
 import { GATE_COPY, CORE_ORDER, gateAsk, qualificationBanks } from '../data/gates'
 import type { GateAnswer } from '../data/gates'
 
 const OA_STORE = 'oa-spiel-profile'
+const FAST_STORE = 'oa-spiel-fast'
+
+const FAST_MODEL = 'claude-haiku-4-5-20251001'
+const VOICE_MODEL = 'claude-sonnet-4-6'
 
 export interface QualifyHandoff {
   /** The role the lead said they want to add. */
@@ -43,6 +48,10 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
     return DEFAULT_OA
   })
   const [tone, setTone] = useState<Tone>('house')
+  /** Write the spiel on the fast model. Default on: it is ~8s quicker per build. */
+  const [fastSpiel, setFastSpiel] = useState<boolean>(() => {
+    try { return localStorage.getItem(FAST_STORE) !== 'off' } catch { return true }
+  })
   const [pacing, setPacing] = useState(true)
   const [days, setDays] = useState('Thursday or Friday afternoon')
   const [showSettings, setShowSettings] = useState(false)
@@ -169,13 +178,31 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
 
     try {
       setStage('Writing the spiel')
+      const writer = fastSpiel ? FAST_MODEL : VOICE_MODEL
       const res = await callAIRaw({
-        model: 'claude-sonnet-4-6',
+        model: writer,
         maxTokens: 1400,
         messages: [{ role: 'user', content: buildSpielPrompt(raw, b, oa, tone, pacing, days) }],
       })
       const parsed = parseJSON<{ beats?: Array<{ id: string; text: string }> }>(textFrom(res))
       const map = Object.fromEntries((parsed.beats || []).map(x => [x.id, oneParagraph(stripEmDash(x.text))]))
+
+      // The positioning wording is a deliberate choice, and the fast writer sometimes
+      // paraphrases it away. Repair that one line rather than lose it or pay for the
+      // slower model on all eight beats.
+      if (map.thumbnail && !keepsIdentityClause(map.thumbnail, oa.positioning)) {
+        setStage('Fixing the intro wording')
+        try {
+          const fix = await callAIRaw({
+            model: writer,
+            maxTokens: 300,
+            messages: [{ role: 'user', content: buildIntroRepairPrompt(map.thumbnail, oa.positioning, tone, pacing) }],
+          })
+          const repaired = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
+          if (repaired && keepsIdentityClause(repaired, oa.positioning)) map.thumbnail = repaired
+        } catch { /* keep the original line rather than fail the whole build */ }
+      }
+
       setBeats(BEATS.map(x => ({ ...x, text: map[x.id] || '' })))
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -304,6 +331,26 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
           <label className="spiel-check">
             <input type="checkbox" checked={pacing} onChange={() => setPacing(v => !v)} />
             <span>Ellipsis pacing marks</span>
+          </label>
+
+          <label className="spiel-check">
+            <input
+              type="checkbox"
+              checked={fastSpiel}
+              onChange={() => {
+                const next = !fastSpiel
+                setFastSpiel(next)
+                try { localStorage.setItem(FAST_STORE, next ? 'on' : 'off') } catch { /* ignore */ }
+              }}
+            />
+            <span>
+              Fast writing
+              <span className="spiel-check-note">
+                About 8 seconds quicker per build. The house voice is a little plainer,
+                fewer pacing marks and less swagger. Turn it off when you want the best
+                copy and can wait.
+              </span>
+            </span>
           </label>
 
           <label className="spiel-label">Calendar options</label>
