@@ -5,7 +5,7 @@ import {
   buildBriefPrompt, buildSpielPrompt, buildRerollPrompt, buildObjectionPrompt,
   verifyReceipts, wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
-  keepsIdentityClause, buildIntroRepairPrompt,
+  keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
 } from '../lib/spiel'
 import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
 import { GATE_COPY, CORE_ORDER, gateAsk, qualificationBanks } from '../data/gates'
@@ -203,6 +203,24 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
         } catch { /* keep the original line rather than fail the whole build */ }
       }
 
+      // A beat that tells the prospect they are failing gets the rep hung up on. Reframe
+      // the offending line structurally rather than shipping a verdict on their numbers.
+      const accusing = BEATS.filter(x => map[x.id] && readsAccusatory(map[x.id]))
+      if (accusing.length) {
+        setStage('Reframing the negative line')
+        for (const x of accusing) {
+          try {
+            const fix = await callAIRaw({
+              model: writer,
+              maxTokens: 400,
+              messages: [{ role: 'user', content: buildReframePrompt(map[x.id], x.hint, b?.title || '', tone, pacing) }],
+            })
+            const reframed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
+            if (reframed && !readsAccusatory(reframed)) map[x.id] = reframed
+          } catch { /* keep the original rather than fail the whole build */ }
+        }
+      }
+
       setBeats(BEATS.map(x => ({ ...x, text: map[x.id] || '' })))
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -222,7 +240,19 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
         maxTokens: 500,
         messages: [{ role: 'user', content: buildRerollPrompt(beat, fullScript, brief, raw, oa, tone, pacing) }],
       })
-      const next = oneParagraph(stripEmDash(textFrom(res).replace(/^["']|["']$/g, '')))
+      let next = oneParagraph(stripEmDash(textFrom(res).replace(/^["']|["']$/g, '')))
+      // Same guard as on a full build: a reroll must not land a verdict either.
+      if (readsAccusatory(next)) {
+        try {
+          const fix = await callAIRaw({
+            model: fastSpiel ? FAST_MODEL : VOICE_MODEL,
+            maxTokens: 400,
+            messages: [{ role: 'user', content: buildReframePrompt(next, beat.hint, brief?.title || '', tone, pacing) }],
+          })
+          const reframed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
+          if (reframed && !readsAccusatory(reframed)) next = reframed
+        } catch { /* keep what we have */ }
+      }
       setBeats(prev => (prev ? prev.map(x => (x.id === id ? { ...x, text: next } : x)) : prev))
       setFreeText(null)
     } catch (e) {

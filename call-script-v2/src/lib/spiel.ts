@@ -171,6 +171,60 @@ ${styleRules(tone, pacing)}
 Respond with the rewritten line only. No labels, no quotes, no commentary.`
 }
 
+// ── Negative-framing guard ────────────────────────────────────────────────
+
+/**
+ * Lines that tell the prospect they are failing, e.g. "either way, you're not hitting
+ * the numbers you're measured on". A stranger's verdict on their performance kills the
+ * call, and it contradicts OA's positive-framing rule: complexities to solve, never
+ * shortfalls to admit.
+ *
+ * Deliberately narrow. These match an assertion about THEIR results, not any negative
+ * word, so legitimate house phrasing ("without slipping SLAs", "not cheap hires")
+ * does not trip a needless repair.
+ */
+export const ACCUSATORY_PATTERNS: RegExp[] = [
+  /\b(?:you(?:'re| are)|your team(?:'s| is)?)\s+(?:not|never)\s+(?:\w+\s+){0,2}(?:hitting|meeting|making|reaching)\b/i,
+  /\bnot\s+(?:hitting|meeting|reaching)\s+(?:the|your|those)\s+(?:numbers|targets|kpis|goals|metrics)\b/i,
+  /\byou(?:'re| are)\s+(?:falling|slipping)\s+(?:behind|short)\b/i,
+  /\b(?:falling|fallen)\s+short\s+of\s+(?:your|the)\b/i,
+  /\byou(?:'re| are)\s+(?:behind|underperforming|failing|struggling)\b/i,
+  /\byou(?:'re| are)\s+(?:losing|missing)\s+(?:ground|out on|your)\b/i,
+  /\byou\s+can'?t\s+keep\s+up\b/i,
+  /\byour\s+(?:numbers|targets|kpis|metrics)\s+(?:are|have been)\s+(?:slipping|suffering|down)\b/i,
+]
+
+/** True when a beat asserts the prospect is failing at their job. */
+export const readsAccusatory = (text: string) =>
+  ACCUSATORY_PATTERNS.some(re => re.test(text || ''))
+
+/**
+ * Rewrite one beat that landed as a verdict on their performance.
+ * `title` matters: without it the writer invents a peer group, and telling a VP of
+ * Customer Operations what "heads of sales" say reads as a mailmerge miss.
+ */
+export function buildReframePrompt(
+  beatText: string, hint: string, title: string, tone: Tone, pacing: boolean,
+): string {
+  return `Rewrite one line of a cold call opener. It currently tells the prospect they are
+failing at their job, which is the fastest way to get hung up on:
+
+"${beatText}"
+
+Keep its job: ${hint}. Keep the same specifics, roles and metrics it already names.
+Change only the framing: make the squeeze structural, something everyone in this seat
+runs into because of what local hiring costs and how long it takes, or something peers
+in the same role report. Do not claim to know their results. Do not say or imply they
+are behind, missing targets, not hitting their numbers, struggling, or stretched too
+thin. Point at the upside they want instead.
+
+${title ? `The person on the phone is a ${title}. If you attribute the tension to peers, they must be people in THAT role, not some other function.` : 'Do not name a peer job title, you were not told theirs.'}
+
+${styleRules(tone, pacing)}
+
+Respond with the rewritten line only. No labels, no quotes, no commentary.`
+}
+
 // ── Single-box editing ────────────────────────────────────────────────────
 
 /**
@@ -232,6 +286,17 @@ const styleRules = (tone: Tone, pacing: boolean) => `STYLE RULES, non negotiable
 - Write for the ear. Short clauses, contractions, sounds like a person talking.
 - No corporate filler, no feature lists, no pricing.
 - Sell the meeting, not the service.
+- NEVER tell this person they are failing. Do not write that they are not hitting their
+  numbers, missing targets, falling behind, struggling, stretched too thin, or losing
+  ground. You do not know their results, and a stranger opening with a verdict on their
+  performance gets hung up on.
+- Frame the tension as a structural constraint everyone in their position faces, not as
+  a personal shortfall. The problem is what local salaries cost and how long hiring
+  takes, not how well they are doing their job. Attribute it to the market, the cost
+  structure, or what peers in the same seat report, never to them.
+- Aim at the upside they want, not the failure they should fear.
+- Do not narrate the framing itself. Never say things like "it's a structural squeeze,
+  not a you problem" or "this isn't a criticism". Just say the structural thing and move on.
 - Tone: ${TONES[tone]}`
 
 const HOMEWORK_RULES = `HOMEWORK RULES, these are what make the call land:
@@ -388,7 +453,11 @@ Beat requirements:
    in the same breath, frame it for this company's industry so it lands as specific
    rather than boilerplate.
 2. homework: the proof the rep did the work. Lead with the strongest receipt, said plainly, and hedge it if it is marked inferred. Two sentences maximum. This is the beat that buys the next thirty seconds.
-3. observation: the tension inside this person's specific remit, using role_scope and role_kpis. Not a generic market statement.
+3. observation: the tension inside this person's specific remit, using role_scope and
+   role_kpis. Not a generic market statement, and not a verdict on their performance.
+   Name the squeeze structurally, what the role is accountable for versus what local
+   headcount costs, or what peers in the same seat say. Never assert that they are
+   behind, missing targets, or not hitting the numbers they are measured on.
 4. question: the reframe. Name the actual roles from offshore_roles and the cost angle, and tie it to a metric this person is measured on. Ends in a question mark.
 5. superpower: why pre-vetted firms beats the alternative this person is currently stuck with.
 6. howitlands: what it feels like in practice, one short line, tied to their actual operation.
