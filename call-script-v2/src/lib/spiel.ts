@@ -253,18 +253,60 @@ const oaBlock = (oa: OAProfile) => `OUTSOURCE ACCELERATOR, the seller:
 
 // ── Prompts ───────────────────────────────────────────────────────────────
 
+/**
+ * With no source text there is nothing to verify, so every receipt would come back
+ * as hedged inference and the reference-only fields (size signal, hook) come back
+ * empty or guessed. Asking for them anyway costs about 460 output tokens and ~5.5
+ * seconds of the rep's time for no gain, so the ungrounded brief asks only for what
+ * the writer and the rep actually use.
+ *
+ * Role scope, KPIs and pain are kept: they are what make the "their world" beat
+ * specific to the title, and dropping them made the writer fabricate an observed
+ * fact instead of hedging. "Do not say" is kept for the same reason.
+ */
+export function buildSlimBriefPrompt(raw: string): string {
+  return `An outbound SDR at Outsource Accelerator, an offshore staffing marketplace, is about to cold call this target. It contains a company name, a job title, and maybe a website, in some order:
+
+"""
+${raw}
+"""
+
+You have NO web access and the rep pasted no source material, so you know nothing
+checkable about this specific company. Work out which part is the company and which is
+the title, then give the rep what they can honestly work from.
+
+Answer ONLY with JSON, no preamble, no fences:
+
+{
+ "company": "clean company name",
+ "title": "the job title of the person being called",
+ "what_they_do": "one plain sentence a rep can say out loud, hedged if you are inferring it from the name alone",
+ "role_scope": "what someone with this exact title actually owns day to day, one sentence",
+ "role_kpis": ["2 to 4 things this person is personally measured on"],
+ "offshore_roles": ["3 to 5 specific roles this company plausibly hires offshore, based on the title and what the name suggests"],
+ "role_pain": "the operational tension this person feels between their targets and their headcount budget, one sentence",
+ "avoid": "anything a rep should not say or assume about this company, one sentence"
+}
+
+Do not invent open roles, headcount, office locations, funding, client names, or
+anything else you were not shown. Everything here is role-level inference and the rep
+will hedge it out loud, so keep it defensible rather than specific.`
+}
+
 export function buildBriefPrompt(raw: string, sourceText: string): string {
   const grounded = sourceText.trim().length > 0
+  if (!grounded) return buildSlimBriefPrompt(raw)
   return `An outbound SDR at Outsource Accelerator, an offshore staffing marketplace, pasted this cold call target. It contains a company name, a job title, and a website in some order:
 
 """
 ${raw}
 """
-${
-  grounded
-    ? `\nThe rep also pasted raw text they copied from the company's own site or profile. This is your ONLY source of checkable fact:\n"""\n${sourceText.slice(0, 6000)}\n"""\n`
-    : `\nThe rep pasted no source material, and you have NO web access. You therefore know nothing checkable about this specific company.\n`
-}
+
+The rep also pasted raw text they copied from the company's own site or profile. This is your ONLY source of checkable fact:
+"""
+${sourceText.slice(0, 6000)}
+"""
+
 Work out which part of the paste is the company, the title, and the website, then build a brief the rep can dial from.
 
 Answer ONLY with JSON, no preamble, no fences:
@@ -290,7 +332,7 @@ Rules for receipts, these matter more than anything else:
 - Give 3 to 5 receipts. Order them most specific first.
 - Mark confidence "verified" ONLY for a fact that appears in the source text above, and include the exact proving words in "quote". A verified receipt with no quote will be rejected.
 - Mark confidence "inferred" for anything that is a reasonable read on the role or industry rather than something you were shown. Leave "quote" empty and put your reasoning in "where".
-- ${grounded ? 'If the source text is thin, return fewer verified receipts. Never pad.' : 'You were given no source text, so EVERY receipt must be "inferred" with an empty quote. Do not invent open roles, headcount, locations, funding, or client names.'}
+- If the source text is thin, return fewer verified receipts. Never pad.
 - Never invent a receipt. An empty receipts list is far better than a wrong one, because the rep will be caught on the call.
 - Prefer receipts that touch headcount: open roles, team locations, recent expansion, service lines that need people.`
 }
@@ -321,7 +363,21 @@ ${
 }
 
 ${HOMEWORK_RULES}
-
+${
+  brief && !(brief.receipts || []).length
+    ? `
+NO RECEIPTS WERE FOUND FOR THIS COMPANY. This is the case that gets reps caught, so it
+overrides anything above that sounds like permission to be specific:
+- You have not seen anything. Do not write "I was looking at your careers page and saw",
+  "I noticed", or any phrasing that claims you observed a fact about this company.
+- Do not state their staffing mix, headcount, locations, tooling, clients or open roles
+  as fact. The offshore roles in the brief are your inference, not something they told you.
+- Open the homework beat with an explicit hedge that invites correction, for example
+  "correct me if I'm off, but it looks like...", and build it from the role's remit
+  rather than from the company.
+`
+    : ''
+}
 ${styleRules(tone, pacing)}
 
 Beat requirements:
