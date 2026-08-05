@@ -1941,37 +1941,59 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
 .spiel-bar-meta { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .spiel-bar-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
-.spiel-beat { margin-bottom: 14px; }
-.spiel-beat-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
-.spiel-beat-id { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
-.spiel-beat-num { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; color: var(--magenta-dark); }
-.spiel-beat-label {
+.spiel-out { margin-bottom: 26px; }
+
+/* The whole spiel, one box, read top to bottom on the call. */
+.spiel-script {
+  width: 100%;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-left: 3px solid var(--magenta);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Roboto', sans-serif;
+  font-size: 17px;
+  line-height: 1.75;
+  padding: 16px 18px;
+  resize: vertical;
+  box-shadow: var(--shadow);
+  white-space: pre-wrap;
+}
+.spiel-script:focus { outline: none; border-color: var(--blue); border-left-color: var(--magenta); }
+
+.spiel-reroll { margin: 12px 0 4px; }
+.spiel-reroll-label {
+  display: block;
   font-family: 'DM Sans', sans-serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+.spiel-reroll-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.spiel-reroll-off {
+  font-size: 13px;
+  line-height: 1.55;
   color: var(--text-2);
+  background: var(--blue-soft);
+  border-left: 3px solid var(--blue-muted);
+  border-radius: 6px;
+  padding: 9px 11px;
 }
-.spiel-beat-key { color: var(--magenta-dark); }
-.spiel-beat-secs { font-size: 11px; color: var(--gray); }
-.spiel-beat-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
-.spiel-beat-text {
-  width: 100%;
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-left: 3px solid var(--blue);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  line-height: 1.65;
-  padding: 11px 13px;
-  resize: vertical;
+.spiel-brief-heading {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid var(--border);
 }
-.spiel-beat-text:focus { outline: none; border-color: var(--blue); }
-.spiel-beat-text-key { border-left-color: var(--magenta); }
 
 /* Objections */
 

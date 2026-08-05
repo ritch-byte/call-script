@@ -104,6 +104,29 @@ export const wordCount = (s: string) => (s || '').trim().split(/\s+/).filter(Boo
 export const speakSeconds = (s: string) => Math.round(wordCount(s) / 2.6)
 export const fmtTime = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
 
+// ── Single-box editing ────────────────────────────────────────────────────
+
+/**
+ * Beat text must stay a single paragraph, otherwise joining beats into one box
+ * and splitting them back apart would not round-trip.
+ */
+export const oneParagraph = (s: string) => (s || '').replace(/\n{2,}/g, '\n').trim()
+
+/** The spiel as it appears in the single edit box. */
+export const joinBeats = (beats: Beat[]) =>
+  beats.map(b => b.text.trim()).filter(Boolean).join('\n\n')
+
+/**
+ * Map hand-edited text back onto beats so reroll survives ordinary editing.
+ * Returns null when the paragraph count no longer matches, which is the signal
+ * to fall back to free text rather than guess which paragraph is which beat.
+ */
+export function remapParagraphs(beats: Beat[], text: string): Beat[] | null {
+  const parts = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
+  if (beats.length === 0 || parts.length !== beats.length) return null
+  return beats.map((b, i) => ({ ...b, text: parts[i] }))
+}
+
 // ── Evidence checking ─────────────────────────────────────────────────────
 
 const normalize = (s: string) =>

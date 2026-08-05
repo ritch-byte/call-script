@@ -4,6 +4,7 @@ import {
   BEATS, DEFAULT_OA, TONES, WINDOW,
   buildBriefPrompt, buildSpielPrompt, buildRerollPrompt, buildObjectionPrompt,
   verifyReceipts, wordCount, speakSeconds, fmtTime,
+  oneParagraph, joinBeats, remapParagraphs,
 } from '../lib/spiel'
 import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
 
@@ -33,6 +34,12 @@ export default function SpielBuilder({ onUseInCall }: Props) {
   const [brief, setBrief] = useState<Brief | null>(null)
   const [beats, setBeats] = useState<Beat[] | null>(null)
   const [objections, setObjections] = useState<Objection[] | null>(null)
+  /**
+   * The spiel shows as one editable block. Beats stay the source of truth so
+   * reroll keeps working; freeText only takes over when a hand edit changes the
+   * paragraph count and we can no longer map text back onto beats.
+   */
+  const [freeText, setFreeText] = useState<string | null>(null)
 
   const [stage, setStage] = useState('')
   const [busy, setBusy] = useState('')
@@ -47,26 +54,43 @@ export default function SpielBuilder({ onUseInCall }: Props) {
     try { localStorage.setItem(OA_STORE, JSON.stringify(oa)) } catch { /* ignore */ }
   }, [oa])
 
-  const totalSeconds = useMemo(
-    () => (beats ? beats.reduce((a, b) => a + speakSeconds(b.text), 0) : 0),
-    [beats],
-  )
-  const fullScript = useMemo(() => (beats ? beats.map(b => b.text).join('\n\n') : ''), [beats])
+  const activeBeats = useMemo(() => (beats ? beats.filter(b => b.text.trim()) : []), [beats])
+  const inSync = freeText === null
+  const fullScript = inSync ? joinBeats(activeBeats) : (freeText as string)
+  const totalSeconds = speakSeconds(fullScript)
   const verified = (brief?.receipts || []).filter(r => r.confidence === 'verified')
 
+  /**
+   * Rewrite the whole spiel from one textarea. If the paragraph count still
+   * matches the beats we map each paragraph back onto its beat, so reroll and
+   * the call-script hand-off keep working through ordinary edits.
+   */
+  function editScript(value: string) {
+    const clean = stripEmDash(value)
+    const remapped = remapParagraphs(activeBeats, clean)
+    if (remapped) {
+      const next = new Map(remapped.map(b => [b.id, b.text]))
+      setBeats(prev => (prev ? prev.map(b => (next.has(b.id) ? { ...b, text: next.get(b.id) as string } : b)) : prev))
+      setFreeText(null)
+    } else {
+      setFreeText(clean)
+    }
+  }
+
   // The research insert the call script expects: proof + the tension it opens up.
+  // Once paragraphs no longer line up with beats we can't isolate those lines,
+  // so we hand over the whole script rather than silently sending stale text.
   const researchInsert = useMemo(() => {
-    if (!beats) return ''
-    return beats
+    if (!inSync) return fullScript
+    return activeBeats
       .filter(b => b.id === 'homework' || b.id === 'observation' || b.id === 'question')
       .map(b => b.text)
-      .filter(Boolean)
       .join('\n\n')
-  }, [beats])
+  }, [inSync, fullScript, activeBeats])
 
   async function run() {
     setErr(''); setWarn(''); setObjections(null); setBeats(null); setBrief(null)
-    setBusy('run'); setSent(false)
+    setBusy('run'); setSent(false); setFreeText(null)
 
     let b: Brief | null = null
     try {
@@ -104,7 +128,7 @@ export default function SpielBuilder({ onUseInCall }: Props) {
         messages: [{ role: 'user', content: buildSpielPrompt(raw, b, oa, tone, pacing, days) }],
       })
       const parsed = parseJSON<{ beats?: Array<{ id: string; text: string }> }>(textFrom(res))
-      const map = Object.fromEntries((parsed.beats || []).map(x => [x.id, stripEmDash(x.text)]))
+      const map = Object.fromEntries((parsed.beats || []).map(x => [x.id, oneParagraph(stripEmDash(x.text))]))
       setBeats(BEATS.map(x => ({ ...x, text: map[x.id] || '' })))
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -124,8 +148,9 @@ export default function SpielBuilder({ onUseInCall }: Props) {
         maxTokens: 500,
         messages: [{ role: 'user', content: buildRerollPrompt(beat, fullScript, brief, raw, oa, tone, pacing) }],
       })
-      const next = stripEmDash(textFrom(res).replace(/^["']|["']$/g, ''))
+      const next = oneParagraph(stripEmDash(textFrom(res).replace(/^["']|["']$/g, '')))
       setBeats(prev => (prev ? prev.map(x => (x.id === id ? { ...x, text: next } : x)) : prev))
+      setFreeText(null)
     } catch (e) {
       setErr(`Reroll failed: ${e instanceof Error ? e.message : String(e)}`)
     } finally {
@@ -266,54 +291,6 @@ export default function SpielBuilder({ onUseInCall }: Props) {
       {warn && <div className="spiel-warn">{warn}</div>}
       {busy === 'run' && <div className="spiel-stage">{stage}...</div>}
 
-      {/* ── Brief: what the rep checks before dialling ── */}
-      {brief && (
-        <div className="spiel-brief">
-          <div className="spiel-brief-head">
-            <span className="spiel-brief-company">{brief.company}</span>
-            <span className="spiel-brief-title">{brief.title}</span>
-          </div>
-          {brief.what_they_do && <div className="spiel-brief-what">{brief.what_they_do}</div>}
-
-          {(brief.receipts || []).length > 0 && (
-            <div className="spiel-receipts">
-              <label className="spiel-label">
-                What you can say you saw · {verified.length} of {brief.receipts!.length} checked
-              </label>
-              {brief.receipts!.map((r, i) => (
-                <div key={i} className="spiel-receipt">
-                  <span className={`spiel-chip${r.confidence === 'verified' ? ' spiel-chip-ok' : ''}`}>
-                    {r.confidence === 'verified' ? 'seen' : 'hedge it'}
-                  </span>
-                  <div>
-                    <div className="spiel-receipt-fact">{r.fact}</div>
-                    {r.where && <div className="spiel-receipt-where">{r.where}</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="spiel-brief-grid">
-            {([
-              ['What this role owns', brief.role_scope],
-              ['Measured on', (brief.role_kpis || []).join(', ')],
-              ['Pain to pull on', brief.role_pain],
-              ['Likely offshore roles', (brief.offshore_roles || []).join(', ')],
-              ['Size signal', brief.size_signal],
-              ['Do not say', brief.avoid],
-            ] as Array<[string, string | undefined]>).map(([k, v]) =>
-              v && v !== 'not found' ? (
-                <div key={k}>
-                  <label className="spiel-label">{k}</label>
-                  <div className="spiel-brief-val">{v}</div>
-                </div>
-              ) : null,
-            )}
-          </div>
-        </div>
-      )}
-
       {!beats && !busy && (
         <div className="spiel-empty">
           <div className="spiel-empty-title">Nothing on the prompter yet</div>
@@ -361,41 +338,39 @@ export default function SpielBuilder({ onUseInCall }: Props) {
             </div>
           )}
 
-          {beats.map((b, i) => (
-            <div key={b.id} className="spiel-beat">
-              <div className="spiel-beat-head">
-                <div className="spiel-beat-id">
-                  <span className="spiel-beat-num">{String(i + 1).padStart(2, '0')}</span>
-                  <span className={`spiel-beat-label${b.id === 'homework' ? ' spiel-beat-key' : ''}`}>
-                    {b.label}
-                  </span>
-                  <span className="spiel-beat-secs">{speakSeconds(b.text)}s</span>
-                </div>
-                <div className="spiel-beat-actions">
+          {/* The whole spiel in one editable block, read top to bottom on the call. */}
+          <textarea
+            className="spiel-script"
+            value={fullScript}
+            onChange={e => editScript(e.target.value)}
+            rows={Math.max(14, fullScript.split('\n').length + Math.ceil(fullScript.length / 74))}
+            spellCheck={false}
+          />
+
+          <div className="spiel-reroll">
+            <span className="spiel-reroll-label">Reroll a beat</span>
+            {inSync ? (
+              <div className="spiel-reroll-row">
+                {activeBeats.map(b => (
                   <button
+                    key={b.id}
                     className="spiel-btn-ghost spiel-btn-small"
                     onClick={() => reroll(b.id)}
                     disabled={!!rolling || !!busy}
+                    title={b.hint}
                   >
-                    {rolling === b.id ? '...' : 'Reroll'}
+                    {rolling === b.id ? '...' : b.label}
                   </button>
-                  <button className="spiel-btn-ghost spiel-btn-small" onClick={() => copy(b.text, b.id)}>
-                    {copied === b.id ? 'Copied' : 'Copy'}
-                  </button>
-                </div>
+                ))}
               </div>
-              <textarea
-                className={`spiel-beat-text${b.id === 'homework' ? ' spiel-beat-text-key' : ''}`}
-                value={b.text}
-                rows={Math.max(2, Math.ceil(b.text.length / 68) + 1)}
-                onChange={e =>
-                  setBeats(prev =>
-                    prev ? prev.map(x => (x.id === b.id ? { ...x, text: stripEmDash(e.target.value) } : x)) : prev,
-                  )
-                }
-              />
-            </div>
-          ))}
+            ) : (
+              <div className="spiel-reroll-off">
+                Your edits changed the paragraph count, so single beats can no longer be
+                rerolled. Put it back to {activeBeats.length} paragraphs separated by a blank
+                line, or hit Rebuild to start fresh.
+              </div>
+            )}
+          </div>
 
           {objections && (
             <div className="spiel-obj">
@@ -416,6 +391,55 @@ export default function SpielBuilder({ onUseInCall }: Props) {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Lead details: what the rep checks before dialling, kept under the spiel ── */}
+      {brief && (
+        <div className="spiel-brief">
+          <div className="spiel-brief-heading">Lead details</div>
+          <div className="spiel-brief-head">
+            <span className="spiel-brief-company">{brief.company}</span>
+            <span className="spiel-brief-title">{brief.title}</span>
+          </div>
+          {brief.what_they_do && <div className="spiel-brief-what">{brief.what_they_do}</div>}
+
+          {(brief.receipts || []).length > 0 && (
+            <div className="spiel-receipts">
+              <label className="spiel-label">
+                What you can say you saw · {verified.length} of {brief.receipts!.length} checked
+              </label>
+              {brief.receipts!.map((r, i) => (
+                <div key={i} className="spiel-receipt">
+                  <span className={`spiel-chip${r.confidence === 'verified' ? ' spiel-chip-ok' : ''}`}>
+                    {r.confidence === 'verified' ? 'seen' : 'hedge it'}
+                  </span>
+                  <div>
+                    <div className="spiel-receipt-fact">{r.fact}</div>
+                    {r.where && <div className="spiel-receipt-where">{r.where}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="spiel-brief-grid">
+            {([
+              ['What this role owns', brief.role_scope],
+              ['Measured on', (brief.role_kpis || []).join(', ')],
+              ['Pain to pull on', brief.role_pain],
+              ['Likely offshore roles', (brief.offshore_roles || []).join(', ')],
+              ['Size signal', brief.size_signal],
+              ['Do not say', brief.avoid],
+            ] as Array<[string, string | undefined]>).map(([k, v]) =>
+              v && v !== 'not found' ? (
+                <div key={k}>
+                  <label className="spiel-label">{k}</label>
+                  <div className="spiel-brief-val">{v}</div>
+                </div>
+              ) : null,
+            )}
+          </div>
         </div>
       )}
     </div>
