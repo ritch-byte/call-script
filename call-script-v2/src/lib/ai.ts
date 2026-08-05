@@ -45,12 +45,45 @@ export async function callAIRaw(body: {
   }
   if (body.tools) payload.tools = body.tools
 
-  const res = await fetch(AI_RELAY_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload),
-  })
-  const data: AIResponse = await res.json()
+  return postRelay(payload)
+}
+
+/**
+ * POST to the relay and parse the reply defensively.
+ *
+ * Apps Script does not always answer with JSON: under bursts, or mid-redeploy, it
+ * serves an HTML error page. Calling res.json() on that throws "Unexpected token
+ * '<'", which tells a rep nothing. Read the body as text first so we can say what
+ * actually happened.
+ */
+async function postRelay(payload: Record<string, unknown>): Promise<AIResponse> {
+  let res: Response
+  try {
+    res = await fetch(AI_RELAY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+    })
+  } catch {
+    throw new Error('Could not reach the AI relay. Check your connection and try again.')
+  }
+
+  const body = await res.text()
+  const looksHtml = /^\s*</.test(body)
+
+  if (looksHtml || !body.trim()) {
+    throw new Error(
+      'The AI relay is busy or being redeployed, so it returned a page instead of a result. Wait a few seconds and press Build spiel again.',
+    )
+  }
+
+  let data: AIResponse
+  try {
+    data = JSON.parse(body)
+  } catch {
+    throw new Error(`The AI relay sent something unreadable (${res.status}). Try again in a moment.`)
+  }
+
   if (data && data.error) {
     const e = data.error as { message?: string }
     throw new Error(typeof data.error === 'string' ? data.error : e.message || 'AI request failed')
@@ -90,20 +123,12 @@ export function stripEmDash(s: string): string {
 
 /** Send a single-user-message prompt to the relay and return the model's text. */
 export async function callAI({ prompt, model, maxTokens }: CallAIOptions): Promise<string> {
-  const res = await fetch(AI_RELAY_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({
-      model: model || 'claude-haiku-4-5-20251001',
-      max_tokens: maxTokens ?? 700,
-      messages: [{ role: 'user', content: prompt }],
-    }),
+  const data = await postRelay({
+    model: model || 'claude-haiku-4-5-20251001',
+    max_tokens: maxTokens ?? 700,
+    messages: [{ role: 'user', content: prompt }],
   })
-  const data = await res.json()
-  if (data && data.error) {
-    throw new Error(typeof data.error === 'string' ? data.error : data.error.message || 'AI request failed')
-  }
-  const text = data && data.content && data.content[0] && data.content[0].text
+  const text = data.content?.[0]?.text
   if (typeof text !== 'string') throw new Error('Unexpected AI response')
   return text.trim()
 }

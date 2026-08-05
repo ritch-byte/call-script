@@ -76,6 +76,16 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
     try { localStorage.setItem(OA_STORE, JSON.stringify(oa)) } catch { /* ignore */ }
   }, [oa])
 
+  // A generate is two model calls and takes roughly 20 seconds. Counting up beats a
+  // static "working..." that leaves the rep wondering whether it has hung.
+  const [elapsed, setElapsed] = useState(0)
+  useEffect(() => {
+    if (busy !== 'run') { setElapsed(0); return }
+    const started = Date.now()
+    const t = setInterval(() => setElapsed(Math.round((Date.now() - started) / 1000)), 500)
+    return () => clearInterval(t)
+  }, [busy])
+
   const activeBeats = useMemo(() => (beats ? beats.filter(b => b.text.trim()) : []), [beats])
   const inSync = freeText === null
   const fullScript = inSync ? joinBeats(activeBeats) : (freeText as string)
@@ -129,7 +139,11 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
     try {
       setStage('Reading the company')
       const res = await callAIRaw({
-        model: 'claude-sonnet-4-6',
+        // The brief is structured extraction, not prose, and the receipt check that
+        // decides "seen" vs "hedge it" runs here on the client either way. Haiku is
+        // ~11s faster than Sonnet on this stage with the same field coverage, so the
+        // rep waits about a third less for the same guarantees.
+        model: 'claude-haiku-4-5-20251001',
         maxTokens: 1400,
         messages: [{ role: 'user', content: buildBriefPrompt(raw, source) }],
         // Forwarded only if the relay supports tool passthrough. Harmless if dropped.
@@ -322,7 +336,12 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
 
       {err && <div className="spiel-err">{err}</div>}
       {warn && <div className="spiel-warn">{warn}</div>}
-      {busy === 'run' && <div className="spiel-stage">{stage}...</div>}
+      {busy === 'run' && (
+        <div className="spiel-stage">
+          {stage}... {elapsed}s
+          <span className="spiel-stage-note">usually about 20 seconds for both steps</span>
+        </div>
+      )}
 
       {!beats && !busy && (
         <div className="spiel-empty">

@@ -1864,6 +1864,16 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
   margin-bottom: 16px;
 }
 
+.spiel-stage-note {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-3);
+}
+
 /* Brief card */
 
 .spiel-brief {
