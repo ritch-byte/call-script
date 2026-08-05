@@ -4,7 +4,7 @@ import {
   BEATS, DEFAULT_OA, TONES, WINDOW,
   buildBriefPrompt, buildSpielPrompt, buildRerollPrompt, buildObjectionPrompt,
   verifyReceipts, wordCount, speakSeconds, fmtTime,
-  oneParagraph, joinBeats, remapParagraphs,
+  oneParagraph, joinBeats, remapParagraphs, migrateProfile,
 } from '../lib/spiel'
 import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
 import { GATE_COPY, CORE_ORDER, gateAsk, qualificationBanks } from '../data/gates'
@@ -37,7 +37,8 @@ export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
   const [oa, setOa] = useState<OAProfile>(() => {
     try {
       const saved = localStorage.getItem(OA_STORE)
-      if (saved) return { ...DEFAULT_OA, ...JSON.parse(saved) }
+      // migrateProfile moves retired default wording forward but keeps real edits.
+      if (saved) return migrateProfile(JSON.parse(saved))
     } catch { /* ignore unreadable storage */ }
     return DEFAULT_OA
   })

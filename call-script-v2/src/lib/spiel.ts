@@ -69,13 +69,39 @@ export const BEATS: Array<Omit<Beat, 'text'>> = [
 
 export const DEFAULT_OA: OAProfile = {
   positioning:
-    "the world's leading outsourcing marketplace, built specifically for connecting businesses to vetted offshore staffing firms",
+    "the world's leading marketplace for offshore staffing, built specifically for connecting businesses to vetted offshore firms",
   network: '4,000+ pre-vetted BPO and staffing firms',
   savings: 'up to 70% less than local hiring cost',
   proof:
     'enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers',
   mechanic:
     'we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one',
+}
+
+/**
+ * Positioning lines we have shipped as the default and since replaced.
+ *
+ * The profile is saved per browser, so a rep who has already opened the builder
+ * keeps whatever was default at the time. Without this list, changing the wording
+ * above would only affect brand new browsers and the floor would keep reading the
+ * retired line.
+ */
+export const SUPERSEDED_POSITIONING = [
+  "the world's leading outsourcing marketplace, built specifically for connecting businesses to vetted offshore staffing firms",
+]
+
+/**
+ * Bring a saved profile up to date. A field the rep never touched (still equal to
+ * a retired default) is moved to the current default; anything they actually
+ * edited is left alone, since that edit was deliberate.
+ */
+export function migrateProfile(saved: Partial<OAProfile> | null | undefined): OAProfile {
+  const merged: OAProfile = { ...DEFAULT_OA, ...(saved || {}) }
+  const norm = (s: string) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase()
+  if (SUPERSEDED_POSITIONING.some(old => norm(old) === norm(merged.positioning))) {
+    merged.positioning = DEFAULT_OA.positioning
+  }
+  return merged
 }
 
 export const TONES: Record<Tone, string> = {
@@ -258,7 +284,10 @@ ${HOMEWORK_RULES}
 ${styleRules(tone, pacing)}
 
 Beat requirements:
-1. thumbnail: who Outsource Accelerator is, one breath, framed for this company's industry.
+1. thumbnail: who Outsource Accelerator is, one breath. Use the Positioning line's own
+   words for the identity clause. Do not reword it, shorten it to a synonym, or swap in
+   your own phrase for what kind of marketplace we are. Then, in the same breath, frame
+   it for this company's industry, so it lands as specific rather than boilerplate.
 2. homework: the proof the rep did the work. Lead with the strongest receipt, said plainly, and hedge it if it is marked inferred. Two sentences maximum. This is the beat that buys the next thirty seconds.
 3. observation: the tension inside this person's specific remit, using role_scope and role_kpis. Not a generic market statement.
 4. question: the reframe. Name the actual roles from offshore_roles and the cost angle, and tie it to a metric this person is measured on. Ends in a question mark.
