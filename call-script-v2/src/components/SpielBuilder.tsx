@@ -7,15 +7,30 @@ import {
   oneParagraph, joinBeats, remapParagraphs,
 } from '../lib/spiel'
 import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
+import { GATE_COPY, CORE_ORDER, gateAsk, qualificationBanks } from '../data/gates'
+import type { GateAnswer } from '../data/gates'
 
 const OA_STORE = 'oa-spiel-profile'
+
+export interface QualifyHandoff {
+  /** The role the lead said they want to add. */
+  role: string
+  /** Whatever slot they agreed to, free text as the rep heard it. */
+  when: string
+  /** Confirmation + BANT ids the buyer confirmed out loud. */
+  banks: string[]
+  /** Ids the buyer ruled out. */
+  refuses: string[]
+}
 
 interface Props {
   /** Push the researched lines into the live call script's {geminiResearch} slot. */
   onUseInCall?: (research: string) => void
+  /** Carry the booked role, the slot, and the confirmed gates into the call script. */
+  onQualify?: (payload: QualifyHandoff) => void
 }
 
-export default function SpielBuilder({ onUseInCall }: Props) {
+export default function SpielBuilder({ onUseInCall, onQualify }: Props) {
   const [raw, setRaw] = useState('')
   const [source, setSource] = useState('')
   const [showSource, setShowSource] = useState(false)
@@ -41,6 +56,12 @@ export default function SpielBuilder({ onUseInCall }: Props) {
    */
   const [freeText, setFreeText] = useState<string | null>(null)
 
+  // ── Post-booking qualification ──
+  const [qualOpen, setQualOpen] = useState(false)
+  const [bookedWhen, setBookedWhen] = useState('')
+  const [roleWanted, setRoleWanted] = useState('')
+  const [gates, setGates] = useState<Record<string, GateAnswer>>({})
+
   const [stage, setStage] = useState('')
   const [busy, setBusy] = useState('')
   const [rolling, setRolling] = useState('')
@@ -59,6 +80,17 @@ export default function SpielBuilder({ onUseInCall }: Props) {
   const fullScript = inSync ? joinBeats(activeBeats) : (freeText as string)
   const totalSeconds = speakSeconds(fullScript)
   const verified = (brief?.receipts || []).filter(r => r.confidence === 'verified')
+
+  // Same rule as readyToBook() in lib/score.ts: all four core gates confirmed, none refused.
+  const missingGates = CORE_ORDER.filter(id => gates[id] !== 'yes')
+  const refusedGates = CORE_ORDER.filter(id => gates[id] === 'no')
+  const qcMet = missingGates.length === 0
+
+  function handOffQualification() {
+    if (!onQualify) return
+    const { banks, refuses } = qualificationBanks(gates, roleWanted, bookedWhen)
+    onQualify({ role: roleWanted.trim(), when: bookedWhen.trim(), banks, refuses })
+  }
 
   /**
    * Rewrite the whole spiel from one textarea. If the paragraph count still
@@ -326,6 +358,12 @@ export default function SpielBuilder({ onUseInCall }: Props) {
                   {sent ? 'Sent to script' : 'Use in call script'}
                 </button>
               )}
+              <button
+                className={`spiel-btn-ghost${qualOpen ? ' spiel-btn-on' : ''}`}
+                onClick={() => setQualOpen(v => !v)}
+              >
+                They gave me a date
+              </button>
               <button className="spiel-btn-primary spiel-btn-small" onClick={run} disabled={!!busy}>
                 Rebuild
               </button>
@@ -371,6 +409,102 @@ export default function SpielBuilder({ onUseInCall }: Props) {
               </div>
             )}
           </div>
+
+          {/* ── They said yes to a slot: get the role, then run the core criteria ── */}
+          {qualOpen && (
+            <div className="spiel-qual">
+              <div className="spiel-qual-head">Qualify the booking</div>
+              <div className="spiel-hint">
+                A slot on its own is not a qualified call. Get the role in their words, then get a
+                spoken yes on all four criteria before you let them go.
+              </div>
+
+              <div className="spiel-qual-fields">
+                <div>
+                  <label className="spiel-label">Slot they agreed to</label>
+                  <input
+                    className="spiel-field"
+                    value={bookedWhen}
+                    onChange={e => setBookedWhen(e.target.value)}
+                    placeholder="Thursday 2pm their time"
+                  />
+                </div>
+                <div>
+                  <label className="spiel-label">Role they want to add</label>
+                  <input
+                    className="spiel-field"
+                    value={roleWanted}
+                    onChange={e => setRoleWanted(e.target.value)}
+                    placeholder="Type what they actually said..."
+                  />
+                </div>
+              </div>
+
+              {(brief?.offshore_roles || []).length > 0 && (
+                <div className="spiel-qual-suggest">
+                  <span className="spiel-qual-suggest-label">Likely, tap to fill</span>
+                  {brief!.offshore_roles!.map(r => (
+                    <button key={r} className="spiel-chip-btn" onClick={() => setRoleWanted(r)}>
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {CORE_ORDER.map((id, i) => {
+                const g = GATE_COPY[id]
+                const state = gates[id] || 'unset'
+                return (
+                  <div key={id} className={`spiel-gate spiel-gate-${state}`}>
+                    <div className="spiel-gate-top">
+                      <span className="spiel-gate-n">{i + 1}</span>
+                      <span className="spiel-gate-label">{g.label}</span>
+                      <div className="spiel-gate-btns">
+                        <button
+                          className={`spiel-btn-ghost spiel-btn-small${state === 'yes' ? ' spiel-btn-yes' : ''}`}
+                          onClick={() => setGates(p => ({ ...p, [id]: state === 'yes' ? 'unset' : 'yes' }))}
+                        >
+                          Said yes
+                        </button>
+                        <button
+                          className={`spiel-btn-ghost spiel-btn-small${state === 'no' ? ' spiel-btn-no' : ''}`}
+                          onClick={() => setGates(p => ({ ...p, [id]: state === 'no' ? 'unset' : 'no' }))}
+                        >
+                          Ruled out
+                        </button>
+                      </div>
+                    </div>
+                    <div className="spiel-gate-ask">“{gateAsk(id, roleWanted)}”</div>
+                    <div className="spiel-gate-phrases">
+                      {g.say.map(s => <span key={s} className="spiel-yes">✓ {s}</span>)}
+                      {g.not.map(n => <span key={n} className="spiel-no">✕ {n}</span>)}
+                    </div>
+                  </div>
+                )
+              })}
+
+              <div className={`spiel-qual-status${qcMet ? ' spiel-qual-met' : ''}`}>
+                {qcMet
+                  ? 'All four criteria confirmed. This one is bookable.'
+                  : refusedGates.length > 0
+                    ? `Ruled out: ${refusedGates.map(id => GATE_COPY[id].label).join(', ')}. Handle it before you book, a booking that fails these gets flagged on review.`
+                    : `Still need a spoken yes on: ${missingGates.map(id => GATE_COPY[id].label).join(', ')}.`}
+              </div>
+
+              {onQualify && (
+                <button
+                  className="spiel-btn-primary"
+                  onClick={handOffQualification}
+                  disabled={!roleWanted.trim()}
+                >
+                  Continue in call script
+                </button>
+              )}
+              {!roleWanted.trim() && (
+                <div className="spiel-hint">Name the role first, it drives the rest of the call.</div>
+              )}
+            </div>
+          )}
 
           {objections && (
             <div className="spiel-obj">

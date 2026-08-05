@@ -8,6 +8,7 @@ import { callAI, buildResearchPrompt } from '../lib/ai'
 import Scorecard from './Scorecard'
 import { newState, applyAnswer } from '../lib/score'
 import type { ScoreState } from '../lib/score'
+import { GATE_COPY, GATE_TITLES, SPOKEN_GATE_ORDER, gateAsk } from '../data/gates'
 
 interface Props {
   callData: CallData
@@ -60,6 +61,8 @@ export default function CallScreen({ onReset }: Props) {
   const [showGates, setShowGates] = useState(false)
   const [emailPageOpen, setEmailPageOpen] = useState(false)
   const [spielPageOpen, setSpielPageOpen] = useState(false)
+  /** Role and slot carried over from the Spiel Builder's post-booking qualifier. */
+  const [qualContext, setQualContext] = useState<{ role: string; when: string } | null>(null)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
@@ -195,6 +198,19 @@ export default function CallScreen({ onReset }: Props) {
             onUseInCall={research => {
               setGeminiResearch(research)
               setShowResearch(false)
+              setSpielPageOpen(false)
+            }}
+            onQualify={({ role, when, banks, refuses }) => {
+              // Credit what the buyer already confirmed so the live scorecard reflects
+              // the call, then drop the rep at Role Fit to carry on in the real flow.
+              setScoreStack(prev => [
+                ...prev,
+                applyAnswer(prev[prev.length - 1], { banks, refuses }),
+              ])
+              setQualContext({ role, when })
+              if (role) setContext(prev => ({ ...prev, roleWanted: role }))
+              const idx = steps.findIndex(s => s.nodeId === 'qualify_role')
+              if (idx !== -1) setActiveIdx(idx)
               setSpielPageOpen(false)
             }}
           />
@@ -362,11 +378,7 @@ export default function CallScreen({ onReset }: Props) {
             The analyzer credits what the <strong style={{ color: '#15213f' }}>buyer</strong> says out loud — not your summary. Get a spoken &ldquo;yes&rdquo; on all three.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-            {[
-              { g: 'Gate 1 · Near-term need', ask: '“When would you want someone starting?”', say: ['“one to two months”', '“thirty to sixty days”'], not: ['“2–3 months”', '“90 days”', '“next year”'] },
-              { g: 'Gate 2 · Open to offshore', ask: '“Offshore, on your hours — open to that?”', say: ['“yes, open to that”', '“the Philippines is fine”', '“we already use offshore”'], not: ['“must be local”', '“on-site only”'] },
-              { g: 'Gate 3 · Full-time dedicated', ask: '“Full-time dedicated, or part-time?”', say: ['“full-time”', '“dedicated, just for us”', '“forty hours”'], not: ['“part-time”', '“project / shared”', '“ad hoc”'] },
-            ].map(c => (
+            {SPOKEN_GATE_ORDER.map(id => ({ g: GATE_TITLES[id], ask: `“${gateAsk(id, qualContext?.role || '')}”`, say: GATE_COPY[id].say, not: GATE_COPY[id].not })).map(c => (
               <div key={c.g} style={{ background: '#fff', border: '1px solid #e5e8f1', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '.02em', color: '#d6006e', marginBottom: 6 }}>{c.g}</div>
                 <div style={{ fontSize: 12.5, color: '#5b6379', fontStyle: 'italic', marginBottom: 10 }}>{c.ask}</div>
@@ -388,6 +400,23 @@ export default function CallScreen({ onReset }: Props) {
           <div style={{ marginTop: 12, background: '#f2f4fa', borderRadius: 10, padding: '10px 14px', fontSize: 12.5, color: '#3f4a5f' }}>
             <strong style={{ color: '#15213f' }}>Recap &amp; lock:</strong> end on a question, wait for an audible &ldquo;yes.&rdquo; A nod isn&rsquo;t proof. &ldquo;Maybe / possibly / probably&rdquo; reads as <strong style={{ color: '#c0364a' }}>unclear</strong> and flags — convert it to an explicit yes before you book.
           </div>
+        </div>
+      )}
+
+      {/* ── Carried over from the Spiel Builder's qualifier ── */}
+      {qualContext && (
+        <div className="qual-banner">
+          <span className="qual-banner-key">Qualifying for</span>
+          <strong>{qualContext.role || 'no role named'}</strong>
+          {qualContext.when && (
+            <>
+              <span className="qual-banner-key">· slot</span>
+              <strong>{qualContext.when}</strong>
+            </>
+          )}
+          <button className="qual-banner-x" onClick={() => setQualContext(null)} title="Dismiss">
+            ×
+          </button>
         </div>
       )}
 
