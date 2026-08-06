@@ -90,11 +90,22 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   const [warn, setWarn] = useState('')
   const [copied, setCopied] = useState('')
   const [sent, setSent] = useState(false)
+  /** Reset wipes real work, so it takes two taps rather than one stray click. */
+  const [confirmReset, setConfirmReset] = useState(false)
   const hidden = useRef<HTMLTextAreaElement>(null)
+  const leadInput = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     try { localStorage.setItem(OA_STORE, JSON.stringify(oa)) } catch { /* ignore */ }
   }, [oa])
+
+  // Never leave Reset sitting armed: a rep who taps it, gets distracted by the call and
+  // taps again minutes later should not lose the lead they are working.
+  useEffect(() => {
+    if (!confirmReset) return
+    const t = setTimeout(() => setConfirmReset(false), 4000)
+    return () => clearTimeout(t)
+  }, [confirmReset])
 
   // A generate is two model calls and takes roughly 20 seconds. Counting up beats a
   // static "working..." that leaves the rep wondering whether it has hung.
@@ -116,12 +127,47 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   const rerollable = activeBeats.filter(b => !b.fixed)
   /** False while the box holds only the fixed opening and nothing has been generated. */
   const hasSpiel = rerollable.length > 0
+  /** Is there anything from this lead worth clearing? Hides Reset on a fresh page. */
+  const dirty = !!(raw.trim() || source.trim() || brief || hasSpiel || qualOpen)
   const verified = (brief?.receipts || []).filter(r => r.confidence === 'verified')
 
   // Same rule as readyToBook() in lib/score.ts: all four core gates confirmed, none refused.
   const missingGates = CORE_ORDER.filter(id => gates[id] !== 'yes')
   const refusedGates = CORE_ORDER.filter(id => gates[id] === 'no')
   const qcMet = missingGates.length === 0
+
+  /**
+   * Clear the call and start on the next lead.
+   *
+   * Everything about THIS lead goes: the paste, the source text, the brief, the spiel,
+   * the objections and the whole qualifier. What survives is configuration rather than
+   * call data: the OA positioning, the voice, the pacing and the calendar options, since
+   * a rep sets those once for the floor and would not want them wiped between dials.
+   * The opening comes back fresh from the call script because the next lead has a
+   * different name in it.
+   */
+  function resetForNewLead() {
+    setRaw('')
+    setSource('')
+    setShowSource(false)
+    setBrief(null)
+    setObjections(null)
+    setFreeText(null)
+    setBeats(openingBeats(leadName, yourName))
+    setQualOpen(false)
+    setQualStep(0)
+    setGates({})
+    setRoleWanted('')
+    setBookedWhen('')
+    setShowRecovery('')
+    setErr('')
+    setWarn('')
+    setStage('')
+    setSent(false)
+    setCopied('')
+    setConfirmReset(false)
+    leadInput.current?.focus()
+  }
 
   function handOffQualification() {
     if (!onQualify) return
@@ -341,6 +387,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
       {/* ── Lead input ── */}
       <div className="spiel-input-row">
         <input
+          ref={leadInput}
           className="spiel-lead-input"
           value={raw}
           onChange={e => setRaw(e.target.value)}
@@ -487,6 +534,16 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
               {hasSpiel && (
                 <button className="spiel-btn-primary spiel-btn-small" onClick={run} disabled={!!busy}>
                   Rebuild
+                </button>
+              )}
+              {dirty && (
+                <button
+                  className={`spiel-btn-ghost spiel-btn-small${confirmReset ? ' spiel-btn-no' : ''}`}
+                  onClick={() => (confirmReset ? resetForNewLead() : setConfirmReset(true))}
+                  disabled={!!busy}
+                  title="Clear this lead and start the next call"
+                >
+                  {confirmReset ? 'Tap again to clear' : 'Reset'}
                 </button>
               )}
             </div>
