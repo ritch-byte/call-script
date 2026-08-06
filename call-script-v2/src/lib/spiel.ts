@@ -446,17 +446,44 @@ Rules for receipts, these matter more than anything else:
 - Prefer receipts that touch headcount: open roles, team locations, recent expansion, service lines that need people.`
 }
 
-export function buildSpielPrompt(
-  raw: string,
-  brief: Brief | null,
-  oa: OAProfile,
-  tone: Tone,
-  pacing: boolean,
-  days: string,
-): string {
+/**
+ * Strip the brief down to what the WRITER needs.
+ *
+ * `quote` and `where` exist so the rep can check a receipt before dialling; the writer
+ * never uses them, and a quote can run 30 tokens each. `hook` and `website` are unused.
+ * Dropping them, and dropping the pretty-printing, cuts the priciest part of the request
+ * without removing anything the spiel is built from.
+ */
+function writerBrief(brief: Brief): string {
+  const slim = {
+    company: brief.company,
+    title: brief.title,
+    what_they_do: brief.what_they_do,
+    size_signal: brief.size_signal,
+    role_scope: brief.role_scope,
+    role_kpis: brief.role_kpis,
+    offshore_roles: brief.offshore_roles,
+    role_pain: brief.role_pain,
+    avoid: brief.avoid,
+    receipts: (brief.receipts || []).map(r => ({ fact: r.fact, confidence: r.confidence })),
+  }
+  return JSON.stringify(slim)
+}
+
+/**
+ * Everything in the spiel request that does NOT change between leads: the exemplar, the
+ * OA positioning, the craft and homework rules, the beat requirements, the output format
+ * and the length ceiling.
+ *
+ * It is split out so it can be sent as its own cached content block. It is roughly 1,300
+ * tokens that were previously re-billed at full rate on every single build, purely
+ * because the lead-specific brief sat in the middle of the prompt. Byte-identical across
+ * builds for a given rep, which is what makes a cache hit possible.
+ */
+export function spielStablePrefix(oa: OAProfile, tone: Tone, pacing: boolean, days: string): string {
   return `You write cold call spiels for outbound SDRs at Outsource Accelerator.
 
-Reproduce the STRUCTURE and VOICE of this exemplar, but rewrite every line so it is specific to this company and this person's role. Do not reuse the exemplar's phrasing verbatim. Never reuse "Pretty bananas".
+Reproduce the STRUCTURE and VOICE of this exemplar, but rewrite every line so it is specific to the company and role you are given below. Do not reuse the exemplar's phrasing verbatim. Never reuse "Pretty bananas".
 
 EXEMPLAR:
 """
@@ -465,28 +492,8 @@ ${EXEMPLAR}
 
 ${oaBlock(oa)}
 
-${
-  brief
-    ? `RESEARCH BRIEF:\n${JSON.stringify(brief, null, 2)}`
-    : `LEAD, unparsed, work out the company and title yourself: ${raw}\nYou have NO research. Do not state any specific fact about this company. Write the homework beat as an honest role level observation instead, with no invented details.`
-}
-
 ${HOMEWORK_RULES}
-${
-  brief && !(brief.receipts || []).length
-    ? `
-NO RECEIPTS WERE FOUND FOR THIS COMPANY. This is the case that gets reps caught, so it
-overrides anything above that sounds like permission to be specific:
-- You have not seen anything. Do not write "I was looking at your careers page and saw",
-  "I noticed", or any phrasing that claims you observed a fact about this company.
-- Do not state their staffing mix, headcount, locations, tooling, clients or open roles
-  as fact. The offshore roles in the brief are your inference, not something they told you.
-- Open the homework beat with an explicit hedge that invites correction, for example
-  "correct me if I'm off, but it looks like...", and build it from the role's remit
-  rather than from the company.
-`
-    : ''
-}
+
 ${styleRules(tone, pacing)}
 
 Beat requirements:
@@ -513,12 +520,40 @@ Respond ONLY with JSON, no preamble, no fences:
 
 Length: aim for 150 to 185 words across all eight beats combined, and never exceed 190.
 That is roughly a minute of speech. Count before you answer. If you are over, cut adjectives
-and subordinate clauses from the middle beats, not from the homework beat.
+and subordinate clauses from the middle beats, not from the homework beat.`
+}
 
-LAST THING, AND IT OVERRIDES EVERY RULE ABOVE: the eight beats together must total no
-more than 190 words. Count them. A rep reads this out loud on a cold call and anything
-longer gets cut off by the prospect, so a shorter spiel that follows the rules beats a
-richer one that runs long. If obeying a craft rule would push you over, drop the rule.`
+/** The only part that changes per lead. Sent after the cached prefix. */
+export function spielLeadBlock(raw: string, brief: Brief | null): string {
+  const noReceipts = brief && !(brief.receipts || []).length
+  return `${
+    brief
+      ? `RESEARCH BRIEF:
+${writerBrief(brief)}`
+      : `LEAD, unparsed, work out the company and title yourself: ${raw}
+You have NO research. Do not state any specific fact about this company. Write the homework beat as an honest role level observation instead, with no invented details.`
+  }
+${
+  noReceipts
+    ? `
+NO RECEIPTS WERE FOUND FOR THIS COMPANY. This is the case that gets reps caught, so it
+overrides anything above that sounds like permission to be specific:
+- You have not seen anything. Do not write "I was looking at your careers page and saw",
+  "I noticed", or any phrasing that claims you observed a fact about this company.
+- Do not state their staffing mix, headcount, locations, tooling, clients or open roles
+  as fact. The offshore roles in the brief are your inference, not something they told you.
+- Open the homework beat with an explicit hedge that invites correction, for example
+  "correct me if I'm off, but it looks like...", and build it from the role's remit
+  rather than from the company.
+`
+    : ''
+}
+Write the eight beats for this lead now, as JSON only.
+
+AND IT OVERRIDES EVERY RULE ABOVE: the eight beats together must total no more than 190
+words. Count them. A rep reads this out loud on a cold call and anything longer gets cut
+off by the prospect, so a shorter spiel that follows the rules beats a richer one that
+runs long. If obeying a craft rule would push you over, drop the rule.`
 }
 
 export function buildRerollPrompt(

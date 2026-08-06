@@ -32,10 +32,24 @@ export interface AIResponse {
  * the absence of web_search_tool_result blocks as "no live evidence" rather
  * than assuming a search happened. See relay/Code.gs to enable passthrough.
  */
+/**
+ * A message's content may be a plain string, or content blocks when we want to mark part
+ * of the prompt as cacheable. The relay forwards `messages` verbatim, so cache_control
+ * reaches Anthropic untouched.
+ */
+export type AIContent = string | Array<Record<string, unknown>>
+
+/** Mark a block of prompt text as cacheable for an hour. */
+export const cached = (text: string) => ({
+  type: 'text',
+  text,
+  cache_control: { type: 'ephemeral', ttl: '1h' },
+})
+
 export async function callAIRaw(body: {
   model?: string
   maxTokens?: number
-  messages: Array<{ role: string; content: string }>
+  messages: Array<{ role: string; content: AIContent }>
   tools?: unknown[]
 }): Promise<AIResponse> {
   const payload: Record<string, unknown> = {

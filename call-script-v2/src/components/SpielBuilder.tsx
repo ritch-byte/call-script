@@ -1,8 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { callAIRaw, textFrom, usedWebSearch, parseJSON, stripEmDash } from '../lib/ai'
+import { callAIRaw, cached, textFrom, usedWebSearch, parseJSON, stripEmDash } from '../lib/ai'
 import {
   BEATS, DEFAULT_OA, TONES, WINDOW,
-  buildBriefPrompt, buildSpielPrompt, buildRerollPrompt,
+  buildBriefPrompt, spielStablePrefix, spielLeadBlock, buildRerollPrompt,
   verifyReceipts, wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
@@ -250,7 +250,16 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
       const res = await callAIRaw({
         model: writer,
         maxTokens: 1400,
-        messages: [{ role: 'user', content: buildSpielPrompt(raw, b, oa, tone, pacing, days) }],
+        // The rules and exemplar are identical on every build, so they go in their own
+        // cached block and the lead-specific brief follows it. First build of the hour
+        // pays to write the cache, the rest read it at a tenth of the price.
+        messages: [{
+          role: 'user',
+          content: [
+            cached(spielStablePrefix(oa, tone, pacing, days)),
+            { type: 'text', text: spielLeadBlock(raw, b) },
+          ],
+        }],
       })
       const parsed = parseJSON<{ beats?: Array<{ id: string; text: string }> }>(textFrom(res))
       const map = Object.fromEntries((parsed.beats || []).map(x => [x.id, oneParagraph(stripEmDash(x.text))]))
