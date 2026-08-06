@@ -132,9 +132,13 @@ export function parseJSON<T>(raw: string): T {
   return JSON.parse(clean.slice(a, b + 1)) as T
 }
 
-/** House style: em dashes never survive to the prompter. */
+/**
+ * House style: em dashes never survive to the prompter.
+ * Consumes the spaces either side, otherwise "Done — sending" reads back as
+ * "Done ,  sending" with a stray space in front of the comma.
+ */
 export function stripEmDash(s: string): string {
-  return (s || '').replace(/—/g, ', ').replace(/\s*--\s*/g, ', ')
+  return (s || '').replace(/\s*[—–]\s*/g, ', ').replace(/\s*--\s*/g, ', ')
 }
 
 /** Send a single-user-message prompt to the relay and return the model's text. */

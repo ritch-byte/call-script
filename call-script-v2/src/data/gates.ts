@@ -8,6 +8,8 @@
 // `banks` mirrors the flow node that owns each gate, so confirming a gate here
 // credits exactly what answering it inside the call script would credit.
 
+import { flow } from './flow'
+
 export interface GateCopy {
   label: string
   /** Spoken ask. {role} is filled in with whatever role the lead named. */
@@ -20,6 +22,8 @@ export interface GateCopy {
   banks: string[]
   /** The node in the live call script that owns this gate. */
   node: string
+  /** The call script's recovery node, shown when the buyer rules this gate out. */
+  recovery: string
 }
 
 export const GATE_COPY: Record<string, GateCopy> = {
@@ -30,6 +34,7 @@ export const GATE_COPY: Record<string, GateCopy> = {
     not: ['“2–3 months”', '“90 days”', '“next year”'],
     banks: ['timeline', 'hiring'],
     node: 'qualify_timeline',
+    recovery: 'obj_timeline_disco',
   },
   offshore: {
     label: 'Open to offshore',
@@ -38,6 +43,7 @@ export const GATE_COPY: Record<string, GateCopy> = {
     not: ['“must be local”', '“on-site only”'],
     banks: ['offshore'],
     node: 'qualify_offshore',
+    recovery: 'obj_offshore',
   },
   full_time: {
     label: 'Full-time dedicated',
@@ -46,6 +52,7 @@ export const GATE_COPY: Record<string, GateCopy> = {
     not: ['“part-time”', '“project / shared”', '“ad hoc”'],
     banks: ['full_time'],
     node: 'qualify_fulltime',
+    recovery: 'obj_parttime',
   },
   decision_maker: {
     label: 'Decision maker',
@@ -54,6 +61,7 @@ export const GATE_COPY: Record<string, GateCopy> = {
     not: ['“that’s someone else entirely”', '“I’d have to pass it on”'],
     banks: ['decision_maker', 'authority'],
     node: 'qualify_dm',
+    recovery: 'obj_wrong_person',
   },
 }
 
@@ -77,6 +85,51 @@ export const gateAsk = (id: string, role: string) =>
   GATE_COPY[id].ask.replace(/\{role\}/g, role.trim() || 'role')
 
 export type GateAnswer = 'unset' | 'yes' | 'no'
+
+const clean = (s: string, role: string, leadName: string) =>
+  (s || '')
+    // Swallow the spaces around the dash too, otherwise "Done — sending" becomes
+    // "Done ,  sending" with a stray space before the comma.
+    .replace(/\s*—\s*/g, ', ')
+    .replace(/\{leadName\}/g, leadName.trim() || '[Lead Name]')
+    .replace(/\{yourName\}/g, '[BDR Name]')
+    .replace(/\{role\}/g, role.trim() || 'that role')
+    .replace(/\[their exact timeline\]/g, 'that timeline you mentioned')
+
+/**
+ * The call script's own recovery line for a gate the buyer just ruled out, so the rep
+ * gets the approved comeback in the moment instead of improvising or going quiet.
+ */
+export const gateRecovery = (id: string, role: string) =>
+  clean(flow[GATE_COPY[id].recovery]?.script ?? '', role, '')
+
+/**
+ * The incentive for accepting the calendar invite, in one place so the amount is a
+ * single edit.
+ *
+ * NOTE: this is not the $100 voucher in the email offer hook (EmailComposer's
+ * OFFER_HOOK), which is a sweetener for the discovery call itself. These are two
+ * different numbers said at two different moments, so if they are ever meant to be the
+ * same figure, change both.
+ */
+export const INVITE_INCENTIVE = {
+  amount: '$10 Amazon voucher',
+  line: 'And once you accept the invite, we will send over a $10 Amazon voucher, just as a thanks for your time.',
+}
+
+/**
+ * The closing sequence: recap the four criteria, ask for the commitment, then send the
+ * invite and mention the voucher. Built from the call script's close_recap and
+ * end_booked nodes so the wording stays the approved one.
+ */
+export function closingLines(role: string, slot: string, leadName: string): string[] {
+  const recap = clean(flow.close_recap?.script ?? '', role, leadName)
+  const booked = clean(flow.end_booked?.script ?? '', role, leadName)
+  const slotLine = slot.trim() ? `So that's ${slot.trim()}, locked in.` : ''
+  return [...recap.split(/\n{2,}/), slotLine, booked, INVITE_INCENTIVE.line]
+    .map(s => s.trim())
+    .filter(Boolean)
+}
 
 /**
  * Translate the qualifier's ticks into scorecard credit.

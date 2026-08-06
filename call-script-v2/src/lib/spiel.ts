@@ -588,7 +588,7 @@ export function parseObjections(raw: string): Objection[] {
     const key = m[1].toLowerCase() as 'objection' | 'playbook' | 'agree' | 'inform' | 'question'
     // A second OBJECTION with no separator between blocks still starts a new record.
     if (key === 'objection' && cur.objection) push()
-    cur[key] = m[2].trim().replace(/^["']|["']$/g, '').replace(/—/g, ', ')
+    cur[key] = m[2].trim().replace(/^["']|["']$/g, '').replace(/\s*[—–]\s*/g, ', ')
   }
   push()
   return out

@@ -9,8 +9,9 @@ import {
   openingBeats, fillLeadName, parseObjections,
 } from '../lib/spiel'
 import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
-import { GATE_COPY, CORE_ORDER, gateAsk, qualificationBanks } from '../data/gates'
+import { GATE_COPY, CORE_ORDER, gateAsk, gateRecovery, closingLines, qualificationBanks } from '../data/gates'
 import type { GateAnswer } from '../data/gates'
+import { flow } from '../data/flow'
 
 const OA_STORE = 'oa-spiel-profile'
 const FAST_STORE = 'oa-spiel-fast'
@@ -77,6 +78,10 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   const [bookedWhen, setBookedWhen] = useState('')
   const [roleWanted, setRoleWanted] = useState('')
   const [gates, setGates] = useState<Record<string, GateAnswer>>({})
+  /** 0 = capture what just happened, 1..4 = one gate each, 5 = recap and close. */
+  const [qualStep, setQualStep] = useState(0)
+  /** The gate the buyer just ruled out, so its recovery line stays on screen. */
+  const [showRecovery, setShowRecovery] = useState('')
 
   const [stage, setStage] = useState('')
   const [busy, setBusy] = useState('')
@@ -479,12 +484,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
                   {sent ? 'Sent to script' : 'Use in call script'}
                 </button>
               )}
-              <button
-                className={`spiel-btn-ghost${qualOpen ? ' spiel-btn-on' : ''}`}
-                onClick={() => setQualOpen(v => !v)}
-              >
-                They gave me a date
-              </button>
               {hasSpiel && (
                 <button className="spiel-btn-primary spiel-btn-small" onClick={run} disabled={!!busy}>
                   Rebuild
@@ -544,98 +543,163 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
           </div>
           )}
 
-          {/* ── They said yes to a slot: get the role, then run the core criteria ── */}
+          {/* ── The qualification hand-off sits under the spiel, where the call is by now ── */}
+          {hasSpiel && !qualOpen && (
+            <button className="spiel-qual-open" onClick={() => setQualOpen(true)}>
+              They gave me a date, or they're interested
+              <span>Step through the four criteria, then close</span>
+            </button>
+          )}
+
           {qualOpen && (
             <div className="spiel-qual">
-              <div className="spiel-qual-head">Qualify the booking</div>
-              <div className="spiel-hint">
-                A slot on its own is not a qualified call. Get the role in their words, then get a
-                spoken yes on all four criteria before you let them go.
+              <div className="spiel-qual-top">
+                <div className="spiel-qual-head">Qualify the booking</div>
+                <span className="spiel-qual-step">
+                  {qualStep === 0 ? 'What just happened' : qualStep <= CORE_ORDER.length ? `Criterion ${qualStep} of ${CORE_ORDER.length}` : 'Recap and close'}
+                </span>
               </div>
 
-              <div className="spiel-qual-fields">
-                <div>
-                  <label className="spiel-label">Slot they agreed to</label>
-                  <input
-                    className="spiel-field"
-                    value={bookedWhen}
-                    onChange={e => setBookedWhen(e.target.value)}
-                    placeholder="Thursday 2pm their time"
-                  />
-                </div>
-                <div>
-                  <label className="spiel-label">Role they want to add</label>
-                  <input
-                    className="spiel-field"
-                    value={roleWanted}
-                    onChange={e => setRoleWanted(e.target.value)}
-                    placeholder="Type what they actually said..."
-                  />
-                </div>
-              </div>
-
-              {(brief?.offshore_roles || []).length > 0 && (
-                <div className="spiel-qual-suggest">
-                  <span className="spiel-qual-suggest-label">Likely, tap to fill</span>
-                  {brief!.offshore_roles!.map(r => (
-                    <button key={r} className="spiel-chip-btn" onClick={() => setRoleWanted(r)}>
-                      {r}
-                    </button>
-                  ))}
-                </div>
+              {/* Step 0: the slot and the role, in their words. */}
+              {qualStep === 0 && (
+                <>
+                  <div className="spiel-hint">
+                    A slot on its own is not a qualified call. Get the role in their words first, it
+                    drives every question after this.
+                  </div>
+                  <div className="spiel-qual-fields">
+                    <div>
+                      <label className="spiel-label">Slot they agreed to</label>
+                      <input
+                        className="spiel-field"
+                        value={bookedWhen}
+                        onChange={e => setBookedWhen(e.target.value)}
+                        placeholder="Thursday 2pm their time"
+                      />
+                    </div>
+                    <div>
+                      <label className="spiel-label">Role they want to add</label>
+                      <input
+                        className="spiel-field"
+                        value={roleWanted}
+                        onChange={e => setRoleWanted(e.target.value)}
+                        placeholder="Type what they actually said..."
+                      />
+                    </div>
+                  </div>
+                  <div className="spiel-gate-ask">“{flow.qualify_role?.script}”</div>
+                  {(brief?.offshore_roles || []).length > 0 && (
+                    <div className="spiel-qual-suggest">
+                      <span className="spiel-qual-suggest-label">Likely, tap to fill</span>
+                      {brief!.offshore_roles!.map(r => (
+                        <button key={r} className="spiel-chip-btn" onClick={() => setRoleWanted(r)}>
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <button
+                    className="spiel-btn-primary"
+                    onClick={() => setQualStep(1)}
+                    disabled={!roleWanted.trim()}
+                  >
+                    Start qualifying
+                  </button>
+                  {!roleWanted.trim() && (
+                    <div className="spiel-hint">Name the role first, it drives the rest of the call.</div>
+                  )}
+                </>
               )}
 
-              {CORE_ORDER.map((id, i) => {
+              {/* Steps 1..4: one criterion at a time, read it, mark what they said. */}
+              {qualStep >= 1 && qualStep <= CORE_ORDER.length && (() => {
+                const id = CORE_ORDER[qualStep - 1]
                 const g = GATE_COPY[id]
                 const state = gates[id] || 'unset'
+                const answer = (v: GateAnswer) => {
+                  setGates(p => ({ ...p, [id]: v }))
+                  setShowRecovery(v === 'no' ? id : '')
+                  if (v === 'yes') setQualStep(s => s + 1)
+                }
                 return (
-                  <div key={id} className={`spiel-gate spiel-gate-${state}`}>
+                  <div className={`spiel-gate spiel-gate-${state}`}>
                     <div className="spiel-gate-top">
-                      <span className="spiel-gate-n">{i + 1}</span>
+                      <span className="spiel-gate-n">{qualStep}</span>
                       <span className="spiel-gate-label">{g.label}</span>
-                      <div className="spiel-gate-btns">
-                        <button
-                          className={`spiel-btn-ghost spiel-btn-small${state === 'yes' ? ' spiel-btn-yes' : ''}`}
-                          onClick={() => setGates(p => ({ ...p, [id]: state === 'yes' ? 'unset' : 'yes' }))}
-                        >
-                          Said yes
-                        </button>
-                        <button
-                          className={`spiel-btn-ghost spiel-btn-small${state === 'no' ? ' spiel-btn-no' : ''}`}
-                          onClick={() => setGates(p => ({ ...p, [id]: state === 'no' ? 'unset' : 'no' }))}
-                        >
-                          Ruled out
-                        </button>
-                      </div>
                     </div>
                     <div className="spiel-gate-ask">“{gateAsk(id, roleWanted)}”</div>
                     <div className="spiel-gate-phrases">
                       {g.say.map(s => <span key={s} className="spiel-yes">✓ {s}</span>)}
                       {g.not.map(n => <span key={n} className="spiel-no">✕ {n}</span>)}
                     </div>
+
+                    {showRecovery === id && (
+                      <div className="spiel-recover">
+                        <span className="spiel-recover-label">They ruled it out, say this</span>
+                        <div className="spiel-recover-line">“{gateRecovery(id, roleWanted)}”</div>
+                        <div className="spiel-recover-note">
+                          If they come round, mark it yes. If not, it stays unmet and the booking
+                          gets flagged on review.
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="spiel-gate-btns">
+                      <button className="spiel-btn-ghost spiel-btn-yes" onClick={() => answer('yes')}>
+                        They said yes
+                      </button>
+                      <button className="spiel-btn-ghost spiel-btn-no" onClick={() => answer('no')}>
+                        They ruled it out
+                      </button>
+                      {state === 'no' && (
+                        <button className="spiel-btn-ghost spiel-btn-small" onClick={() => { setShowRecovery(''); setQualStep(s => s + 1) }}>
+                          Move on
+                        </button>
+                      )}
+                      <button
+                        className="spiel-btn-ghost spiel-btn-small"
+                        onClick={() => { setShowRecovery(''); setQualStep(s => Math.max(0, s - 1)) }}
+                      >
+                        Back
+                      </button>
+                    </div>
                   </div>
                 )
-              })}
+              })()}
 
-              <div className={`spiel-qual-status${qcMet ? ' spiel-qual-met' : ''}`}>
-                {qcMet
-                  ? 'All four criteria confirmed. This one is bookable.'
-                  : refusedGates.length > 0
-                    ? `Ruled out: ${refusedGates.map(id => GATE_COPY[id].label).join(', ')}. Handle it before you book, a booking that fails these gets flagged on review.`
-                    : `Still need a spoken yes on: ${missingGates.map(id => GATE_COPY[id].label).join(', ')}.`}
-              </div>
+              {/* Step 5: recap, commitment, invite, voucher. */}
+              {qualStep > CORE_ORDER.length && (
+                <>
+                  <div className={`spiel-qual-status${qcMet ? ' spiel-qual-met' : ''}`}>
+                    {qcMet
+                      ? 'All four criteria confirmed. This one is bookable.'
+                      : refusedGates.length > 0
+                        ? `Ruled out: ${refusedGates.map(id => GATE_COPY[id].label).join(', ')}. A booking that fails these gets flagged on review.`
+                        : `Still no spoken yes on: ${missingGates.map(id => GATE_COPY[id].label).join(', ')}.`}
+                  </div>
 
-              {onQualify && (
-                <button
-                  className="spiel-btn-primary"
-                  onClick={handOffQualification}
-                  disabled={!roleWanted.trim()}
-                >
-                  Continue in call script
-                </button>
-              )}
-              {!roleWanted.trim() && (
-                <div className="spiel-hint">Name the role first, it drives the rest of the call.</div>
+                  <label className="spiel-label">Read this to close</label>
+                  {closingLines(roleWanted, bookedWhen, leadName).map((line, i) => (
+                    <div key={i} className="spiel-close-line">{line}</div>
+                  ))}
+
+                  <div className="spiel-qual-actions">
+                    {onQualify && (
+                      <button className="spiel-btn-primary" onClick={handOffQualification}>
+                        Continue in call script
+                      </button>
+                    )}
+                    <button
+                      className="spiel-btn-ghost"
+                      onClick={() => copy(closingLines(roleWanted, bookedWhen, leadName).join('\n\n'), 'close')}
+                    >
+                      {copied === 'close' ? 'Copied' : 'Copy close'}
+                    </button>
+                    <button className="spiel-btn-ghost spiel-btn-small" onClick={() => setQualStep(CORE_ORDER.length)}>
+                      Back
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           )}
