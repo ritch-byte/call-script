@@ -2,7 +2,7 @@
 // Prompt construction and scoring live here so the component stays presentational.
 
 import { flow } from '../data/flow'
-import { GLENCOCO_WRITING_RULES, OBJECTION_PLAYBOOK, OBJECTION_FRAMEWORK } from '../data/glencoco'
+import { GLENCOCO_WRITING_RULES } from '../data/glencoco'
 
 export interface Receipt {
   fact: string
@@ -35,15 +35,6 @@ export interface Beat {
   text: string
   /** Approved call-script wording, not model output. Never rerolled, never regenerated. */
   fixed?: boolean
-}
-
-export interface Objection {
-  objection: string
-  agree: string
-  inform: string
-  question: string
-  /** Which Glencoco playbook line this maps to, or 'custom' for role-specific ones. */
-  playbook?: string
 }
 
 export interface OAProfile {
@@ -564,78 +555,3 @@ ${
 Respond with the new line of spoken script and nothing else. No labels, no quotes, no commentary.`
 }
 
-/**
- * Parse the labelled objection format.
- *
- * These answers are spoken lines that naturally contain quotes ("a lot of clients said
- * the same"), and asking for JSON kept producing a doubled quote that broke the parse
- * mid-value. A line format has nothing to escape, so the reply cannot be malformed in a
- * way that costs the rep their prep.
- */
-export function parseObjections(raw: string): Objection[] {
-  const out: Objection[] = []
-  let cur: Partial<Objection> = {}
-  const push = () => {
-    if (cur.objection && cur.agree && cur.inform && cur.question) out.push(cur as Objection)
-    cur = {}
-  }
-  for (const line of (raw || '').split('\n')) {
-    const t = line.trim()
-    if (!t) continue
-    if (/^-{3,}$/.test(t)) { push(); continue }
-    const m = t.match(/^(OBJECTION|PLAYBOOK|AGREE|INFORM|QUESTION)\s*:\s*(.+)$/i)
-    if (!m) continue
-    const key = m[1].toLowerCase() as 'objection' | 'playbook' | 'agree' | 'inform' | 'question'
-    // A second OBJECTION with no separator between blocks still starts a new record.
-    if (key === 'objection' && cur.objection) push()
-    cur[key] = m[2].trim().replace(/^["']|["']$/g, '').replace(/\s*[—–]\s*/g, ', ')
-  }
-  push()
-  return out
-}
-
-export function buildObjectionPrompt(
-  fullScript: string,
-  brief: Brief | null,
-  raw: string,
-): string {
-  return `An SDR is about to run this spiel on a cold call.
-
-${brief ? `RESEARCH BRIEF:\n${JSON.stringify(brief, null, 2)}` : `LEAD, unparsed: ${raw}`}
-
-SPIEL:
-"""
-${fullScript}
-"""
-
-Predict the 4 objections THIS person is most likely to raise, given their exact title, what they are measured on, and their company.
-
-These five come up on nearly every cold call. Where one of them is likely here, use it and follow its direction. Phrase the objection the way THIS person would actually say it, not as the generic label:
-
-${OBJECTION_PLAYBOOK.map(o => `- "${o.objection}": ${o.direction}`).join('\n')}
-
-At least TWO of your four must come from that list, because they come up on nearly every call and a rep who is not ready for them loses the meeting. Phrase them as this person would actually say them. The other two should be specific to this role, industry or company where that is genuinely more likely than a generic one.
-
-Tag each block with the playbook line it came from, or "custom" if it is one of your role-specific ones.
-
-Respond to each using this discipline:
-${OBJECTION_FRAMEWORK}
-
-No em dashes. Spoken language. Each field one short sentence, 25 words at most. Never
-tell them they are failing at their job, and do not pitch inside the Inform line.
-
-Reply in exactly this format, four blocks, nothing before or after. Plain text on each
-line, no quotes around anything, no JSON, no markdown:
-
-OBJECTION: what they say, in their words
-PLAYBOOK: send me an email | not interested | we already have a solution | bad timing | who are you | custom
-AGREE: validate it
-INFORM: one short honest line
-QUESTION: an open question that re-engages
----
-OBJECTION: ...
-PLAYBOOK: ...
-AGREE: ...
-INFORM: ...
-QUESTION: ...`
-}

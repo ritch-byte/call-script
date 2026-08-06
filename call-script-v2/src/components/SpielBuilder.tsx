@@ -2,13 +2,13 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { callAIRaw, textFrom, usedWebSearch, parseJSON, stripEmDash } from '../lib/ai'
 import {
   BEATS, DEFAULT_OA, TONES, WINDOW,
-  buildBriefPrompt, buildSpielPrompt, buildRerollPrompt, buildObjectionPrompt,
+  buildBriefPrompt, buildSpielPrompt, buildRerollPrompt,
   verifyReceipts, wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
-  openingBeats, fillLeadName, parseObjections,
+  openingBeats, fillLeadName,
 } from '../lib/spiel'
-import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
+import type { Beat, Brief, OAProfile, Tone } from '../lib/spiel'
 import { GATE_COPY, CORE_ORDER, gateAsk, gateRecovery, closingLines, qualificationBanks } from '../data/gates'
 import type { GateAnswer } from '../data/gates'
 import { flow } from '../data/flow'
@@ -65,7 +65,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   // The opening is fixed wording that needs no model call, so it is on the prompter
   // from the moment the page opens. The rep can start reading it while the spiel builds.
   const [beats, setBeats] = useState<Beat[] | null>(() => openingBeats(leadName, yourName))
-  const [objections, setObjections] = useState<Objection[] | null>(null)
   /**
    * The spiel shows as one editable block. Beats stay the source of truth so
    * reroll keeps working; freeText only takes over when a hand edit changes the
@@ -140,7 +139,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
    * Clear the call and start on the next lead.
    *
    * Everything about THIS lead goes: the paste, the source text, the brief, the spiel,
-   * the objections and the whole qualifier. What survives is configuration rather than
+   * and the whole qualifier. What survives is configuration rather than
    * call data: the OA positioning, the voice, the pacing and the calendar options, since
    * a rep sets those once for the floor and would not want them wiped between dials.
    * The opening comes back fresh from the call script because the next lead has a
@@ -151,7 +150,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     setSource('')
     setShowSource(false)
     setBrief(null)
-    setObjections(null)
     setFreeText(null)
     setBeats(openingBeats(leadName, yourName))
     setQualOpen(false)
@@ -204,7 +202,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   }, [inSync, fullScript, activeBeats])
 
   async function run() {
-    setErr(''); setWarn(''); setObjections(null); setBrief(null)
+    setErr(''); setWarn(''); setBrief(null)
     // Drop back to the opening rather than an empty box: the rep keeps something to
     // read while the two calls run, and a failed build still leaves them the opener.
     // Keep their edits to it, a rebuild should not undo a hand-tweaked opener.
@@ -337,26 +335,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
       setErr(`Reroll failed: ${e instanceof Error ? e.message : String(e)}`)
     } finally {
       setRolling('')
-    }
-  }
-
-  async function prepObjections() {
-    setErr(''); setBusy('obj')
-    try {
-      const res = await callAIRaw({
-        model: 'claude-sonnet-4-6',
-        // Four objections with four fields each, plus the playbook context. 1200 was
-        // tight enough to truncate the JSON mid-value and fail the parse.
-        maxTokens: 1800,
-        messages: [{ role: 'user', content: buildObjectionPrompt(fullScript, brief, raw) }],
-      })
-      const found = parseObjections(textFrom(res))
-      if (!found.length) throw new Error('the reply came back in a shape we could not read')
-      setObjections(found)
-    } catch (e) {
-      setErr(`Objection prep failed: ${e instanceof Error ? e.message : String(e)}`)
-    } finally {
-      setBusy('')
     }
   }
 
@@ -518,11 +496,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
               <button className="spiel-btn-ghost" onClick={() => copy(fullScript, 'all')}>
                 {copied === 'all' ? 'Copied' : hasSpiel ? 'Copy spiel' : 'Copy opening'}
               </button>
-              {hasSpiel && (
-              <button className="spiel-btn-ghost" onClick={prepObjections} disabled={!!busy}>
-                {busy === 'obj' ? 'Thinking...' : 'Objection prep'}
-              </button>
-              )}
               {hasSpiel && onUseInCall && (
                 <button
                   className="spiel-btn-ghost"
@@ -762,30 +735,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             </div>
           )}
 
-          {objections && (
-            <div className="spiel-obj">
-              <div className="spiel-obj-head">Objection prep</div>
-              <div className="spiel-hint">Agree, inform, question back. Never argue the objection.</div>
-              {objections.map((o, i) => (
-                <div key={i} className="spiel-obj-card">
-                  <div className="spiel-obj-said">
-                    "{o.objection}"
-                    {o.playbook && o.playbook.toLowerCase() !== 'custom' && (
-                      <span className="spiel-obj-tag">comes up on most calls</span>
-                    )}
-                  </div>
-                  {([['Agree', o.agree], ['Inform', o.inform], ['Question back', o.question]] as Array<[string, string]>).map(
-                    ([k, v]) => (
-                      <div key={k} className="spiel-obj-row">
-                        <span className="spiel-obj-key">{k}</span>
-                        <span className="spiel-obj-val">{v}</span>
-                      </div>
-                    ),
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       )}
 
