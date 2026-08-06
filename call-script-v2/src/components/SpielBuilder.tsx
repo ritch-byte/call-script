@@ -573,6 +573,15 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             </div>
           )}
 
+          {/* Straight under the script, because this is the next thing that happens on a
+              live call. Reroll is an editing action and sits below it. */}
+          {hasSpiel && !qualOpen && (
+            <button className="spiel-qual-open" onClick={() => setQualOpen(true)}>
+              They're interested, or they gave me a date. Qualify now
+              <span>Get the role, step the four criteria, then close</span>
+            </button>
+          )}
+
           {hasSpiel && (
           <div className="spiel-reroll">
             <span className="spiel-reroll-label">Reroll a beat</span>
@@ -598,14 +607,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
               </div>
             )}
           </div>
-          )}
-
-          {/* ── The qualification hand-off sits under the spiel, where the call is by now ── */}
-          {hasSpiel && !qualOpen && (
-            <button className="spiel-qual-open" onClick={() => setQualOpen(true)}>
-              They gave me a date, or they're interested
-              <span>Step through the four criteria, then close</span>
-            </button>
           )}
 
           {qualOpen && (
