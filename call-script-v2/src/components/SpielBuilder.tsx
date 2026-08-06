@@ -61,7 +61,9 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   const [showSettings, setShowSettings] = useState(false)
 
   const [brief, setBrief] = useState<Brief | null>(null)
-  const [beats, setBeats] = useState<Beat[] | null>(null)
+  // The opening is fixed wording that needs no model call, so it is on the prompter
+  // from the moment the page opens. The rep can start reading it while the spiel builds.
+  const [beats, setBeats] = useState<Beat[] | null>(() => openingBeats(leadName, yourName))
   const [objections, setObjections] = useState<Objection[] | null>(null)
   /**
    * The spiel shows as one editable block. Beats stay the source of truth so
@@ -107,6 +109,8 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   // wording, so counting it would leave the warning permanently lit and meaningless.
   const writtenSeconds = speakSeconds(activeBeats.filter(b => !b.fixed).map(b => b.text).join(' '))
   const rerollable = activeBeats.filter(b => !b.fixed)
+  /** False while the box holds only the fixed opening and nothing has been generated. */
+  const hasSpiel = rerollable.length > 0
   const verified = (brief?.receipts || []).filter(r => r.confidence === 'verified')
 
   // Same rule as readyToBook() in lib/score.ts: all four core gates confirmed, none refused.
@@ -149,7 +153,14 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   }, [inSync, fullScript, activeBeats])
 
   async function run() {
-    setErr(''); setWarn(''); setObjections(null); setBeats(null); setBrief(null)
+    setErr(''); setWarn(''); setObjections(null); setBrief(null)
+    // Drop back to the opening rather than an empty box: the rep keeps something to
+    // read while the two calls run, and a failed build still leaves them the opener.
+    // Keep their edits to it, a rebuild should not undo a hand-tweaked opener.
+    setBeats(prev => {
+      const kept = (prev || []).filter(b => b.fixed)
+      return kept.length ? kept : openingBeats(leadName, yourName)
+    })
     setBusy('run'); setSent(false); setFreeText(null)
 
     let b: Brief | null = null
@@ -229,11 +240,15 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         }
       }
 
-      // The fixed opening leads, the generated spiel follows, all in the one box.
-      setBeats([
-        ...openingBeats(leadName, yourName),
-        ...BEATS.map(x => ({ ...x, text: fillLeadName(map[x.id] || '', leadName) })),
-      ])
+      // The opening leads, the generated spiel follows, all in the one box. Reuse the
+      // opening already on screen so any edit the rep made to it survives the build.
+      setBeats(prev => {
+        const opening = (prev || []).filter(b => b.fixed)
+        return [
+          ...(opening.length ? opening : openingBeats(leadName, yourName)),
+          ...BEATS.map(x => ({ ...x, text: fillLeadName(map[x.id] || '', leadName) })),
+        ]
+      })
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
       setErr(`Could not write the spiel: ${msg}. Press build again.`)
@@ -432,16 +447,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         </div>
       )}
 
-      {!beats && !busy && (
-        <div className="spiel-empty">
-          <div className="spiel-empty-title">Nothing on the prompter yet</div>
-          <div className="spiel-empty-body">
-            Paste a lead above. It works out the company and the role, builds a brief you can defend,
-            then writes the cold open around it.
-          </div>
-        </div>
-      )}
-
       {/* ── The prompter ── */}
       {beats && (
         <div className="spiel-out">
@@ -451,17 +456,19 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
                 {fmtTime(totalSeconds)}
               </span>
               <span className="spiel-bar-meta">
-                to speak · {wordCount(fullScript)} words · opening + spiel
+                to speak · {wordCount(fullScript)} words · {hasSpiel ? 'opening + spiel' : 'opening only'}
               </span>
             </div>
             <div className="spiel-bar-actions">
               <button className="spiel-btn-ghost" onClick={() => copy(fullScript, 'all')}>
-                {copied === 'all' ? 'Copied' : 'Copy spiel'}
+                {copied === 'all' ? 'Copied' : hasSpiel ? 'Copy spiel' : 'Copy opening'}
               </button>
+              {hasSpiel && (
               <button className="spiel-btn-ghost" onClick={prepObjections} disabled={!!busy}>
                 {busy === 'obj' ? 'Thinking...' : 'Objection prep'}
               </button>
-              {onUseInCall && (
+              )}
+              {hasSpiel && onUseInCall && (
                 <button
                   className="spiel-btn-ghost"
                   onClick={() => { onUseInCall(researchInsert); setSent(true); setTimeout(() => setSent(false), 2000) }}
@@ -475,9 +482,11 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
               >
                 They gave me a date
               </button>
-              <button className="spiel-btn-primary spiel-btn-small" onClick={run} disabled={!!busy}>
-                Rebuild
-              </button>
+              {hasSpiel && (
+                <button className="spiel-btn-primary spiel-btn-small" onClick={run} disabled={!!busy}>
+                  Rebuild
+                </button>
+              )}
             </div>
           </div>
 
@@ -497,6 +506,15 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             spellCheck={false}
           />
 
+          {!hasSpiel && (
+            <div className="spiel-await">
+              {busy === 'run'
+                ? 'Start reading. The rest of the spiel drops in underneath as soon as it is written.'
+                : 'This opening is ready to read now. Paste a lead above and press Build spiel to add the rest.'}
+            </div>
+          )}
+
+          {hasSpiel && (
           <div className="spiel-reroll">
             <span className="spiel-reroll-label">Reroll a beat</span>
             {inSync ? (
@@ -521,6 +539,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
               </div>
             )}
           </div>
+          )}
 
           {/* ── They said yes to a slot: get the role, then run the core criteria ── */}
           {qualOpen && (

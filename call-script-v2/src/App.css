@@ -1979,6 +1979,17 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
 }
 .spiel-script:focus { outline: none; border-color: var(--blue); border-left-color: var(--magenta); }
 
+.spiel-await {
+  margin-top: 12px;
+  background: var(--blue-soft);
+  border-left: 3px solid var(--blue);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
 .spiel-reroll { margin: 12px 0 4px; }
 .spiel-reroll-label {
   display: block;
