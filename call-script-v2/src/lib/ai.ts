@@ -57,31 +57,47 @@ export async function callAIRaw(body: {
  * actually happened.
  */
 async function postRelay(payload: Record<string, unknown>): Promise<AIResponse> {
-  let res: Response
-  try {
-    res = await fetch(AI_RELAY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload),
-    })
-  } catch {
+  // Apps Script intermittently fails to serve the script at all, answering with a
+  // Google "unable to open the file at this time" page (usually a 404). Measured at
+  // roughly one request in six, and independent of payload size. The script never runs
+  // in that case, so retrying once costs nothing and turns most of these into a slightly
+  // slower build rather than a failed one the rep has to notice and repeat by hand.
+  const attempt = async () => {
+    let res: Response
+    try {
+      res = await fetch(AI_RELAY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+      })
+    } catch {
+      return { unreachable: true as const }
+    }
+    const body = await res.text()
+    return { body, notServed: /^\s*</.test(body) || !body.trim() }
+  }
+
+  let out = await attempt()
+  if ('unreachable' in out || out.notServed) {
+    await new Promise(r => setTimeout(r, 1500))
+    out = await attempt()
+  }
+
+  if ('unreachable' in out) {
     throw new Error('Could not reach the AI relay. Check your connection and try again.')
   }
-
-  const body = await res.text()
-  const looksHtml = /^\s*</.test(body)
-
-  if (looksHtml || !body.trim()) {
+  if (out.notServed) {
     throw new Error(
-      'The AI relay is busy or being redeployed, so it returned a page instead of a result. Wait a few seconds and press Build spiel again.',
+      'The AI relay did not answer, twice in a row. Google sometimes drops these for a few seconds. Press Build spiel again.',
     )
   }
+  const body = out.body as string
 
   let data: AIResponse
   try {
     data = JSON.parse(body)
   } catch {
-    throw new Error(`The AI relay sent something unreadable (${res.status}). Try again in a moment.`)
+    throw new Error('The AI relay sent something unreadable. Try again in a moment.')
   }
 
   if (data && data.error) {

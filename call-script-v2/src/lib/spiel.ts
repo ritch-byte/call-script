@@ -2,6 +2,7 @@
 // Prompt construction and scoring live here so the component stays presentational.
 
 import { flow } from '../data/flow'
+import { GLENCOCO_WRITING_RULES, OBJECTION_PLAYBOOK, OBJECTION_FRAMEWORK } from '../data/glencoco'
 
 export interface Receipt {
   fact: string
@@ -41,6 +42,8 @@ export interface Objection {
   agree: string
   inform: string
   question: string
+  /** Which Glencoco playbook line this maps to, or 'custom' for role-specific ones. */
+  playbook?: string
 }
 
 export interface OAProfile {
@@ -345,7 +348,9 @@ const styleRules = (tone: Tone, pacing: boolean) => `STYLE RULES, non negotiable
 - Aim at the upside they want, not the failure they should fear.
 - Do not narrate the framing itself. Never say things like "it's a structural squeeze,
   not a you problem" or "this isn't a criticism". Just say the structural thing and move on.
-- Tone: ${TONES[tone]}`
+- Tone: ${TONES[tone]}
+
+${GLENCOCO_WRITING_RULES}`
 
 const HOMEWORK_RULES = `HOMEWORK RULES, these are what make the call land:
 
@@ -517,7 +522,12 @@ Respond ONLY with JSON, no preamble, no fences:
 
 Length: aim for 150 to 185 words across all eight beats combined, and never exceed 190.
 That is roughly a minute of speech. Count before you answer. If you are over, cut adjectives
-and subordinate clauses from the middle beats, not from the homework beat.`
+and subordinate clauses from the middle beats, not from the homework beat.
+
+LAST THING, AND IT OVERRIDES EVERY RULE ABOVE: the eight beats together must total no
+more than 190 words. Count them. A rep reads this out loud on a cold call and anything
+longer gets cut off by the prospect, so a shorter spiel that follows the rules beats a
+richer one that runs long. If obeying a craft rule would push you over, drop the rule.`
 }
 
 export function buildRerollPrompt(
@@ -554,6 +564,36 @@ ${
 Respond with the new line of spoken script and nothing else. No labels, no quotes, no commentary.`
 }
 
+/**
+ * Parse the labelled objection format.
+ *
+ * These answers are spoken lines that naturally contain quotes ("a lot of clients said
+ * the same"), and asking for JSON kept producing a doubled quote that broke the parse
+ * mid-value. A line format has nothing to escape, so the reply cannot be malformed in a
+ * way that costs the rep their prep.
+ */
+export function parseObjections(raw: string): Objection[] {
+  const out: Objection[] = []
+  let cur: Partial<Objection> = {}
+  const push = () => {
+    if (cur.objection && cur.agree && cur.inform && cur.question) out.push(cur as Objection)
+    cur = {}
+  }
+  for (const line of (raw || '').split('\n')) {
+    const t = line.trim()
+    if (!t) continue
+    if (/^-{3,}$/.test(t)) { push(); continue }
+    const m = t.match(/^(OBJECTION|PLAYBOOK|AGREE|INFORM|QUESTION)\s*:\s*(.+)$/i)
+    if (!m) continue
+    const key = m[1].toLowerCase() as 'objection' | 'playbook' | 'agree' | 'inform' | 'question'
+    // A second OBJECTION with no separator between blocks still starts a new record.
+    if (key === 'objection' && cur.objection) push()
+    cur[key] = m[2].trim().replace(/^["']|["']$/g, '').replace(/—/g, ', ')
+  }
+  push()
+  return out
+}
+
 export function buildObjectionPrompt(
   fullScript: string,
   brief: Brief | null,
@@ -568,10 +608,34 @@ SPIEL:
 ${fullScript}
 """
 
-Predict the 4 objections THIS person is most likely to raise, given their exact title, what they are measured on, and their company. For each, write a response using Agree, then Inform, then Question Back. Validate the objection, give a short honest answer, then ask an open question that re-engages and pulls on something in their remit.
+Predict the 4 objections THIS person is most likely to raise, given their exact title, what they are measured on, and their company.
 
-No em dashes. Spoken language. Each field one short sentence.
+These five come up on nearly every cold call. Where one of them is likely here, use it and follow its direction. Phrase the objection the way THIS person would actually say it, not as the generic label:
 
-Respond ONLY with JSON:
-{"objections":[{"objection":"what they say","agree":"...","inform":"...","question":"..."}]}`
+${OBJECTION_PLAYBOOK.map(o => `- "${o.objection}": ${o.direction}`).join('\n')}
+
+At least TWO of your four must come from that list, because they come up on nearly every call and a rep who is not ready for them loses the meeting. Phrase them as this person would actually say them. The other two should be specific to this role, industry or company where that is genuinely more likely than a generic one.
+
+Tag each block with the playbook line it came from, or "custom" if it is one of your role-specific ones.
+
+Respond to each using this discipline:
+${OBJECTION_FRAMEWORK}
+
+No em dashes. Spoken language. Each field one short sentence, 25 words at most. Never
+tell them they are failing at their job, and do not pitch inside the Inform line.
+
+Reply in exactly this format, four blocks, nothing before or after. Plain text on each
+line, no quotes around anything, no JSON, no markdown:
+
+OBJECTION: what they say, in their words
+PLAYBOOK: send me an email | not interested | we already have a solution | bad timing | who are you | custom
+AGREE: validate it
+INFORM: one short honest line
+QUESTION: an open question that re-engages
+---
+OBJECTION: ...
+PLAYBOOK: ...
+AGREE: ...
+INFORM: ...
+QUESTION: ...`
 }

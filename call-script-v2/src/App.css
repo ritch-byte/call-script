@@ -2045,6 +2045,22 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
   box-shadow: var(--shadow);
 }
 .spiel-obj-said { font-size: 15px; font-weight: 600; color: #B57400; margin-bottom: 9px; }
+.spiel-obj-tag {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: 2px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  background: var(--blue-soft);
+  border: 1.5px solid var(--blue-muted);
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
 .spiel-obj-row { display: flex; gap: 12px; align-items: baseline; margin-bottom: 6px; }
 .spiel-obj-key {
   flex-shrink: 0;

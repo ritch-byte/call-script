@@ -6,7 +6,7 @@ import {
   verifyReceipts, wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
-  openingBeats, fillLeadName,
+  openingBeats, fillLeadName, parseObjections,
 } from '../lib/spiel'
 import type { Beat, Brief, Objection, OAProfile, Tone } from '../lib/spiel'
 import { GATE_COPY, CORE_ORDER, gateAsk, qualificationBanks } from '../data/gates'
@@ -294,11 +294,14 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     try {
       const res = await callAIRaw({
         model: 'claude-sonnet-4-6',
-        maxTokens: 1200,
+        // Four objections with four fields each, plus the playbook context. 1200 was
+        // tight enough to truncate the JSON mid-value and fail the parse.
+        maxTokens: 1800,
         messages: [{ role: 'user', content: buildObjectionPrompt(fullScript, brief, raw) }],
       })
-      const parsed = parseJSON<{ objections?: Objection[] }>(textFrom(res))
-      setObjections(parsed.objections || [])
+      const found = parseObjections(textFrom(res))
+      if (!found.length) throw new Error('the reply came back in a shape we could not read')
+      setObjections(found)
     } catch (e) {
       setErr(`Objection prep failed: ${e instanceof Error ? e.message : String(e)}`)
     } finally {
@@ -643,7 +646,12 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
               <div className="spiel-hint">Agree, inform, question back. Never argue the objection.</div>
               {objections.map((o, i) => (
                 <div key={i} className="spiel-obj-card">
-                  <div className="spiel-obj-said">"{o.objection}"</div>
+                  <div className="spiel-obj-said">
+                    "{o.objection}"
+                    {o.playbook && o.playbook.toLowerCase() !== 'custom' && (
+                      <span className="spiel-obj-tag">comes up on most calls</span>
+                    )}
+                  </div>
                   {([['Agree', o.agree], ['Inform', o.inform], ['Question back', o.question]] as Array<[string, string]>).map(
                     ([k, v]) => (
                       <div key={k} className="spiel-obj-row">
