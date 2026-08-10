@@ -523,6 +523,73 @@ That is roughly a minute of speech. Count before you answer. If you are over, cu
 and subordinate clauses from the middle beats, not from the homework beat.`
 }
 
+/**
+ * Turn a lean, plain-text spiel into beats.
+ *
+ * The model is asked for blank-line separated paragraphs, but it sometimes uses single
+ * newlines, so fall back to those rather than handing the rep one giant block. Numbering
+ * is stripped in case it labels them despite being told not to.
+ */
+export function parseLeanSpiel(raw: string): Beat[] {
+  const clean = (raw || '').trim()
+  let parts = clean.split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
+  if (parts.length < BEATS.length) {
+    parts = clean.split(/\n+/).map(p => p.trim()).filter(Boolean)
+  }
+  parts = parts.map(p => p.replace(/^\s*\d+[.)]\s*/, '').trim()).filter(Boolean)
+  return BEATS.map((b, i) => ({ ...b, text: oneParagraph(parts[i] || '') }))
+}
+
+/**
+ * One-call spiel, no research pass, no JSON.
+ *
+ * The full path runs two calls and a ~2000 token prompt because it produces receipts the
+ * rep can defend and a brief they read before dialling. When all you want is the spiel,
+ * that is most of the bill for output nobody looks at. This asks for the eight beats as
+ * plain paragraphs and nothing else: no exemplar, no brief, no JSON scaffolding.
+ *
+ * The guarantees that survive are the ones enforced in code afterwards, plus the two
+ * rules that keep a rep out of trouble: never claim to have seen something we were not
+ * shown, and never tell the prospect they are failing.
+ */
+export function buildLeanSpielPrompt(
+  raw: string,
+  source: string,
+  oa: OAProfile,
+  tone: Tone,
+  pacing: boolean,
+  days: string,
+): string {
+  const grounded = source.trim().length > 0
+  return `Write a cold call opener for an SDR at Outsource Accelerator, ${oa.positioning}.
+
+LEAD: ${raw}
+${
+  grounded
+    ? `WHAT THE REP ACTUALLY SAW, the only facts you may claim:\n"""\n${source.slice(0, 2500)}\n"""`
+    : 'The rep has no research and you have no web access, so you know nothing checkable about this company.'
+}
+
+Write exactly 8 short paragraphs, one blank line between each. No labels, no numbering, no JSON, no preamble:
+
+1. Who we are, one breath. Must contain this clause word for word: "${identityClause(oa.positioning)}". Then frame it for their industry.
+2. The homework. ${
+    grounded
+      ? 'Lead with the single strongest thing from WHAT THE REP SAW, said the way someone who looked would say it. Nothing outside that text.'
+      : 'You have seen nothing. Do not write "I saw" or "I noticed". Open with a hedge that invites correction, like "correct me if I\'m off, but it looks like...", built from what this role owns rather than from the company.'
+  }
+3. Their world: the squeeze this role lives with, what they are accountable for against what local headcount costs. Structural, or what peers in the same seat report. Never say or imply they are failing, behind, missing targets or stretched thin.
+4. The big question: name two or three roles they could plausibly hire offshore, tie it to ${oa.savings} and a metric this role owns. Ends in a question mark.
+5. Our edge: ${oa.proof}.
+6. What it feels like in practice, one short line: ${oa.mechanic}.
+7. The ask: name the objection you expect from this title, then ask for 15 minutes. Address them as (Name).
+8. Close with these options: ${days}.
+
+VOICE: spoken, short clauses, contractions${pacing ? ', ellipses as pacing marks' : ', no ellipses'}. ${TONES[tone]} No em dashes, no corporate filler, no feature lists, no pricing. Curiosity, not authority. Sell the meeting, not the service. Their vocabulary, nothing that could appear on a website.
+
+LENGTH: 150 to 185 words across all eight, never more than 190. Count before answering.`
+}
+
 /** The only part that changes per lead. Sent after the cached prefix. */
 export function spielLeadBlock(raw: string, brief: Brief | null): string {
   const noReceipts = brief && !(brief.receipts || []).length

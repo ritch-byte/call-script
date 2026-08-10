@@ -3,6 +3,7 @@ import { callAIRaw, cached, textFrom, usedWebSearch, parseJSON, stripEmDash } fr
 import {
   BEATS, DEFAULT_OA, TONES, WINDOW,
   buildBriefPrompt, spielStablePrefix, spielLeadBlock, buildRerollPrompt,
+  buildLeanSpielPrompt, parseLeanSpiel,
   verifyReceipts, wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
@@ -15,6 +16,7 @@ import { flow } from '../data/flow'
 
 const OA_STORE = 'oa-spiel-profile'
 const FAST_STORE = 'oa-spiel-fast'
+const LEAN_STORE = 'oa-spiel-lean'
 
 const FAST_MODEL = 'claude-haiku-4-5-20251001'
 const VOICE_MODEL = 'claude-sonnet-4-6'
@@ -53,6 +55,13 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     return DEFAULT_OA
   })
   const [tone, setTone] = useState<Tone>('house')
+  /**
+   * Spiel only: one call, no company research pass. Default on, because the brief is
+   * roughly half the bill and most dials only need the script.
+   */
+  const [leanMode, setLeanMode] = useState<boolean>(() => {
+    try { return localStorage.getItem(LEAN_STORE) !== 'off' } catch { return true }
+  })
   /** Write the spiel on the fast model. Default on: it is ~8s quicker per build. */
   const [fastSpiel, setFastSpiel] = useState<boolean>(() => {
     try { return localStorage.getItem(FAST_STORE) !== 'off' } catch { return true }
@@ -213,7 +222,10 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     setBusy('run'); setSent(false); setFreeText(null)
 
     let b: Brief | null = null
-    try {
+    if (leanMode && !source.trim()) {
+      setWarn('Spiel only mode, so nothing here is a checked fact about this company. The homework beat is written as hedged inference on purpose. Paste text from their site, or switch Spiel only off, to get something you can claim you saw.')
+    }
+    if (!leanMode) try {
       setStage('Reading the company')
       const res = await callAIRaw({
         // The brief is structured extraction, not prose, and the receipt check that
@@ -247,22 +259,35 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     try {
       setStage('Writing the spiel')
       const writer = fastSpiel ? FAST_MODEL : VOICE_MODEL
-      const res = await callAIRaw({
-        model: writer,
-        maxTokens: 1400,
-        // The rules and exemplar are identical on every build, so they go in their own
-        // cached block and the lead-specific brief follows it. First build of the hour
-        // pays to write the cache, the rest read it at a tenth of the price.
-        messages: [{
-          role: 'user',
-          content: [
-            cached(spielStablePrefix(oa, tone, pacing, days)),
-            { type: 'text', text: spielLeadBlock(raw, b) },
-          ],
-        }],
-      })
-      const parsed = parseJSON<{ beats?: Array<{ id: string; text: string }> }>(textFrom(res))
-      const map = Object.fromEntries((parsed.beats || []).map(x => [x.id, oneParagraph(stripEmDash(x.text))]))
+      let map: Record<string, string>
+
+      if (leanMode) {
+        // One call, no exemplar, no brief, plain paragraphs instead of JSON. Half the
+        // cost of the researched path for the same eight beats.
+        const res = await callAIRaw({
+          model: writer,
+          maxTokens: 700,
+          messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing, days) }],
+        })
+        map = Object.fromEntries(parseLeanSpiel(stripEmDash(textFrom(res))).map(x => [x.id, x.text]))
+      } else {
+        const res = await callAIRaw({
+          model: writer,
+          maxTokens: 1400,
+          // The rules and exemplar are identical on every build, so they go in their own
+          // cached block and the lead-specific brief follows it. First build of the hour
+          // pays to write the cache, the rest read it at a tenth of the price.
+          messages: [{
+            role: 'user',
+            content: [
+              cached(spielStablePrefix(oa, tone, pacing, days)),
+              { type: 'text', text: spielLeadBlock(raw, b) },
+            ],
+          }],
+        })
+        const parsed = parseJSON<{ beats?: Array<{ id: string; text: string }> }>(textFrom(res))
+        map = Object.fromEntries((parsed.beats || []).map(x => [x.id, oneParagraph(stripEmDash(x.text))]))
+      }
 
       // The positioning wording is a deliberate choice, and the fast writer sometimes
       // paraphrases it away. Repair that one line rather than lose it or pay for the
@@ -430,6 +455,25 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
           <label className="spiel-check">
             <input type="checkbox" checked={pacing} onChange={() => setPacing(v => !v)} />
             <span>Ellipsis pacing marks</span>
+          </label>
+
+          <label className="spiel-check">
+            <input
+              type="checkbox"
+              checked={leanMode}
+              onChange={() => {
+                const next = !leanMode
+                setLeanMode(next)
+                try { localStorage.setItem(LEAN_STORE, next ? 'on' : 'off') } catch { /* ignore */ }
+              }}
+            />
+            <span>
+              Spiel only
+              <span className="spiel-check-note">
+                One call instead of two. Skips the company research, so there is no lead
+                details card and no checked receipts, just the script. Half the cost.
+              </span>
+            </span>
           </label>
 
           <label className="spiel-check">
