@@ -7,8 +7,8 @@ actually sends.
 ## How a build works
 
 One button, one path, one price. The rep pastes a line (company, job title, website) and
-presses Build spiel. That is a single call on Haiku 4.5 costing 0.23 cents,
-so 500 builds a day is $1.15. There is no research
+presses Build spiel. That is a single call on Haiku 4.5 costing 0.24 cents,
+so 500 builds a day is $1.20. There is no research
 pass and no model choice, so a rep cannot land on an expensive setting.
 
 The eight beats come back as plain paragraphs rather than JSON, because the JSON
@@ -81,8 +81,11 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    on" + what this title in this industry does hour to hour, in their vocabulary: two
    concrete activities joined by "and then", in the order the work happens. Then word for
    word: "am I close?"
-   They have not offshored anything, that is why we are calling, so describe the in-house
-   day. Never write offshore, outsourced, BPO or nearshore in this beat.
+   Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
+   submissions, they do not hunt for clinical ops people. Beat 3 owns hiring, so naming it
+   here announces the pitch before you have earned the call. Nothing about hiring,
+   headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore
+   either: they have done none of it, which is why we are calling.
    Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
      them signed, and then getting them actually live."
@@ -138,8 +141,11 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    on" + what this title in this industry does hour to hour, in their vocabulary: two
    concrete activities joined by "and then", in the order the work happens. Then word for
    word: "am I close?"
-   They have not offshored anything, that is why we are calling, so describe the in-house
-   day. Never write offshore, outsourced, BPO or nearshore in this beat.
+   Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
+   submissions, they do not hunt for clinical ops people. Beat 3 owns hiring, so naming it
+   here announces the pitch before you have earned the call. Nothing about hiring,
+   headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore
+   either: they have done none of it, which is why we are calling.
    Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
      them signed, and then getting them actually live."

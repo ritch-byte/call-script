@@ -6,7 +6,7 @@ import {
   wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
-  presumesOffshore, buildDeoffshorePrompt,
+  presumesOffshore, buildDeoffshorePrompt, describesHiring, buildRefocusPrompt,
   openingBeats, fillLeadName,
 } from '../lib/spiel'
 import type { Beat, OAProfile, Tone } from '../lib/spiel'
@@ -268,6 +268,21 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
           })
           const fixed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
           if (fixed && !presumesOffshore(fixed, raw)) map.homework = fixed
+        } catch { /* keep the original rather than fail the whole build */ }
+      }
+
+      // Same beat, sibling problem: describing the staffing of their job instead of the
+      // job. That is beat 3's material, and hearing it here tells them we are selling.
+      if (map.homework && describesHiring(map.homework, raw)) {
+        setStage('Refocusing the homework line')
+        try {
+          const fix = await callAIRaw({
+            model: MODEL,
+            maxTokens: 400,
+            messages: [{ role: 'user', content: buildRefocusPrompt(map.homework, raw, tone, pacing) }],
+          })
+          const fixed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
+          if (fixed && !describesHiring(fixed, raw)) map.homework = fixed
         } catch { /* keep the original rather than fail the whole build */ }
       }
 

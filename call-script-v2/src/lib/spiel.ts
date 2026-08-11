@@ -326,6 +326,72 @@ export function presumesOffshore(text: string, lead = ''): boolean {
   return PRESUMED_OFFSHORE_PATTERNS.some(re => re.test(text || ''))
 }
 
+/**
+ * Words that make the homework beat about staffing rather than about their work.
+ *
+ * A sibling of the offshore problem and the same root cause: the writer knows what we
+ * sell, so it describes their day in our vocabulary. "You're most likely spending your
+ * days hunting down the right clinical ops people" is not their day. Their day is
+ * clinical trials and regulatory submissions; the hiring squeeze is beat 3's job, and
+ * saying it in beat 2 announces the pitch before the call has been earned.
+ *
+ * Bare "talent" and "sourcing" are deliberately absent: a video producer books talent
+ * and a partnerships lead sources partners, and both are legitimately their day. The
+ * finding/hunting patterns below only fire when the object is people.
+ */
+export const HIRING_PATTERNS: RegExp[] = [
+  /\bhir(?:e|es|ing|ed)\b/i,
+  /\brecruit\w*/i,
+  /\bhead[- ]?count\b/i,
+  /\bstaffing\b|\bstaff(?:ing)? up\b/i,
+  /\bcandidates?\b/i,
+  /\bvacan\w+/i,
+  /\bbackfill\w*/i,
+  /\b(?:finding|hunting|chasing|sourcing|scouting)\s+(?:down\s+)?(?:the\s+)?(?:right\s+)?[\w\s]{0,20}?(?:people|staff|specialists|professionals|hires)\b/i,
+  /\bfill(?:ing)?\s+(?:the\s+|those\s+|a\s+)?(?:seat|seats|role|roles|position|positions)\b/i,
+]
+
+/**
+ * True when the homework beat describes staffing instead of the job.
+ *
+ * Stands down for the same reason presumesOffshore does: a recruitment or staffing firm
+ * really does spend its days on hiring, so the guard would be the thing introducing the
+ * error.
+ */
+export function describesHiring(text: string, lead = ''): boolean {
+  if (/\b(?:out-?sourc\w*|off-?shor\w*|near-?shor\w*|BPOs?|staffing|recruit\w*|talent)\b/i.test(lead)) {
+    return false
+  }
+  return HIRING_PATTERNS.some(re => re.test(text || ''))
+}
+
+/** Rewrite a homework beat that described staffing rather than the work itself. */
+export function buildRefocusPrompt(
+  beatText: string, raw: string, tone: Tone, pacing: boolean,
+): string {
+  return `Rewrite one line of a cold call opener. It guesses at the prospect's working day
+but describes hiring rather than the work itself:
+
+"${beatText}"
+
+Their day is the job, not the staffing of it. A clinical operations lead runs trials and
+regulatory submissions; they do not spend their days hunting for clinical ops people.
+Naming the hiring problem here announces the pitch before the call has been earned, and
+it belongs two beats later anyway.
+
+LEAD: ${raw}
+
+Keep the exact opening "I did do a bit of homework before I dialled... so correct me if I'm
+off, but you're most likely spending your days on" and the exact ending "am I close?".
+Between them, name two concrete things this title actually does hour to hour, joined by
+"and then", in the order the work happens. Their vocabulary, one sentence. Do not mention
+hiring, recruiting, headcount, candidates, vacancies or filling seats.
+
+${styleRules(tone, pacing)}
+
+Respond with the rewritten line only. No labels, no quotes, no commentary.`
+}
+
 /** Rewrite a homework beat that handed them an offshore team they never built. */
 export function buildDeoffshorePrompt(
   beatText: string, raw: string, tone: Tone, pacing: boolean,
@@ -429,8 +495,54 @@ const oaBlock = (oa: OAProfile) => `OUTSOURCE ACCELERATOR, the seller:
  * newlines, so fall back to those rather than handing the rep one giant block. Numbering
  * is stripped in case it labels them despite being told not to.
  */
+/**
+ * The opening words of each written beat, which the house script fixes.
+ *
+ * Splitting on these rather than on paragraph position is what makes the parse
+ * survive a model that merges two beats or breaks one across lines: an anchor is
+ * where the beat actually starts, whereas position is only a guess about it.
+ */
+const BEAT_ANCHORS: Array<[string, RegExp]> = [
+  ['thumbnail',   /so yeah,?\s*quick thumbnail on us/i],
+  ['homework',    /i did do a bit of homework/i],
+  ['observation', /and so what we are seeing from a high[- ]?level/i],
+  ['question',    /so the big question is/i],
+  ['superpower',  /so in response to this,?\s*our superpower/i],
+  ['howitlands',  /and we do it in a way where/i],
+]
+
+/**
+ * Cut the response at the frames. Returns null unless every beat was found, so a
+ * partial match falls through to the positional split rather than silently
+ * dropping whichever beat the writer phrased differently.
+ */
+function splitByAnchors(raw: string): Record<string, string> | null {
+  const hits: Array<{ id: string; at: number }> = []
+  for (const [id, re] of BEAT_ANCHORS) {
+    const m = re.exec(raw)
+    if (!m) return null
+    hits.push({ id, at: m.index })
+  }
+  hits.sort((a, b) => a.at - b.at)
+  const out: Record<string, string> = {}
+  hits.forEach((h, i) => {
+    const end = i + 1 < hits.length ? hits[i + 1].at : raw.length
+    out[h.id] = oneParagraph(raw.slice(h.at, end).trim())
+  })
+  return out
+}
+
 export function parseLeanSpiel(raw: string, days: string): Beat[] {
   const clean = (raw || '').trim()
+
+  const anchored = splitByAnchors(clean)
+  if (anchored) {
+    return [
+      ...GENERATED_BEATS.map(b => ({ ...b, text: anchored[b.id] || '' })),
+      ...closingBeats(days),
+    ]
+  }
+
   let parts = clean.split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
   if (parts.length < GENERATED_BEATS.length) {
     parts = clean.split(/\n+/).map(p => p.trim()).filter(Boolean)
@@ -495,8 +607,11 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    on" + what this title in this industry does hour to hour, in their vocabulary: two
    concrete activities joined by "and then", in the order the work happens. Then word for
    word: "am I close?"
-   They have not offshored anything, that is why we are calling, so describe the in-house
-   day. Never write offshore, outsourced, BPO or nearshore in this beat.
+   Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
+   submissions, they do not hunt for clinical ops people. Beat 3 owns hiring, so naming it
+   here announces the pitch before you have earned the call. Nothing about hiring,
+   headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore
+   either: they have done none of it, which is why we are calling.
    Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
      them signed, and then getting them actually live."

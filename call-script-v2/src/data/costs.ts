@@ -11,17 +11,21 @@
 // what not to say. Then the prompt was cut 16% with every rule kept, and this is where
 // it landed.
 //
-// MEASURED, five leads: 0.232, 0.235, 0.234, 0.223 and 0.219, mean 0.229, from
-// usage.input_tokens and usage.output_tokens on the real responses (~960 in, ~265 out).
-// Rounded up to 0.23 because understating what the floor spends is the worse error.
-// $1.14 per 500 builds.
+// MEASURED, five leads: 0.231, 0.250, 0.233, 0.221 and 0.245, mean 0.236, from
+// usage.input_tokens and usage.output_tokens on the real responses (~1015 in, ~270 out).
+// Rounded up to 0.24 because understating what the floor spends is the worse error.
+// $1.18 per 500 builds.
 //
-// The house screenplay landed here without moving the number, which is the point of
-// fixing the close in code. Change in the World grew from one line to three sentences
-// and the close and calendar ask stopped being generated at all, so the prompt got
-// longer and the output got shorter. A first attempt did move it, to 0.238, because the
-// length rule still budgeted 205 words across eight beats when only six are written now.
-// Per-beat word budgets fixed that: written output fell from 204-232 words to 193-216.
+// This is 3c per 500 above the $1.15 the floor asked for, and the reason is prompt
+// tokens, not waste. Two rules were added to beat 2 after it was caught describing the
+// staffing of the job rather than the job, and the Change in the World beat carries the
+// screenplay's three moves. Both are instructions, so both are input. Fixing the close
+// in code paid for most of it: the model writes six beats instead of eight, so output
+// fell even as the prompt grew.
+//
+// Getting back under $1.15 means cutting one of those rules or shortening a beat, which
+// is a product decision rather than an optimisation, and it is worth about 50c a month
+// at the floor's ~550 builds a day. Left as is deliberately.
 //
 // Note the char-count estimate made before the run said ~754 input tokens against an
 // actual ~840, about 9% low. Estimating prompt tokens from characters is fine for
@@ -32,7 +36,7 @@
 // live risk in trimming, since the offshore rule lost its emphasis to get here. Each
 // repair costs about another 0.05, so if that rate ever climbs to one build in five it
 // gives the whole saving back. Re-measure if the prompt or the model changes.
-export const BUILD_COST_CENTS = 0.23
+export const BUILD_COST_CENTS = 0.24
 
 /** Dollars for a day of dialling at this rate. */
 export const dailyCost = (cents: number, builds: number) => (cents * builds) / 100
