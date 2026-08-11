@@ -24,11 +24,15 @@ export interface OAProfile {
 export type Tone = 'measured' | 'house' | 'high'
 
 /**
- * Seconds a researched cold open can run before it drags.
- * Kept consistent with the 150-190 word target below: 190 words at 2.6 words
- * per second is ~73s, so a spiel that obeys the brief must read green.
+ * Seconds the written part can run before it drags.
+ *
+ * Moved 80 -> 95 when the house frames and the homework beat went in. That is not the
+ * threshold chasing the output: the structure genuinely got longer. The floor's own
+ * exemplar is ~175 words and the homework beat adds ~40, so a correct spiel is now
+ * 210-235 words, or 81-90 seconds. Measured builds land in that band, so 95 leaves the
+ * amber flag meaning "this one is actually bloated" rather than lighting on every build.
  */
-export const WINDOW = 80
+export const WINDOW = 95
 
 export const BEATS: Array<Omit<Beat, 'text'>> = [
   { id: 'thumbnail',  label: 'Thumbnail',      hint: 'Who we are, in one breath' },
@@ -359,24 +363,42 @@ ${
     : 'The rep has no research and you have no web access, so you know nothing checkable about this company.'
 }
 
-Write exactly 8 short paragraphs, one blank line between each. No labels, no numbering, no JSON, no preamble:
+Write exactly 8 short paragraphs, one blank line between each. No labels, no numbering, no JSON, no preamble.
 
-1. Who we are, one breath. Must contain this clause word for word: "${identityClause(oa.positioning)}". Then frame it for their industry.
-2. The homework. ${
-    grounded
-      ? 'Lead with the single strongest thing from WHAT THE REP SAW, said the way someone who looked would say it. Nothing outside that text.'
-      : 'You have seen nothing. Do not write "I saw" or "I noticed". Open with a hedge that invites correction, like "correct me if I\'m off, but it looks like...", built from what this role owns rather than from the company.'
-  }
-3. Their world: the squeeze this role lives with, what they are accountable for against what local headcount costs. Structural, or what peers in the same seat report. Never say or imply they are failing, behind, missing targets or stretched thin.
-4. The big question: name two or three roles they could plausibly hire offshore, tie it to ${oa.savings} and a metric this role owns. Ends in a question mark.
-5. Our edge: ${oa.proof}.
-6. What it feels like in practice, one short line: ${oa.mechanic}.
-7. The ask: name the objection you expect from this title, then ask for 15 minutes. Address them as (Name).
-8. Close with these options: ${days}.
+House script. Keep each opening phrase exactly as written, that is how the floor talks.
+Fill the rest with this person's world. One or two short sentences per beat, never three:
+
+1. "So yeah quick thumbnail on us." + this clause word for word:
+   "${identityClause(oa.positioning)}" + one clause framing it for their industry.
+2. THE HOMEWORK, the beat that buys the call. Exactly:
+   "I did do a bit of homework before I dialled... so correct me if I'm off, but you're
+   most likely spending your days on" + what someone with THIS title in THIS industry
+   does hour to hour, in their vocabulary: two concrete activities joined by "and then",
+   in the order the work really happens. End with exactly "am I close?"
+   Shape to copy, content to replace: "carrier and partner deals across the SEA
+   markets... getting them signed, and then getting them actually live."${
+     grounded
+       ? ' Use WHAT THE REP SAW where it fits. Claim nothing beyond that text.'
+       : ' You have seen nothing, so this is inference. That is why it hedges and ends in a question.'
+   }
+3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
+   theirs live with, premium local talent against unverified freelancers, in their
+   industry's terms. Never imply THEY are failing or behind.
+4. "So the big question is" + is it possible to secure world class talent, naming two or
+   three roles this company would really hire offshore, at ${oa.savings}, without
+   sacrificing quality? Ends in a question mark.
+5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
+   ${oa.proof}.
+6. "And we do it in a way where," + ${oa.mechanic}.
+7. "But super simple, (Name)," + the objection you expect from this title + would they be
+   completely opposed to carving out 15 minutes for a coffee-break style chat.
+8. "Does ${days} work for you?"
 
 VOICE: spoken, short clauses, contractions${pacing ? ', ellipses as pacing marks' : ', no ellipses'}. ${TONES[tone]} No em dashes, no corporate filler, no feature lists, no pricing. Curiosity, not authority. Sell the meeting, not the service. Their vocabulary, nothing that could appear on a website.
 
-LENGTH: 150 to 185 words across all eight, never more than 190. Count before answering.`
+LENGTH, this overrides everything above: 205 words across all eight beats is the hard
+ceiling and 180 is the target. Count before you answer. The homework beat earns its
+words; take them off beats 3 to 7, which should be one sentence each.`
 }
 
 export function buildRerollPrompt(

@@ -7,8 +7,8 @@ actually sends.
 ## How a build works
 
 One button, one path, one price. The rep pastes a line (company, job title, website) and
-presses Build spiel. That is a single call on Haiku 4.5 costing 0.19 cents,
-so 500 builds a day is 95c. There is no research
+presses Build spiel. That is a single call on Haiku 4.5 costing 0.23 cents,
+so 500 builds a day is $1.15. There is no research
 pass and no model choice, so a rep cannot land on an expensive setting.
 
 The eight beats come back as plain paragraphs rather than JSON, because the JSON
@@ -68,20 +68,38 @@ Write a cold call opener for an SDR at Outsource Accelerator, the leading market
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 The rep has no research and you have no web access, so you know nothing checkable about this company.
 
-Write exactly 8 short paragraphs, one blank line between each. No labels, no numbering, no JSON, no preamble:
+Write exactly 8 short paragraphs, one blank line between each. No labels, no numbering, no JSON, no preamble.
 
-1. Who we are, one breath. Must contain this clause word for word: "the leading marketplace for global talent networks". Then frame it for their industry.
-2. The homework. You have seen nothing. Do not write "I saw" or "I noticed". Open with a hedge that invites correction, like "correct me if I'm off, but it looks like...", built from what this role owns rather than from the company.
-3. Their world: the squeeze this role lives with, what they are accountable for against what local headcount costs. Structural, or what peers in the same seat report. Never say or imply they are failing, behind, missing targets or stretched thin.
-4. The big question: name two or three roles they could plausibly hire offshore, tie it to up to 70% less than local hiring cost and a metric this role owns. Ends in a question mark.
-5. Our edge: enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
-6. What it feels like in practice, one short line: we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
-7. The ask: name the objection you expect from this title, then ask for 15 minutes. Address them as (Name).
-8. Close with these options: Thursday or Friday afternoon.
+House script. Keep each opening phrase exactly as written, that is how the floor talks.
+Fill the rest with this person's world. One or two short sentences per beat, never three:
+
+1. "So yeah quick thumbnail on us." + this clause word for word:
+   "the leading marketplace for global talent networks" + one clause framing it for their industry.
+2. THE HOMEWORK, the beat that buys the call. Exactly:
+   "I did do a bit of homework before I dialled... so correct me if I'm off, but you're
+   most likely spending your days on" + what someone with THIS title in THIS industry
+   does hour to hour, in their vocabulary: two concrete activities joined by "and then",
+   in the order the work really happens. End with exactly "am I close?"
+   Shape to copy, content to replace: "carrier and partner deals across the SEA
+   markets... getting them signed, and then getting them actually live." You have seen nothing, so this is inference. That is why it hedges and ends in a question.
+3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
+   theirs live with, premium local talent against unverified freelancers, in their
+   industry's terms. Never imply THEY are failing or behind.
+4. "So the big question is" + is it possible to secure world class talent, naming two or
+   three roles this company would really hire offshore, at up to 70% less than local hiring cost, without
+   sacrificing quality? Ends in a question mark.
+5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
+   enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
+6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
+7. "But super simple, (Name)," + the objection you expect from this title + would they be
+   completely opposed to carving out 15 minutes for a coffee-break style chat.
+8. "Does Thursday or Friday afternoon work for you?"
 
 VOICE: spoken, short clauses, contractions, ellipses as pacing marks. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, no corporate filler, no feature lists, no pricing. Curiosity, not authority. Sell the meeting, not the service. Their vocabulary, nothing that could appear on a website.
 
-LENGTH: 150 to 185 words across all eight, never more than 190. Count before answering.
+LENGTH, this overrides everything above: 205 words across all eight beats is the hard
+ceiling and 180 is the target. Count before you answer. The homework beat earns its
+words; take them off beats 3 to 7, which should be one sentence each.
 ```
 
 ### With pasted source text
@@ -99,20 +117,38 @@ brands in the UK and Ireland, with fulfilment centres in Manchester, Leeds and D
 Careers: hiring a Customer Support Advisor (Manchester, 2 positions).
 """
 
-Write exactly 8 short paragraphs, one blank line between each. No labels, no numbering, no JSON, no preamble:
+Write exactly 8 short paragraphs, one blank line between each. No labels, no numbering, no JSON, no preamble.
 
-1. Who we are, one breath. Must contain this clause word for word: "the leading marketplace for global talent networks". Then frame it for their industry.
-2. The homework. Lead with the single strongest thing from WHAT THE REP SAW, said the way someone who looked would say it. Nothing outside that text.
-3. Their world: the squeeze this role lives with, what they are accountable for against what local headcount costs. Structural, or what peers in the same seat report. Never say or imply they are failing, behind, missing targets or stretched thin.
-4. The big question: name two or three roles they could plausibly hire offshore, tie it to up to 70% less than local hiring cost and a metric this role owns. Ends in a question mark.
-5. Our edge: enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
-6. What it feels like in practice, one short line: we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
-7. The ask: name the objection you expect from this title, then ask for 15 minutes. Address them as (Name).
-8. Close with these options: Thursday or Friday afternoon.
+House script. Keep each opening phrase exactly as written, that is how the floor talks.
+Fill the rest with this person's world. One or two short sentences per beat, never three:
+
+1. "So yeah quick thumbnail on us." + this clause word for word:
+   "the leading marketplace for global talent networks" + one clause framing it for their industry.
+2. THE HOMEWORK, the beat that buys the call. Exactly:
+   "I did do a bit of homework before I dialled... so correct me if I'm off, but you're
+   most likely spending your days on" + what someone with THIS title in THIS industry
+   does hour to hour, in their vocabulary: two concrete activities joined by "and then",
+   in the order the work really happens. End with exactly "am I close?"
+   Shape to copy, content to replace: "carrier and partner deals across the SEA
+   markets... getting them signed, and then getting them actually live." Use WHAT THE REP SAW where it fits. Claim nothing beyond that text.
+3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
+   theirs live with, premium local talent against unverified freelancers, in their
+   industry's terms. Never imply THEY are failing or behind.
+4. "So the big question is" + is it possible to secure world class talent, naming two or
+   three roles this company would really hire offshore, at up to 70% less than local hiring cost, without
+   sacrificing quality? Ends in a question mark.
+5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
+   enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
+6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
+7. "But super simple, (Name)," + the objection you expect from this title + would they be
+   completely opposed to carving out 15 minutes for a coffee-break style chat.
+8. "Does Thursday or Friday afternoon work for you?"
 
 VOICE: spoken, short clauses, contractions, ellipses as pacing marks. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, no corporate filler, no feature lists, no pricing. Curiosity, not authority. Sell the meeting, not the service. Their vocabulary, nothing that could appear on a website.
 
-LENGTH: 150 to 185 words across all eight, never more than 190. Count before answering.
+LENGTH, this overrides everything above: 205 words across all eight beats is the hard
+ceiling and 180 is the target. Count before you answer. The homework beat earns its
+words; take them off beats 3 to 7, which should be one sentence each.
 ```
 
 
