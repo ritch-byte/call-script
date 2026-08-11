@@ -13,6 +13,7 @@ import type { Beat, Brief, OAProfile, Tone } from '../lib/spiel'
 import { GATE_COPY, CORE_ORDER, gateAsk, gateRecovery, closingLines, qualificationBanks } from '../data/gates'
 import type { GateAnswer } from '../data/gates'
 import { flow } from '../data/flow'
+import { buildCost, isCheapest, CHEAPEST, dailyCost, money } from '../data/costs'
 
 const OA_STORE = 'oa-spiel-profile'
 const FAST_STORE = 'oa-spiel-fast'
@@ -495,6 +496,35 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
               </span>
             </span>
           </label>
+
+          <div className="spiel-cost">
+            <div className="spiel-cost-row">
+              <span className="spiel-cost-figure">{buildCost(leanMode, fastSpiel).cents}c</span>
+              <span className="spiel-cost-what">
+                per Build spiel · {buildCost(leanMode, fastSpiel).label}
+              </span>
+            </div>
+            <div className="spiel-cost-scale">
+              500 builds a day ≈ {money(dailyCost(buildCost(leanMode, fastSpiel).cents, 500))} ·
+              {' '}100 ≈ {money(dailyCost(buildCost(leanMode, fastSpiel).cents, 100))}
+              {buildCost(leanMode, fastSpiel).note ? `. ${buildCost(leanMode, fastSpiel).note}` : ''}
+            </div>
+            {!isCheapest(leanMode, fastSpiel) && (
+              <button
+                className="spiel-btn-ghost spiel-btn-small"
+                onClick={() => {
+                  setLeanMode(CHEAPEST.leanMode)
+                  setFastSpiel(CHEAPEST.fastSpiel)
+                  try {
+                    localStorage.setItem(LEAN_STORE, 'on')
+                    localStorage.setItem(FAST_STORE, 'on')
+                  } catch { /* ignore */ }
+                }}
+              >
+                Use the cheapest settings
+              </button>
+            )}
+          </div>
 
           <label className="spiel-label">Calendar options</label>
           <input className="spiel-field" value={days} onChange={e => setDays(e.target.value)} />
