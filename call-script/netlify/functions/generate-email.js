@@ -1,3 +1,9 @@
+// Model and max_tokens are fixed below, so this proxy is already bounded; it needs
+// its own key and a usage line so its spend shows up separately.
+const { keyFor, logUsage } = require('./_spend.cjs')
+
+const APP = 'email'
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -12,7 +18,7 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' }
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const apiKey = keyFor(APP)
   if (!apiKey) {
     return {
       statusCode: 500,
@@ -74,6 +80,7 @@ Output format — respond with ONLY valid JSON, no markdown, no preamble:
     }
 
     const data = await response.json()
+    logUsage(APP, data)
     const text = data.content[0].text.trim()
 
     let parsed
