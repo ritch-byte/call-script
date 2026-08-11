@@ -45,6 +45,14 @@ const RATES: Record<string, [number, number]> = {
  * quietly put test spend back on the floor's key, which is the exact thing this file
  * exists to prevent, and it would do so invisibly.
  */
+/**
+ * A real key starts with sk-ant-. The second test catches the case where someone
+ * copies .env.probe.example and edits it carelessly, leaving placeholder wording
+ * behind a correct-looking prefix — which would otherwise be sent as a key.
+ */
+const looksLikeKey = (v: string) =>
+  v.startsWith('sk-ant-') && !/paste|replace|your[-_]key|xxx/i.test(v)
+
 function devKey(): string {
   const fromEnv = process.env.ANTHROPIC_API_KEY_DEV
   if (fromEnv) return fromEnv.trim()
@@ -62,8 +70,20 @@ function devKey(): string {
       const text = readFileSync(path, 'utf8')
       const line = text.split(/\r?\n/).find((l: string) => l.trim().startsWith('ANTHROPIC_API_KEY_DEV='))
       const value = line?.split('=').slice(1).join('=').trim()
+      // An untouched copy of .env.probe.example would otherwise be sent as if it were
+      // a key, and come back as an opaque 401. Say what is actually wrong instead.
+      if (value && !looksLikeKey(value)) {
+        throw new Error(
+          `${path} has a placeholder, not a key.\n` +
+          '  Replace it with the real value from console.anthropic.com -> API keys.\n' +
+          '  It should start with sk-ant-'
+        )
+      }
       if (value) return value
-    } catch { /* try the next one */ }
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('placeholder')) throw e
+      /* otherwise the file is absent — try the next candidate */
+    }
   }
 
   throw new Error(
