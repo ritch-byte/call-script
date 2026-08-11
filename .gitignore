@@ -4,3 +4,7 @@ dc-dashboard-pages
 # deployable bundle is committed under call-script/public/v2 instead.
 call-script-v2/node_modules/
 call-script-v2/dist/
+
+# The development API key probes spend, so test runs never land on the same line of
+# the usage page as the floor's real builds. Never commit it.
+call-script-v2/.env.probe
