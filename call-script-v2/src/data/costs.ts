@@ -8,19 +8,23 @@
 //
 // THE HISTORY, all metered off real responses. 0.19 before the house frames. 0.23 once
 // the frames and the homework beat went in. 0.24 once the homework beat had to be told
-// what not to say. Then the prompt was cut 16% with every rule kept, 3908 -> 3271 chars
-// and ~900 -> ~754 input tokens.
+// what not to say. Then the prompt was cut 16% with every rule kept, and this is where
+// it landed.
 //
-// THIS FIGURE IS DERIVED, NOT METERED. 754 input plus 300 output comes to 0.225, rounded
-// up to 0.23 because understating what the floor spends is the worse error. It is
-// computed from the character count against a measured 4.34 chars/token rather than read
-// off usage.input_tokens, because probes now spend a development key that does not exist
-// yet. Re-measure and correct the moment it does.
+// MEASURED, five leads: 0.224, 0.234, 0.220, 0.232 and 0.226, mean 0.227, from
+// usage.input_tokens and usage.output_tokens on the real responses (~840 in, ~285 out).
+// Rounded up to 0.23 because understating what the floor spends is the worse error.
+// $1.13 per 500 builds.
 //
-// The repair calls are not in this figure. The intro, reframe and offshore guards each
-// add about 0.05 when they fire, and none fired across the last five-lead runs. Watch
-// that rate after this trim: the offshore rule lost its emphasis, and a repair firing on
-// one build in five would give back the whole saving.
+// Note the char-count estimate made before the run said ~754 input tokens against an
+// actual ~840, about 9% low. Estimating prompt tokens from characters is fine for
+// deciding whether a cut is worth making and not fine for the number on screen.
+//
+// The repair calls are not in this figure because they did not fire: intro, reframe and
+// offshore guards, zero out of five builds, both before and after the trim. That was the
+// live risk in trimming, since the offshore rule lost its emphasis to get here. Each
+// repair costs about another 0.05, so if that rate ever climbs to one build in five it
+// gives the whole saving back. Re-measure if the prompt or the model changes.
 export const BUILD_COST_CENTS = 0.23
 
 /** Dollars for a day of dialling at this rate. */

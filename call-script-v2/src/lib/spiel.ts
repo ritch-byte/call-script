@@ -458,7 +458,8 @@ with this person's world. One or two short sentences per beat, never three.
    Never imply THEY are failing.
 4. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at ${oa.savings}, without sacrificing
-   quality? The cost set against local pay must appear. Ends in a question mark.
+   quality? Ends in a question mark. The cost comparison IS this beat: the number and
+   what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
    ${oa.proof}.
 6. "And we do it in a way where," + ${oa.mechanic}.

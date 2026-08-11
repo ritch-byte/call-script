@@ -7,8 +7,8 @@ actually sends.
 ## How a build works
 
 One button, one path, one price. The rep pastes a line (company, job title, website) and
-presses Build spiel. That is a single call on Haiku 4.5 costing 0.24 cents,
-so 500 builds a day is $1.20. There is no research
+presses Build spiel. That is a single call on Haiku 4.5 costing 0.23 cents,
+so 500 builds a day is $1.15. There is no research
 pass and no model choice, so a rep cannot land on an expensive setting.
 
 The eight beats come back as plain paragraphs rather than JSON, because the JSON
@@ -91,7 +91,8 @@ with this person's world. One or two short sentences per beat, never three.
    Never imply THEY are failing.
 4. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing
-   quality? The cost set against local pay must appear. Ends in a question mark.
+   quality? Ends in a question mark. The cost comparison IS this beat: the number and
+   what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
    enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
 6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
@@ -144,7 +145,8 @@ with this person's world. One or two short sentences per beat, never three.
    Never imply THEY are failing.
 4. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing
-   quality? The cost set against local pay must appear. Ends in a question mark.
+   quality? Ends in a question mark. The cost comparison IS this beat: the number and
+   what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
    enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
 6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
