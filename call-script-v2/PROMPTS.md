@@ -29,14 +29,14 @@ Enforced in code after the model replies, which is what keeps a cheap single cal
 
 ### The eight beats
 
-1. **Thumbnail** — Who we are, in one breath
+1. **Status thumbnail** — Who we are, in one breath, with someone recognisable to stand on
 2. **The homework** — Proof the rep actually looked them up, one real detail
-3. **Their world** — The tension inside this exact role's remit
+3. **Change in the world** — What shifted, why it is worse than the last shift, and the part nobody can see
 4. **The big question** — The reframe, in this role's own metrics
-5. **Our superpower** — Why we are different
+5. **Our superpower** — The outcome in one word, then why we are different
 6. **How it lands** — What it feels like, tied to their operation
-7. **The ask** — Soft permission for 15 minutes
-8. **Calendar** — Two options, close it
+7. **The close** — Disarm, 14-15 minutes, coffee break, back pocket or not
+8. **The ask** — Would it be ridiculous, two days
 
 ### The opening
 
@@ -68,9 +68,11 @@ Write a cold call opener for an SDR at Outsource Accelerator, the leading market
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 No research and no web access: you know nothing checkable about this company.
 
-8 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
+6 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
 Keep each opening phrase word for word, that is how the floor talks, and fill the rest
-with this person's world. One or two short sentences per beat, never three.
+with this person's world. One or two short sentences per beat, never three, except beat 3.
+
+Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
 
 1. "So yeah quick thumbnail on us." + word for word "the leading marketplace for global talent networks" + one clause framing it
    for their industry.
@@ -86,25 +88,26 @@ with this person's world. One or two short sentences per beat, never three.
      them signed, and then getting them actually live."
      Practice Manager, dental: "the surgery rota across both sites, and then the insurance
      claims nobody else has time to chase." You have seen nothing, so this is inference: that is why it hedges and ends in a question.
-3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
-   theirs live with, premium local talent against unverified freelancers, in their terms.
-   Never imply THEY are failing.
+3. CHANGE IN THE WORLD, the beat that earns the call. Three short sentences, 45 words at
+   the very most. "And so what we are seeing from a high level... is that..." then: what
+   filling this seat used to take, what it takes now and why this squeeze is worse, and
+   the part nobody costs, an open seat or a hire that does not work out. About the market,
+   never their failing.
 4. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
-   enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
-6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
-7. "But super simple, (Name)," + the objection you expect from this title + would they be
-   completely opposed to carving out 15 minutes for a coffee-break style chat.
-8. "Does Thursday or Friday afternoon work for you?"
+   name in one word what they get back, then enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
+6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. Close the beat by saying the team
+   feels like theirs, not like a vendor bolted on.
 
 VOICE: spoken, short clauses, contractions, ellipses as pacing marks. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
-LENGTH overrides everything above: 205 words across the eight beats is the ceiling, 180
-the target. Count before answering. The homework beat earns its words, take them off
-beats 3 to 7, one sentence each.
+LENGTH overrides everything above, and you are running long. Budget, in words: beat 1 is
+25, beat 2 is 45, beat 3 is 45, beat 4 is 30, beat 5 is 20, beat 6 is 25. That is 190 and
+you should come in under it. Beats 1, 4, 5 and 6 are ONE short sentence each, no
+subclauses, no lists. Count each beat as you write it.
 ```
 
 ### With pasted source text
@@ -122,9 +125,11 @@ brands in the UK and Ireland, with fulfilment centres in Manchester, Leeds and D
 Careers: hiring a Customer Support Advisor (Manchester, 2 positions).
 """
 
-8 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
+6 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
 Keep each opening phrase word for word, that is how the floor talks, and fill the rest
-with this person's world. One or two short sentences per beat, never three.
+with this person's world. One or two short sentences per beat, never three, except beat 3.
+
+Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
 
 1. "So yeah quick thumbnail on us." + word for word "the leading marketplace for global talent networks" + one clause framing it
    for their industry.
@@ -140,25 +145,26 @@ with this person's world. One or two short sentences per beat, never three.
      them signed, and then getting them actually live."
      Practice Manager, dental: "the surgery rota across both sites, and then the insurance
      claims nobody else has time to chase." Ground it in the facts above, claim nothing beyond them.
-3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
-   theirs live with, premium local talent against unverified freelancers, in their terms.
-   Never imply THEY are failing.
+3. CHANGE IN THE WORLD, the beat that earns the call. Three short sentences, 45 words at
+   the very most. "And so what we are seeing from a high level... is that..." then: what
+   filling this seat used to take, what it takes now and why this squeeze is worse, and
+   the part nobody costs, an open seat or a hire that does not work out. About the market,
+   never their failing.
 4. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
-   enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
-6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
-7. "But super simple, (Name)," + the objection you expect from this title + would they be
-   completely opposed to carving out 15 minutes for a coffee-break style chat.
-8. "Does Thursday or Friday afternoon work for you?"
+   name in one word what they get back, then enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
+6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. Close the beat by saying the team
+   feels like theirs, not like a vendor bolted on.
 
 VOICE: spoken, short clauses, contractions, ellipses as pacing marks. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
-LENGTH overrides everything above: 205 words across the eight beats is the ceiling, 180
-the target. Count before answering. The homework beat earns its words, take them off
-beats 3 to 7, one sentence each.
+LENGTH overrides everything above, and you are running long. Budget, in words: beat 1 is
+25, beat 2 is 45, beat 3 is 45, beat 4 is 30, beat 5 is 20, beat 6 is 25. That is 190 and
+you should come in under it. Beats 1, 4, 5 and 6 are ONE short sentence each, no
+subclauses, no lists. Count each beat as you write it.
 ```
 
 

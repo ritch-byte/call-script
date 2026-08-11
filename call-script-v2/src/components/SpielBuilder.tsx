@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { callAIRaw, textFrom, stripEmDash } from '../lib/ai'
 import {
-  BEATS, DEFAULT_OA, TONES, WINDOW,
+  BEATS, GENERATED_BEATS, DEFAULT_OA, TONES, WINDOW,
   buildRerollPrompt, buildLeanSpielPrompt, parseLeanSpiel,
   wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
@@ -214,7 +214,8 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         maxTokens: 700,
         messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing, days) }],
       })
-      const map = Object.fromEntries(parseLeanSpiel(stripEmDash(textFrom(res))).map(x => [x.id, x.text]))
+      const parsed = parseLeanSpiel(stripEmDash(textFrom(res)), days)
+      const map = Object.fromEntries(parsed.map(x => [x.id, x.text]))
 
       // The positioning wording is a deliberate choice, and the fast writer sometimes
       // paraphrases it away. Repair that one line rather than lose it or pay for the
@@ -234,7 +235,9 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
 
       // A beat that tells the prospect they are failing gets the rep hung up on. Reframe
       // the offending line structurally rather than shipping a verdict on their numbers.
-      const accusing = BEATS.filter(x => map[x.id] && readsAccusatory(map[x.id]))
+      // Only the written beats: the house close is fixed and known good, and "repairing"
+      // it would rewrite approved wording.
+      const accusing = GENERATED_BEATS.filter(x => map[x.id] && readsAccusatory(map[x.id]))
       if (accusing.length) {
         setStage('Reframing the negative line')
         for (const x of accusing) {
@@ -250,10 +253,8 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         }
       }
 
-      // Beat 8 has no personalisation in it at all, it is the days setting read back. The
-      // writer paraphrases it anyway ("does Thursday or Friday work better for you?"), so
-      // take it out of the model's hands rather than police it.
-      map.calendar = `Does ${days} work for you?`
+      // The close and the calendar ask are no longer the model's to write: closingBeats()
+      // supplies the house wording, so there is nothing to overwrite or police here.
 
       // The homework beat guesses at their day. If the guess hands them an offshore team,
       // it is wrong about the one thing we are calling about, so rewrite that line.
@@ -272,11 +273,16 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
 
       // The opening leads, the generated spiel follows, all in the one box. Reuse the
       // opening already on screen so any edit the rep made to it survives the build.
+      //
+      // Match the opening on its id, not on `fixed`: the close is fixed too now, and
+      // filtering on the flag would carry it up to the top alongside the opening.
       setBeats(prev => {
-        const opening = (prev || []).filter(b => b.fixed)
+        const opening = (prev || []).filter(b => b.id.startsWith('opening_'))
         return [
           ...(opening.length ? opening : openingBeats(leadName, yourName)),
-          ...BEATS.map(x => ({ ...x, text: fillLeadName(map[x.id] || '', leadName) })),
+          // Keep the parsed beats rather than rebuilding from BEATS, so the close keeps
+          // its fixed flag and the UI does not offer to reroll the house wording.
+          ...parsed.map(x => ({ ...x, text: fillLeadName(map[x.id] || '', leadName) })),
         ]
       })
     } catch (e) {

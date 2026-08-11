@@ -11,10 +11,17 @@
 // what not to say. Then the prompt was cut 16% with every rule kept, and this is where
 // it landed.
 //
-// MEASURED, five leads: 0.224, 0.234, 0.220, 0.232 and 0.226, mean 0.227, from
-// usage.input_tokens and usage.output_tokens on the real responses (~840 in, ~285 out).
+// MEASURED, five leads: 0.232, 0.235, 0.234, 0.223 and 0.219, mean 0.229, from
+// usage.input_tokens and usage.output_tokens on the real responses (~960 in, ~265 out).
 // Rounded up to 0.23 because understating what the floor spends is the worse error.
-// $1.13 per 500 builds.
+// $1.14 per 500 builds.
+//
+// The house screenplay landed here without moving the number, which is the point of
+// fixing the close in code. Change in the World grew from one line to three sentences
+// and the close and calendar ask stopped being generated at all, so the prompt got
+// longer and the output got shorter. A first attempt did move it, to 0.238, because the
+// length rule still budgeted 205 words across eight beats when only six are written now.
+// Per-beat word budgets fixed that: written output fell from 204-232 words to 193-216.
 //
 // Note the char-count estimate made before the run said ~754 input tokens against an
 // actual ~840, about 9% low. Estimating prompt tokens from characters is fine for

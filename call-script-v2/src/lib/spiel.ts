@@ -34,16 +34,61 @@ export type Tone = 'measured' | 'house' | 'high'
  */
 export const WINDOW = 95
 
+/**
+ * The eight beats, in the order the house screenplay runs them.
+ *
+ * The first six are written for this lead. The last two are the close, and they are
+ * fixed: see CLOSING_BEATS below for why the floor's own wording beats a generated
+ * paraphrase of it.
+ */
 export const BEATS: Array<Omit<Beat, 'text'>> = [
-  { id: 'thumbnail',  label: 'Thumbnail',      hint: 'Who we are, in one breath' },
+  { id: 'thumbnail',  label: 'Status thumbnail', hint: 'Who we are, in one breath, with someone recognisable to stand on' },
   { id: 'homework',   label: 'The homework',   hint: 'Proof the rep actually looked them up, one real detail' },
-  { id: 'observation',label: 'Their world',    hint: "The tension inside this exact role's remit" },
+  { id: 'observation',label: 'Change in the world', hint: 'What shifted, why it is worse than the last shift, and the part nobody can see' },
   { id: 'question',   label: 'The big question', hint: "The reframe, in this role's own metrics" },
-  { id: 'superpower', label: 'Our superpower', hint: 'Why we are different' },
+  { id: 'superpower', label: 'Our superpower', hint: 'The outcome in one word, then why we are different' },
   { id: 'howitlands', label: 'How it lands',   hint: 'What it feels like, tied to their operation' },
-  { id: 'ask',        label: 'The ask',        hint: 'Soft permission for 15 minutes' },
-  { id: 'calendar',   label: 'Calendar',       hint: 'Two options, close it' },
+  { id: 'ask',        label: 'The close',      hint: 'Disarm, 14-15 minutes, coffee break, back pocket or not' },
+  { id: 'calendar',   label: 'The ask',        hint: 'Would it be ridiculous, two days' },
 ]
+
+/** Only these are written for the lead. The rest is the floor's fixed wording. */
+export const GENERATED_BEATS = BEATS.slice(0, 6)
+
+/**
+ * The close, word for word from the house screenplay.
+ *
+ * Held in code rather than asked of the model, for three reasons. It carries no
+ * information about this lead, so generating it buys nothing. It is the most
+ * load-bearing wording in the call and the least tolerant of paraphrase: the disarm,
+ * the 14-then-15 correction that makes the number sound counted rather than scripted,
+ * the back-pocket exit that removes the commitment, and "would it be ridiculous",
+ * which is answered by "no" from someone who means yes. And the model demonstrably
+ * does paraphrase it: while the calendar line was generated it drifted to "does
+ * Thursday or Friday work better for you?", losing the negative frame entirely.
+ *
+ * Fixing it also pays for the Change in the World beat, which genuinely does need
+ * this lead's industry.
+ */
+export function closingBeats(days: string): Beat[] {
+  return [
+    {
+      ...BEATS[6],
+      fixed: true,
+      text:
+        "But super simple, (Name)... I know my timing's probably off here... but I just " +
+        'wanted to see if you would be completely opposed to carving out 14... 15 minutes... ' +
+        'for more of a coffee-break style chat... walk through what this actually looks like ' +
+        'in practice with folks who look like you guys... and then from there you keep us in ' +
+        "the back pocket or you don't.",
+    },
+    {
+      ...BEATS[7],
+      fixed: true,
+      text: `Would it be ridiculous to loop up... say... ${days}?`,
+    },
+  ]
+}
 
 /**
  * The opening the rep reads before the spiel: the dial, the half-a-minute permission
@@ -384,14 +429,20 @@ const oaBlock = (oa: OAProfile) => `OUTSOURCE ACCELERATOR, the seller:
  * newlines, so fall back to those rather than handing the rep one giant block. Numbering
  * is stripped in case it labels them despite being told not to.
  */
-export function parseLeanSpiel(raw: string): Beat[] {
+export function parseLeanSpiel(raw: string, days: string): Beat[] {
   const clean = (raw || '').trim()
   let parts = clean.split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
-  if (parts.length < BEATS.length) {
+  if (parts.length < GENERATED_BEATS.length) {
     parts = clean.split(/\n+/).map(p => p.trim()).filter(Boolean)
   }
   parts = parts.map(p => p.replace(/^\s*\d+[.)]\s*/, '').trim()).filter(Boolean)
-  return BEATS.map((b, i) => ({ ...b, text: oneParagraph(parts[i] || '') }))
+  // Six from the model, then the floor's own close. If the model wrote an ask anyway
+  // despite being told not to, the extra paragraphs fall off here rather than competing
+  // with the real close.
+  return [
+    ...GENERATED_BEATS.map((b, i) => ({ ...b, text: oneParagraph(parts[i] || '') })),
+    ...closingBeats(days),
+  ]
 }
 
 /**
@@ -431,9 +482,11 @@ ${
     : 'No research and no web access: you know nothing checkable about this company.'
 }
 
-8 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
+6 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
 Keep each opening phrase word for word, that is how the floor talks, and fill the rest
-with this person's world. One or two short sentences per beat, never three.
+with this person's world. One or two short sentences per beat, never three, except beat 3.
+
+Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
 
 1. "So yeah quick thumbnail on us." + word for word "${clause}" + one clause framing it
    for their industry.
@@ -453,25 +506,26 @@ with this person's world. One or two short sentences per beat, never three.
        ? ' Ground it in the facts above, claim nothing beyond them.'
        : ' You have seen nothing, so this is inference: that is why it hedges and ends in a question.'
    }
-3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
-   theirs live with, premium local talent against unverified freelancers, in their terms.
-   Never imply THEY are failing.
+3. CHANGE IN THE WORLD, the beat that earns the call. Three short sentences, 45 words at
+   the very most. "And so what we are seeing from a high level... is that..." then: what
+   filling this seat used to take, what it takes now and why this squeeze is worse, and
+   the part nobody costs, an open seat or a hire that does not work out. About the market,
+   never their failing.
 4. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at ${oa.savings}, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
-   ${oa.proof}.
-6. "And we do it in a way where," + ${oa.mechanic}.
-7. "But super simple, (Name)," + the objection you expect from this title + would they be
-   completely opposed to carving out 15 minutes for a coffee-break style chat.
-8. "Does ${days} work for you?"
+   name in one word what they get back, then ${oa.proof}.
+6. "And we do it in a way where," + ${oa.mechanic}. Close the beat by saying the team
+   feels like theirs, not like a vendor bolted on.
 
 VOICE: spoken, short clauses, contractions${pacing ? ', ellipses as pacing marks' : ', no ellipses'}. ${TONES[tone]} No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
-LENGTH overrides everything above: 205 words across the eight beats is the ceiling, 180
-the target. Count before answering. The homework beat earns its words, take them off
-beats 3 to 7, one sentence each.`
+LENGTH overrides everything above, and you are running long. Budget, in words: beat 1 is
+25, beat 2 is 45, beat 3 is 45, beat 4 is 30, beat 5 is 20, beat 6 is 25. That is 190 and
+you should come in under it. Beats 1, 4, 5 and 6 are ONE short sentence each, no
+subclauses, no lists. Count each beat as you write it.`
 }
 
 export function buildRerollPrompt(
