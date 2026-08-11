@@ -1,23 +1,27 @@
-// What a press of Build spiel costs.
+// What a press of Build spiel costs, at the Haiku 4.5 rate of $1 per million tokens in
+// and $5 per million out.
 //
-// There is one path now, so there is one number. It is measured, not estimated: taken
-// from usage.input_tokens / output_tokens on real responses at the Haiku 4.5 rate of $1
-// per million in and $5 per million out, averaged over five leads a run: 0.240, 0.241,
-// 0.242 and 0.240 cents. Rounded to 0.24 rather than down: understating what the floor
-// spends is the worse error.
+// WHERE THE MONEY GOES. Output is five times the price of input, so the ~300 tokens of
+// spiel cost 0.150 and the prompt costs the rest. That sets a floor: even a zero-length
+// prompt lands at 0.150, or $0.75 per 500 builds. Nothing gets under that without
+// shortening the eight-beat script itself, which is the one thing the floor asked for.
 //
-// The climb: 0.19 before the house frames, 0.23 once the frames and the homework beat
-// went in, 0.24 once the homework beat had to be told what NOT to say. Longer prompt,
-// longer script.
+// THE HISTORY, all metered off real responses. 0.19 before the house frames. 0.23 once
+// the frames and the homework beat went in. 0.24 once the homework beat had to be told
+// what not to say. Then the prompt was cut 16% with every rule kept, 3908 -> 3271 chars
+// and ~900 -> ~754 input tokens.
 //
-// The repair calls do not show up here because they almost never fire. The intro,
-// reframe and offshore guards each cost about another 0.05 when they do, and across the
-// last five-lead runs none of them fired at all.
+// THIS FIGURE IS DERIVED, NOT METERED. 754 input plus 300 output comes to 0.225, rounded
+// up to 0.23 because understating what the floor spends is the worse error. It is
+// computed from the character count against a measured 4.34 chars/token rather than read
+// off usage.input_tokens, because probes now spend a development key that does not exist
+// yet. Re-measure and correct the moment it does.
 //
-// If the prompt or the model changes, re-measure. A stale figure here is worse than none,
-// because the whole point is that the floor can trust the number on screen.
-
-export const BUILD_COST_CENTS = 0.24
+// The repair calls are not in this figure. The intro, reframe and offshore guards each
+// add about 0.05 when they fire, and none fired across the last five-lead runs. Watch
+// that rate after this trim: the offshore rule lost its emphasis, and a repair firing on
+// one build in five would give back the whole saving.
+export const BUILD_COST_CENTS = 0.23
 
 /** Dollars for a day of dialling at this rate. */
 export const dailyCost = (cents: number, builds: number) => (cents * builds) / 100

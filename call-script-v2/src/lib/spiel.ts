@@ -421,49 +421,44 @@ export function buildLeanSpielPrompt(
   days: string,
 ): string {
   const grounded = source.trim().length > 0
-  return `Write a cold call opener for an SDR at Outsource Accelerator, ${oa.positioning}.
+  const clause = identityClause(oa.positioning)
+  return `Write a cold call opener for an SDR at Outsource Accelerator, ${clause}.
 
 LEAD: ${raw}
 ${
   grounded
-    ? `WHAT THE REP ACTUALLY SAW, the only facts you may claim:\n"""\n${source.slice(0, 2500)}\n"""`
-    : 'The rep has no research and you have no web access, so you know nothing checkable about this company.'
+    ? `THE ONLY FACTS YOU MAY CLAIM:\n"""\n${source.slice(0, 2500)}\n"""`
+    : 'No research and no web access: you know nothing checkable about this company.'
 }
 
-Write exactly 8 short paragraphs, one blank line between each. No labels, no numbering, no JSON, no preamble.
+8 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
+Keep each opening phrase word for word, that is how the floor talks, and fill the rest
+with this person's world. One or two short sentences per beat, never three.
 
-House script. Keep each opening phrase exactly as written, that is how the floor talks.
-Fill the rest with this person's world. One or two short sentences per beat, never three:
-
-1. "So yeah quick thumbnail on us." + this clause word for word:
-   "${identityClause(oa.positioning)}" + one clause framing it for their industry.
-2. THE HOMEWORK, the beat that buys the call. Exactly:
-   "I did do a bit of homework before I dialled... so correct me if I'm off, but you're
-   most likely spending your days on" + what someone with THIS title in THIS industry
-   does hour to hour, in their vocabulary: two concrete activities joined by "and then",
-   in the order the work really happens. End with exactly "am I close?"
-   HARD RULE for this beat: this person has NOT offshored anything, that is the entire
-   reason we are calling them. Describe the work they do with the team they have in house
-   today. The words offshore, offshoring, outsourced, outsourcing, BPO and nearshore must
-   not appear in this beat. If your sentence needs one of them you have written the wrong
-   day, and naming a team they do not have is the fastest way to be caught guessing.
-   Two examples of the SHAPE only. Do not reuse their words, their industries, or the
-   "across the X markets" construction:
+1. "So yeah quick thumbnail on us." + word for word "${clause}" + one clause framing it
+   for their industry.
+2. THE HOMEWORK, the beat that buys the call. Word for word: "I did do a bit of homework
+   before I dialled... so correct me if I'm off, but you're most likely spending your days
+   on" + what this title in this industry does hour to hour, in their vocabulary: two
+   concrete activities joined by "and then", in the order the work happens. Then word for
+   word: "am I close?"
+   They have not offshored anything, that is why we are calling, so describe the in-house
+   day. Never write offshore, outsourced, BPO or nearshore in this beat.
+   Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
      them signed, and then getting them actually live."
-     Practice Manager, dental group: "the surgery rota across both sites, and then the
-     insurance claims nobody else has time to chase."${
+     Practice Manager, dental: "the surgery rota across both sites, and then the insurance
+     claims nobody else has time to chase."${
      grounded
-       ? ' Use WHAT THE REP SAW where it fits. Claim nothing beyond that text.'
-       : ' You have seen nothing, so this is inference. That is why it hedges and ends in a question.'
+       ? ' Ground it in the facts above, claim nothing beyond them.'
+       : ' You have seen nothing, so this is inference: that is why it hedges and ends in a question.'
    }
 3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
-   theirs live with, premium local talent against unverified freelancers, in their
-   industry's terms. Never imply THEY are failing or behind.
-4. "So the big question is" + is it possible to secure world class talent, naming two or
-   three roles this company would really hire offshore, at ${oa.savings}, without
-   sacrificing quality? Ends in a question mark. The cost comparison is the point of this
-   beat and must appear in it, as a number set against what they pay locally.
+   theirs live with, premium local talent against unverified freelancers, in their terms.
+   Never imply THEY are failing.
+4. "So the big question is" + can they secure world class talent, naming two or three
+   roles this company would really hire offshore, at ${oa.savings}, without sacrificing
+   quality? The cost set against local pay must appear. Ends in a question mark.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
    ${oa.proof}.
 6. "And we do it in a way where," + ${oa.mechanic}.
@@ -471,11 +466,11 @@ Fill the rest with this person's world. One or two short sentences per beat, nev
    completely opposed to carving out 15 minutes for a coffee-break style chat.
 8. "Does ${days} work for you?"
 
-VOICE: spoken, short clauses, contractions${pacing ? ', ellipses as pacing marks' : ', no ellipses'}. ${TONES[tone]} No em dashes, no corporate filler, no feature lists, no pricing. Curiosity, not authority. Sell the meeting, not the service. Their vocabulary, nothing that could appear on a website.
+VOICE: spoken, short clauses, contractions${pacing ? ', ellipses as pacing marks' : ', no ellipses'}. ${TONES[tone]} No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
-LENGTH, this overrides everything above: 205 words across all eight beats is the hard
-ceiling and 180 is the target. Count before you answer. The homework beat earns its
-words; take them off beats 3 to 7, which should be one sentence each.`
+LENGTH overrides everything above: 205 words across the eight beats is the ceiling, 180
+the target. Count before answering. The homework beat earns its words, take them off
+beats 3 to 7, one sentence each.`
 }
 
 export function buildRerollPrompt(
