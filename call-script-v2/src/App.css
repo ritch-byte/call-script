@@ -2289,3 +2289,21 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
 .spiel-cost-what { font-size: 13px; color: var(--text-2); }
 .spiel-cost-scale { font-size: 12.5px; line-height: 1.5; color: var(--text-3); margin-top: 3px; }
 .spiel-cost .spiel-btn-small { margin-top: 9px; }
+
+/* Cost shown on the collapsed settings row, so it is never hidden behind a click. */
+.spiel-cost-chip {
+  display: inline-block;
+  margin-left: 8px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #1E7742;
+  background: #EAF8EF;
+  border: 1.5px solid #B7E3C7;
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.spiel-cost-chip-high { color: #8A6400; background: #FFF8E6; border-color: #E8CF8F; }

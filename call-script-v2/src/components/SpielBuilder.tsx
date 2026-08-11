@@ -437,6 +437,12 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
       {/* ── Settings ── */}
       <button className="spiel-disclosure" onClick={() => setShowSettings(v => !v)}>
         Voice and positioning {showSettings ? '−' : '+'}
+        {/* The cost rides on the collapsed row too. Hiding it inside the panel meant
+            nobody saw which setting they were on until they went looking. */}
+        <span className={`spiel-cost-chip${isCheapest(leanMode, fastSpiel) ? '' : ' spiel-cost-chip-high'}`}>
+          {buildCost(leanMode, fastSpiel).cents}c per build · 500 a day ≈{' '}
+          {money(dailyCost(buildCost(leanMode, fastSpiel).cents, 500))}
+        </span>
       </button>
       {showSettings && (
         <div className="spiel-panel">
