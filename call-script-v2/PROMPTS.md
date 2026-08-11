@@ -7,8 +7,8 @@ actually sends.
 ## How a build works
 
 One button, one path, one price. The rep pastes a line (company, job title, website) and
-presses Build spiel. That is a single call on Haiku 4.5 costing 0.23 cents,
-so 500 builds a day is $1.15. There is no research
+presses Build spiel. That is a single call on Haiku 4.5 costing 0.24 cents,
+so 500 builds a day is $1.20. There is no research
 pass and no model choice, so a rep cannot land on an expensive setting.
 
 The eight beats come back as plain paragraphs rather than JSON, because the JSON
@@ -80,14 +80,24 @@ Fill the rest with this person's world. One or two short sentences per beat, nev
    most likely spending your days on" + what someone with THIS title in THIS industry
    does hour to hour, in their vocabulary: two concrete activities joined by "and then",
    in the order the work really happens. End with exactly "am I close?"
-   Shape to copy, content to replace: "carrier and partner deals across the SEA
-   markets... getting them signed, and then getting them actually live." You have seen nothing, so this is inference. That is why it hedges and ends in a question.
+   HARD RULE for this beat: this person has NOT offshored anything, that is the entire
+   reason we are calling them. Describe the work they do with the team they have in house
+   today. The words offshore, offshoring, outsourced, outsourcing, BPO and nearshore must
+   not appear in this beat. If your sentence needs one of them you have written the wrong
+   day, and naming a team they do not have is the fastest way to be caught guessing.
+   Two examples of the SHAPE only. Do not reuse their words, their industries, or the
+   "across the X markets" construction:
+     Head of Partnerships: "carrier and partner deals across the SEA markets... getting
+     them signed, and then getting them actually live."
+     Practice Manager, dental group: "the surgery rota across both sites, and then the
+     insurance claims nobody else has time to chase." You have seen nothing, so this is inference. That is why it hedges and ends in a question.
 3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
    theirs live with, premium local talent against unverified freelancers, in their
    industry's terms. Never imply THEY are failing or behind.
 4. "So the big question is" + is it possible to secure world class talent, naming two or
    three roles this company would really hire offshore, at up to 70% less than local hiring cost, without
-   sacrificing quality? Ends in a question mark.
+   sacrificing quality? Ends in a question mark. The cost comparison is the point of this
+   beat and must appear in it, as a number set against what they pay locally.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
    enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
 6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
@@ -129,14 +139,24 @@ Fill the rest with this person's world. One or two short sentences per beat, nev
    most likely spending your days on" + what someone with THIS title in THIS industry
    does hour to hour, in their vocabulary: two concrete activities joined by "and then",
    in the order the work really happens. End with exactly "am I close?"
-   Shape to copy, content to replace: "carrier and partner deals across the SEA
-   markets... getting them signed, and then getting them actually live." Use WHAT THE REP SAW where it fits. Claim nothing beyond that text.
+   HARD RULE for this beat: this person has NOT offshored anything, that is the entire
+   reason we are calling them. Describe the work they do with the team they have in house
+   today. The words offshore, offshoring, outsourced, outsourcing, BPO and nearshore must
+   not appear in this beat. If your sentence needs one of them you have written the wrong
+   day, and naming a team they do not have is the fastest way to be caught guessing.
+   Two examples of the SHAPE only. Do not reuse their words, their industries, or the
+   "across the X markets" construction:
+     Head of Partnerships: "carrier and partner deals across the SEA markets... getting
+     them signed, and then getting them actually live."
+     Practice Manager, dental group: "the surgery rota across both sites, and then the
+     insurance claims nobody else has time to chase." Use WHAT THE REP SAW where it fits. Claim nothing beyond that text.
 3. "And so what we are seeing from a high level... is that..." + the squeeze firms like
    theirs live with, premium local talent against unverified freelancers, in their
    industry's terms. Never imply THEY are failing or behind.
 4. "So the big question is" + is it possible to secure world class talent, naming two or
    three roles this company would really hire offshore, at up to 70% less than local hiring cost, without
-   sacrificing quality? Ends in a question mark.
+   sacrificing quality? Ends in a question mark. The cost comparison is the point of this
+   beat and must appear in it, as a number set against what they pay locally.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
    enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
 6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one.
@@ -184,6 +204,7 @@ The rep must sound like someone who spent ten minutes on this company before dia
 3. Speak to the ROLE, not the company. This person owns a specific remit and gets measured on specific things. Use their vocabulary and their numbers, not generic business language. A support leader hears backlog, response time, cost per ticket. An engineering leader hears velocity, hiring pipeline, burn.
 4. Do not flatter. No "impressive growth", no "love what you're building". Observation, then tension, then question.
 5. Do not reveal how you found the information. No "according to your LinkedIn". Just say what you saw.
+6. This person has not offshored anything, which is why we are calling. Describe the work they do with the team they have in house today. Never put an offshore, outsourced, BPO or nearshore team in their day. Naming a team they do not have is the fastest way to be caught guessing.
 
 FULL CURRENT SPIEL, for continuity:
 """

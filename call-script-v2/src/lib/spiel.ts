@@ -247,6 +247,66 @@ ${styleRules(tone, pacing)}
 Respond with the rewritten line only. No labels, no quotes, no commentary.`
 }
 
+/**
+ * Words that put an offshore team in the prospect's day.
+ *
+ * The homework beat guesses what this person does hour to hour. If the guess includes
+ * "managing the offshore teams that handle it", the rep has just told someone who has
+ * never offshored that they already have. It is wrong about the one thing we are calling
+ * about, and it is the sort of wrong a prospect notices immediately.
+ *
+ * The prompt forbids this, but a guess is exactly where a writer reaches for the seller's
+ * vocabulary, so it is enforced here too. Scoped to the homework beat only: beat 4 has to
+ * say "hire offshore" and beat 5 has to say "pre-vetted firms", and both are correct.
+ */
+export const PRESUMED_OFFSHORE_PATTERNS: RegExp[] = [
+  /\boff-?shor(?:e|ing|ed)\b/i,
+  /\bout-?sourc(?:e|ed|ing)\b/i,
+  /\bnear-?shor(?:e|ing|ed)\b/i,
+  /\bBPOs?\b/,
+  /\byour\s+remote\s+teams?\b/i,
+]
+
+/**
+ * True when the homework beat credits them with a team they probably do not have.
+ *
+ * `lead` is the rep's pasted line. When the company is itself in this business, an
+ * outsourcing firm or a BPO, then offshore work genuinely is their day and the guard
+ * would be the thing introducing the error, so it stands down.
+ */
+export function presumesOffshore(text: string, lead = ''): boolean {
+  if (/\b(?:out-?sourc\w*|off-?shor\w*|near-?shor\w*|BPOs?|staffing|recruit\w*)\b/i.test(lead)) {
+    return false
+  }
+  return PRESUMED_OFFSHORE_PATTERNS.some(re => re.test(text || ''))
+}
+
+/** Rewrite a homework beat that handed them an offshore team they never built. */
+export function buildDeoffshorePrompt(
+  beatText: string, raw: string, tone: Tone, pacing: boolean,
+): string {
+  return `Rewrite one line of a cold call opener. It guesses at the prospect's working day
+and puts an offshore or outsourced team in it:
+
+"${beatText}"
+
+This person has not offshored anything. That is the entire reason we are calling them, so
+describing a team they do not have gets the rep caught guessing in the first thirty seconds.
+
+LEAD: ${raw}
+
+Keep the exact opening "I did do a bit of homework before I dialled... so correct me if I'm
+off, but you're most likely spending your days on" and the exact ending "am I close?".
+Between them, name two concrete activities this title really does with the team they have
+in house today, joined by "and then", in the order the work happens. Their vocabulary, one
+sentence. The words offshore, offshoring, outsourced, outsourcing, BPO and nearshore must
+not appear.
+
+${styleRules(tone, pacing)}
+
+Respond with the rewritten line only. No labels, no quotes, no commentary.`
+}
+
 // ── Single-box editing ────────────────────────────────────────────────────
 
 /**
@@ -305,7 +365,8 @@ The rep must sound like someone who spent ten minutes on this company before dia
 2. If there is no source text, you have seen nothing about this company. Do not write "I saw" or "I noticed". Hedge out loud and invite the correction: "correct me if I'm off, but it looks like most of your delivery team sits in Manchester". A hedge that invites correction builds more credibility than false certainty, and it opens the conversation.
 3. Speak to the ROLE, not the company. This person owns a specific remit and gets measured on specific things. Use their vocabulary and their numbers, not generic business language. A support leader hears backlog, response time, cost per ticket. An engineering leader hears velocity, hiring pipeline, burn.
 4. Do not flatter. No "impressive growth", no "love what you're building". Observation, then tension, then question.
-5. Do not reveal how you found the information. No "according to your LinkedIn". Just say what you saw.`
+5. Do not reveal how you found the information. No "according to your LinkedIn". Just say what you saw.
+6. This person has not offshored anything, which is why we are calling. Describe the work they do with the team they have in house today. Never put an offshore, outsourced, BPO or nearshore team in their day. Naming a team they do not have is the fastest way to be caught guessing.`
 
 const oaBlock = (oa: OAProfile) => `OUTSOURCE ACCELERATOR, the seller:
 - Positioning: ${oa.positioning}
@@ -344,6 +405,12 @@ export function parseLeanSpiel(raw: string): Beat[] {
  * The guarantees that survive are the ones enforced in code afterwards, plus the two
  * rules that keep a rep out of trouble: never claim to have seen something we were not
  * shown, and never tell the prospect they are failing.
+ *
+ * Known and accepted: when a lead shares a title with one of the two homework examples,
+ * the writer adapts that example rather than inventing from scratch. Telling it not to
+ * did not work. Left alone, because two examples cover almost none of the titles the
+ * floor dials, and when it does fire the line it produces is a correct description of
+ * that job. Adding examples would widen the exposure, not narrow it.
  */
 export function buildLeanSpielPrompt(
   raw: string,
@@ -375,8 +442,17 @@ Fill the rest with this person's world. One or two short sentences per beat, nev
    most likely spending your days on" + what someone with THIS title in THIS industry
    does hour to hour, in their vocabulary: two concrete activities joined by "and then",
    in the order the work really happens. End with exactly "am I close?"
-   Shape to copy, content to replace: "carrier and partner deals across the SEA
-   markets... getting them signed, and then getting them actually live."${
+   HARD RULE for this beat: this person has NOT offshored anything, that is the entire
+   reason we are calling them. Describe the work they do with the team they have in house
+   today. The words offshore, offshoring, outsourced, outsourcing, BPO and nearshore must
+   not appear in this beat. If your sentence needs one of them you have written the wrong
+   day, and naming a team they do not have is the fastest way to be caught guessing.
+   Two examples of the SHAPE only. Do not reuse their words, their industries, or the
+   "across the X markets" construction:
+     Head of Partnerships: "carrier and partner deals across the SEA markets... getting
+     them signed, and then getting them actually live."
+     Practice Manager, dental group: "the surgery rota across both sites, and then the
+     insurance claims nobody else has time to chase."${
      grounded
        ? ' Use WHAT THE REP SAW where it fits. Claim nothing beyond that text.'
        : ' You have seen nothing, so this is inference. That is why it hedges and ends in a question.'
@@ -386,7 +462,8 @@ Fill the rest with this person's world. One or two short sentences per beat, nev
    industry's terms. Never imply THEY are failing or behind.
 4. "So the big question is" + is it possible to secure world class talent, naming two or
    three roles this company would really hire offshore, at ${oa.savings}, without
-   sacrificing quality? Ends in a question mark.
+   sacrificing quality? Ends in a question mark. The cost comparison is the point of this
+   beat and must appear in it, as a number set against what they pay locally.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
    ${oa.proof}.
 6. "And we do it in a way where," + ${oa.mechanic}.

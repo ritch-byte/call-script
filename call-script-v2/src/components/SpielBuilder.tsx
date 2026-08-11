@@ -6,6 +6,7 @@ import {
   wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
+  presumesOffshore, buildDeoffshorePrompt,
   openingBeats, fillLeadName,
 } from '../lib/spiel'
 import type { Beat, OAProfile, Tone } from '../lib/spiel'
@@ -249,6 +250,26 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         }
       }
 
+      // Beat 8 has no personalisation in it at all, it is the days setting read back. The
+      // writer paraphrases it anyway ("does Thursday or Friday work better for you?"), so
+      // take it out of the model's hands rather than police it.
+      map.calendar = `Does ${days} work for you?`
+
+      // The homework beat guesses at their day. If the guess hands them an offshore team,
+      // it is wrong about the one thing we are calling about, so rewrite that line.
+      if (map.homework && presumesOffshore(map.homework, raw)) {
+        setStage('Fixing the homework line')
+        try {
+          const fix = await callAIRaw({
+            model: MODEL,
+            maxTokens: 400,
+            messages: [{ role: 'user', content: buildDeoffshorePrompt(map.homework, raw, tone, pacing) }],
+          })
+          const fixed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
+          if (fixed && !presumesOffshore(fixed, raw)) map.homework = fixed
+        } catch { /* keep the original rather than fail the whole build */ }
+      }
+
       // The opening leads, the generated spiel follows, all in the one box. Reuse the
       // opening already on screen so any edit the rep made to it survives the build.
       setBeats(prev => {
@@ -287,6 +308,18 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
           })
           const reframed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
           if (reframed && !readsAccusatory(reframed)) next = reframed
+        } catch { /* keep what we have */ }
+      }
+      // And a rerolled homework beat must not invent an offshore team either.
+      if (id === 'homework' && presumesOffshore(next, raw)) {
+        try {
+          const fix = await callAIRaw({
+            model: MODEL,
+            maxTokens: 400,
+            messages: [{ role: 'user', content: buildDeoffshorePrompt(next, raw, tone, pacing) }],
+          })
+          const fixed = fillLeadName(oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, ''))), leadName)
+          if (fixed && !presumesOffshore(fixed, raw)) next = fixed
         } catch { /* keep what we have */ }
       }
       setBeats(prev => (prev ? prev.map(x => (x.id === id ? { ...x, text: next } : x)) : prev))
