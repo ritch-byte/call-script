@@ -1,26 +1,24 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { callAIRaw, cached, textFrom, usedWebSearch, parseJSON, stripEmDash } from '../lib/ai'
+import { callAIRaw, textFrom, stripEmDash } from '../lib/ai'
 import {
   BEATS, DEFAULT_OA, TONES, WINDOW,
-  buildBriefPrompt, spielStablePrefix, spielLeadBlock, buildRerollPrompt,
-  buildLeanSpielPrompt, parseLeanSpiel,
-  verifyReceipts, wordCount, speakSeconds, fmtTime,
+  buildRerollPrompt, buildLeanSpielPrompt, parseLeanSpiel,
+  wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
   openingBeats, fillLeadName,
 } from '../lib/spiel'
-import type { Beat, Brief, OAProfile, Tone } from '../lib/spiel'
+import type { Beat, OAProfile, Tone } from '../lib/spiel'
 import { GATE_COPY, CORE_ORDER, gateAsk, gateRecovery, closingLines, qualificationBanks } from '../data/gates'
 import type { GateAnswer } from '../data/gates'
 import { flow } from '../data/flow'
-import { buildCost, isCheapest, CHEAPEST, dailyCost, money } from '../data/costs'
+import { BUILD_COST_CENTS, dailyCost, money } from '../data/costs'
 
 const OA_STORE = 'oa-spiel-profile'
-const FAST_STORE = 'oa-spiel-fast'
-const LEAN_STORE = 'oa-spiel-lean'
 
-const FAST_MODEL = 'claude-haiku-4-5-20251001'
-const VOICE_MODEL = 'claude-sonnet-4-6'
+// One model, one path. Every press of Build spiel is a single call on the fast model,
+// so the cost per build is fixed and a rep cannot land on an expensive setting.
+const MODEL = 'claude-haiku-4-5-20251001'
 
 export interface QualifyHandoff {
   /** The role the lead said they want to add. */
@@ -56,22 +54,10 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     return DEFAULT_OA
   })
   const [tone, setTone] = useState<Tone>('house')
-  /**
-   * Spiel only: one call, no company research pass. Default on, because the brief is
-   * roughly half the bill and most dials only need the script.
-   */
-  const [leanMode, setLeanMode] = useState<boolean>(() => {
-    try { return localStorage.getItem(LEAN_STORE) !== 'off' } catch { return true }
-  })
-  /** Write the spiel on the fast model. Default on: it is ~8s quicker per build. */
-  const [fastSpiel, setFastSpiel] = useState<boolean>(() => {
-    try { return localStorage.getItem(FAST_STORE) !== 'off' } catch { return true }
-  })
   const [pacing, setPacing] = useState(true)
   const [days, setDays] = useState('Thursday or Friday afternoon')
   const [showSettings, setShowSettings] = useState(false)
 
-  const [brief, setBrief] = useState<Brief | null>(null)
   // The opening is fixed wording that needs no model call, so it is on the prompter
   // from the moment the page opens. The rep can start reading it while the spiel builds.
   const [beats, setBeats] = useState<Beat[] | null>(() => openingBeats(leadName, yourName))
@@ -137,8 +123,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   /** False while the box holds only the fixed opening and nothing has been generated. */
   const hasSpiel = rerollable.length > 0
   /** Is there anything from this lead worth clearing? Hides Reset on a fresh page. */
-  const dirty = !!(raw.trim() || source.trim() || brief || hasSpiel || qualOpen)
-  const verified = (brief?.receipts || []).filter(r => r.confidence === 'verified')
+  const dirty = !!(raw.trim() || source.trim() || hasSpiel || qualOpen)
 
   // Same rule as readyToBook() in lib/score.ts: all four core gates confirmed, none refused.
   const missingGates = CORE_ORDER.filter(id => gates[id] !== 'yes')
@@ -159,7 +144,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     setRaw('')
     setSource('')
     setShowSource(false)
-    setBrief(null)
     setFreeText(null)
     setBeats(openingBeats(leadName, yourName))
     setQualOpen(false)
@@ -212,7 +196,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   }, [inSync, fullScript, activeBeats])
 
   async function run() {
-    setErr(''); setWarn(''); setBrief(null)
+    setErr(''); setWarn('')
     // Drop back to the opening rather than an empty box: the rep keeps something to
     // read while the two calls run, and a failed build still leaves them the opener.
     // Keep their edits to it, a rebuild should not undo a hand-tweaked opener.
@@ -222,73 +206,14 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     })
     setBusy('run'); setSent(false); setFreeText(null)
 
-    let b: Brief | null = null
-    if (leanMode && !source.trim()) {
-      setWarn('Spiel only mode, so nothing here is a checked fact about this company. The homework beat is written as hedged inference on purpose. Paste text from their site, or switch Spiel only off, to get something you can claim you saw.')
-    }
-    if (!leanMode) try {
-      setStage('Reading the company')
-      const res = await callAIRaw({
-        // The brief is structured extraction, not prose, and the receipt check that
-        // decides "seen" vs "hedge it" runs here on the client either way. Haiku is
-        // ~11s faster than Sonnet on this stage with the same field coverage, so the
-        // rep waits about a third less for the same guarantees.
-        model: 'claude-haiku-4-5-20251001',
-        maxTokens: 1400,
-        messages: [{ role: 'user', content: buildBriefPrompt(raw, source) }],
-        // Forwarded only if the relay supports tool passthrough. Harmless if dropped.
-        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4 }],
-      })
-      const parsed = parseJSON<Brief>(textFrom(res))
-      parsed.receipts = verifyReceipts(parsed.receipts, source, usedWebSearch(res))
-      b = parsed
-      setBrief(parsed)
-
-      const v = parsed.receipts.filter(r => r.confidence === 'verified')
-      if (v.length === 0) {
-        setWarn(
-          source.trim()
-            ? 'Nothing in the text you pasted could be matched to a hard fact, so every line below is role-level inference. Read it before you dial and cut anything you cannot defend.'
-            : 'No source material and no live search, so nothing here is a checked fact about this company. The homework beat is written as hedged, role-level inference on purpose. Paste text from their site or careers page to get something you can actually claim you saw.',
-        )
-      }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e)
-      setErr(`Could not build the brief (${msg}). Writing from the paste alone, so the spiel will contain no company specifics.`)
-    }
-
     try {
       setStage('Writing the spiel')
-      const writer = fastSpiel ? FAST_MODEL : VOICE_MODEL
-      let map: Record<string, string>
-
-      if (leanMode) {
-        // One call, no exemplar, no brief, plain paragraphs instead of JSON. Half the
-        // cost of the researched path for the same eight beats.
-        const res = await callAIRaw({
-          model: writer,
-          maxTokens: 700,
-          messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing, days) }],
-        })
-        map = Object.fromEntries(parseLeanSpiel(stripEmDash(textFrom(res))).map(x => [x.id, x.text]))
-      } else {
-        const res = await callAIRaw({
-          model: writer,
-          maxTokens: 1400,
-          // The rules and exemplar are identical on every build, so they go in their own
-          // cached block and the lead-specific brief follows it. First build of the hour
-          // pays to write the cache, the rest read it at a tenth of the price.
-          messages: [{
-            role: 'user',
-            content: [
-              cached(spielStablePrefix(oa, tone, pacing, days)),
-              { type: 'text', text: spielLeadBlock(raw, b) },
-            ],
-          }],
-        })
-        const parsed = parseJSON<{ beats?: Array<{ id: string; text: string }> }>(textFrom(res))
-        map = Object.fromEntries((parsed.beats || []).map(x => [x.id, oneParagraph(stripEmDash(x.text))]))
-      }
+      const res = await callAIRaw({
+        model: MODEL,
+        maxTokens: 700,
+        messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing, days) }],
+      })
+      const map = Object.fromEntries(parseLeanSpiel(stripEmDash(textFrom(res))).map(x => [x.id, x.text]))
 
       // The positioning wording is a deliberate choice, and the fast writer sometimes
       // paraphrases it away. Repair that one line rather than lose it or pay for the
@@ -297,7 +222,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         setStage('Fixing the intro wording')
         try {
           const fix = await callAIRaw({
-            model: writer,
+            model: MODEL,
             maxTokens: 300,
             messages: [{ role: 'user', content: buildIntroRepairPrompt(map.thumbnail, oa.positioning, tone, pacing) }],
           })
@@ -314,9 +239,9 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         for (const x of accusing) {
           try {
             const fix = await callAIRaw({
-              model: writer,
+              model: MODEL,
               maxTokens: 400,
-              messages: [{ role: 'user', content: buildReframePrompt(map[x.id], x.hint, b?.title || '', tone, pacing) }],
+              messages: [{ role: 'user', content: buildReframePrompt(map[x.id], x.hint, '', tone, pacing) }],
             })
             const reframed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
             if (reframed && !readsAccusatory(reframed)) map[x.id] = reframed
@@ -347,18 +272,18 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     try {
       const beat = beats.find(x => x.id === id)!
       const res = await callAIRaw({
-        model: 'claude-sonnet-4-6',
+        model: MODEL,
         maxTokens: 500,
-        messages: [{ role: 'user', content: buildRerollPrompt(beat, fullScript, brief, raw, oa, tone, pacing) }],
+        messages: [{ role: 'user', content: buildRerollPrompt(beat, fullScript, raw, source, oa, tone, pacing) }],
       })
       let next = fillLeadName(oneParagraph(stripEmDash(textFrom(res).replace(/^["']|["']$/g, ''))), leadName)
       // Same guard as on a full build: a reroll must not land a verdict either.
       if (readsAccusatory(next)) {
         try {
           const fix = await callAIRaw({
-            model: fastSpiel ? FAST_MODEL : VOICE_MODEL,
+            model: MODEL,
             maxTokens: 400,
-            messages: [{ role: 'user', content: buildReframePrompt(next, beat.hint, brief?.title || '', tone, pacing) }],
+            messages: [{ role: 'user', content: buildReframePrompt(next, beat.hint, '', tone, pacing) }],
           })
           const reframed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
           if (reframed && !readsAccusatory(reframed)) next = reframed
@@ -439,9 +364,8 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         Voice and positioning {showSettings ? '−' : '+'}
         {/* The cost rides on the collapsed row too. Hiding it inside the panel meant
             nobody saw which setting they were on until they went looking. */}
-        <span className={`spiel-cost-chip${isCheapest(leanMode, fastSpiel) ? '' : ' spiel-cost-chip-high'}`}>
-          {buildCost(leanMode, fastSpiel).cents}c per build · 500 a day ≈{' '}
-          {money(dailyCost(buildCost(leanMode, fastSpiel).cents, 500))}
+        <span className="spiel-cost-chip">
+          {BUILD_COST_CENTS}c per build · 500 a day ≈ {money(dailyCost(BUILD_COST_CENTS, 500))}
         </span>
       </button>
       {showSettings && (
@@ -463,74 +387,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             <input type="checkbox" checked={pacing} onChange={() => setPacing(v => !v)} />
             <span>Ellipsis pacing marks</span>
           </label>
-
-          <label className="spiel-check">
-            <input
-              type="checkbox"
-              checked={leanMode}
-              onChange={() => {
-                const next = !leanMode
-                setLeanMode(next)
-                try { localStorage.setItem(LEAN_STORE, next ? 'on' : 'off') } catch { /* ignore */ }
-              }}
-            />
-            <span>
-              Spiel only
-              <span className="spiel-check-note">
-                One call instead of two. Skips the company research, so there is no lead
-                details card and no checked receipts, just the script. Half the cost.
-              </span>
-            </span>
-          </label>
-
-          <label className="spiel-check">
-            <input
-              type="checkbox"
-              checked={fastSpiel}
-              onChange={() => {
-                const next = !fastSpiel
-                setFastSpiel(next)
-                try { localStorage.setItem(FAST_STORE, next ? 'on' : 'off') } catch { /* ignore */ }
-              }}
-            />
-            <span>
-              Fast writing
-              <span className="spiel-check-note">
-                About 8 seconds quicker per build. The house voice is a little plainer,
-                fewer pacing marks and less swagger. Turn it off when you want the best
-                copy and can wait.
-              </span>
-            </span>
-          </label>
-
-          <div className="spiel-cost">
-            <div className="spiel-cost-row">
-              <span className="spiel-cost-figure">{buildCost(leanMode, fastSpiel).cents}c</span>
-              <span className="spiel-cost-what">
-                per Build spiel · {buildCost(leanMode, fastSpiel).label}
-              </span>
-            </div>
-            <div className="spiel-cost-scale">
-              500 builds a day ≈ {money(dailyCost(buildCost(leanMode, fastSpiel).cents, 500))} ·
-              {' '}100 ≈ {money(dailyCost(buildCost(leanMode, fastSpiel).cents, 100))}
-              {buildCost(leanMode, fastSpiel).note ? `. ${buildCost(leanMode, fastSpiel).note}` : ''}
-            </div>
-            {!isCheapest(leanMode, fastSpiel) && (
-              <button
-                className="spiel-btn-ghost spiel-btn-small"
-                onClick={() => {
-                  setLeanMode(CHEAPEST.leanMode)
-                  setFastSpiel(CHEAPEST.fastSpiel)
-                  try {
-                    localStorage.setItem(LEAN_STORE, 'on')
-                    localStorage.setItem(FAST_STORE, 'on')
-                  } catch { /* ignore */ }
-                }}
-              >
-                Use the cheapest settings
-              </button>
-            )}
-          </div>
 
           <label className="spiel-label">Calendar options</label>
           <input className="spiel-field" value={days} onChange={e => setDays(e.target.value)} />
@@ -708,16 +564,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
                     </div>
                   </div>
                   <div className="spiel-gate-ask">“{flow.qualify_role?.script}”</div>
-                  {(brief?.offshore_roles || []).length > 0 && (
-                    <div className="spiel-qual-suggest">
-                      <span className="spiel-qual-suggest-label">Likely, tap to fill</span>
-                      {brief!.offshore_roles!.map(r => (
-                        <button key={r} className="spiel-chip-btn" onClick={() => setRoleWanted(r)}>
-                          {r}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                   <button
                     className="spiel-btn-primary"
                     onClick={() => setQualStep(1)}
@@ -827,54 +673,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         </div>
       )}
 
-      {/* ── Lead details: what the rep checks before dialling, kept under the spiel ── */}
-      {brief && (
-        <div className="spiel-brief">
-          <div className="spiel-brief-heading">Lead details</div>
-          <div className="spiel-brief-head">
-            <span className="spiel-brief-company">{brief.company}</span>
-            <span className="spiel-brief-title">{brief.title}</span>
-          </div>
-          {brief.what_they_do && <div className="spiel-brief-what">{brief.what_they_do}</div>}
-
-          {(brief.receipts || []).length > 0 && (
-            <div className="spiel-receipts">
-              <label className="spiel-label">
-                What you can say you saw · {verified.length} of {brief.receipts!.length} checked
-              </label>
-              {brief.receipts!.map((r, i) => (
-                <div key={i} className="spiel-receipt">
-                  <span className={`spiel-chip${r.confidence === 'verified' ? ' spiel-chip-ok' : ''}`}>
-                    {r.confidence === 'verified' ? 'seen' : 'hedge it'}
-                  </span>
-                  <div>
-                    <div className="spiel-receipt-fact">{r.fact}</div>
-                    {r.where && <div className="spiel-receipt-where">{r.where}</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="spiel-brief-grid">
-            {([
-              ['What this role owns', brief.role_scope],
-              ['Measured on', (brief.role_kpis || []).join(', ')],
-              ['Pain to pull on', brief.role_pain],
-              ['Likely offshore roles', (brief.offshore_roles || []).join(', ')],
-              ['Size signal', brief.size_signal],
-              ['Do not say', brief.avoid],
-            ] as Array<[string, string | undefined]>).map(([k, v]) =>
-              v && v !== 'not found' ? (
-                <div key={k}>
-                  <label className="spiel-label">{k}</label>
-                  <div className="spiel-brief-val">{v}</div>
-                </div>
-              ) : null,
-            )}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

@@ -4,30 +4,6 @@
 import { flow } from '../data/flow'
 import { GLENCOCO_WRITING_RULES } from '../data/glencoco'
 
-export interface Receipt {
-  fact: string
-  where: string
-  /** 'verified' only survives if we could check it (search evidence or a quote we matched). */
-  confidence: 'verified' | 'inferred'
-  /** Verbatim span from the pasted source text. Used to prove a 'verified' claim. */
-  quote?: string
-}
-
-export interface Brief {
-  company: string
-  title: string
-  website?: string
-  what_they_do?: string
-  size_signal?: string
-  receipts?: Receipt[]
-  role_scope?: string
-  role_kpis?: string[]
-  offshore_roles?: string[]
-  role_pain?: string
-  hook?: string
-  avoid?: string
-}
-
 export interface Beat {
   id: string
   label: string
@@ -290,32 +266,6 @@ export function remapParagraphs(beats: Beat[], text: string): Beat[] | null {
   return beats.map((b, i) => ({ ...b, text: parts[i] }))
 }
 
-// ── Evidence checking ─────────────────────────────────────────────────────
-
-const normalize = (s: string) =>
-  (s || '').toLowerCase().replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim()
-
-/**
- * A receipt may only claim 'verified' if we can actually check it:
- *   - the model ran a live web search on this response, or
- *   - it supplied a quote that really appears in the source text the rep pasted.
- * Everything else is downgraded to 'inferred' so the rep hedges it on the call.
- */
-export function verifyReceipts(
-  receipts: Receipt[] | undefined,
-  sourceText: string,
-  searchEvidence: boolean,
-): Receipt[] {
-  const haystack = normalize(sourceText)
-  return (receipts || []).map(r => {
-    if (r.confidence !== 'verified') return { ...r, confidence: 'inferred' as const }
-    if (searchEvidence) return r
-    const quote = normalize(r.quote || '')
-    if (quote.length >= 8 && haystack.includes(quote)) return r
-    return { ...r, confidence: 'inferred' as const }
-  })
-}
-
 // ── Prompt fragments ──────────────────────────────────────────────────────
 
 const styleRules = (tone: Tone, pacing: boolean) => `STYLE RULES, non negotiable:
@@ -347,9 +297,9 @@ const HOMEWORK_RULES = `HOMEWORK RULES, these are what make the call land:
 
 The rep must sound like someone who spent ten minutes on this company before dialling, not someone reading a template. That means:
 
-1. Reference something real and checkable. Use only facts from the receipts list in the brief. Say them the way a person who actually looked would say them, for example "I was on your careers page and saw you're hiring three more support reps", not "I noticed your commitment to excellence".
-2. Never state a fact that is not in the receipts list. Any receipt marked inferred MUST be hedged out loud and invite the correction: "correct me if I'm off, but it looks like most of your delivery team sits in Manchester". A hedge that invites correction builds more credibility than false certainty, and it opens the conversation.
-3. Speak to the ROLE, not the company. This person owns a specific remit and gets measured on specific things. Use their vocabulary and their numbers, not generic business language. A support leader hears backlog, response time, cost per ticket. An engineering leader hears velocity, hiring pipeline, burn. Match the vocabulary to the title in the brief.
+1. Only claim what you were actually shown. If there is source text above, use one real detail from it, said the way a person who looked would say it: "I was on your careers page and saw you're hiring three more support reps", not "I noticed your commitment to excellence".
+2. If there is no source text, you have seen nothing about this company. Do not write "I saw" or "I noticed". Hedge out loud and invite the correction: "correct me if I'm off, but it looks like most of your delivery team sits in Manchester". A hedge that invites correction builds more credibility than false certainty, and it opens the conversation.
+3. Speak to the ROLE, not the company. This person owns a specific remit and gets measured on specific things. Use their vocabulary and their numbers, not generic business language. A support leader hears backlog, response time, cost per ticket. An engineering leader hears velocity, hiring pipeline, burn.
 4. Do not flatter. No "impressive growth", no "love what you're building". Observation, then tension, then question.
 5. Do not reveal how you found the information. No "according to your LinkedIn". Just say what you saw.`
 
@@ -361,167 +311,6 @@ const oaBlock = (oa: OAProfile) => `OUTSOURCE ACCELERATOR, the seller:
 - How it works: ${oa.mechanic}`
 
 // ── Prompts ───────────────────────────────────────────────────────────────
-
-/**
- * With no source text there is nothing to verify, so every receipt would come back
- * as hedged inference and the reference-only fields (size signal, hook) come back
- * empty or guessed. Asking for them anyway costs about 460 output tokens and ~5.5
- * seconds of the rep's time for no gain, so the ungrounded brief asks only for what
- * the writer and the rep actually use.
- *
- * Role scope, KPIs and pain are kept: they are what make the "their world" beat
- * specific to the title, and dropping them made the writer fabricate an observed
- * fact instead of hedging. "Do not say" is kept for the same reason.
- */
-export function buildSlimBriefPrompt(raw: string): string {
-  return `An outbound SDR at Outsource Accelerator, an offshore staffing marketplace, is about to cold call this target. It contains a company name, a job title, and maybe a website, in some order:
-
-"""
-${raw}
-"""
-
-You have NO web access and the rep pasted no source material, so you know nothing
-checkable about this specific company. Work out which part is the company and which is
-the title, then give the rep what they can honestly work from.
-
-Answer ONLY with JSON, no preamble, no fences:
-
-{
- "company": "clean company name",
- "title": "the job title of the person being called",
- "what_they_do": "one plain sentence a rep can say out loud, hedged if you are inferring it from the name alone",
- "role_scope": "what someone with this exact title actually owns day to day, one sentence",
- "role_kpis": ["2 to 4 things this person is personally measured on"],
- "offshore_roles": ["3 to 5 specific roles this company plausibly hires offshore, based on the title and what the name suggests"],
- "role_pain": "the operational tension this person feels between their targets and their headcount budget, one sentence",
- "avoid": "anything a rep should not say or assume about this company, one sentence"
-}
-
-Do not invent open roles, headcount, office locations, funding, client names, or
-anything else you were not shown. Everything here is role-level inference and the rep
-will hedge it out loud, so keep it defensible rather than specific.`
-}
-
-export function buildBriefPrompt(raw: string, sourceText: string): string {
-  const grounded = sourceText.trim().length > 0
-  if (!grounded) return buildSlimBriefPrompt(raw)
-  return `An outbound SDR at Outsource Accelerator, an offshore staffing marketplace, pasted this cold call target. It contains a company name, a job title, and a website in some order:
-
-"""
-${raw}
-"""
-
-The rep also pasted raw text they copied from the company's own site or profile. This is your ONLY source of checkable fact:
-"""
-${sourceText.slice(0, 6000)}
-"""
-
-Work out which part of the paste is the company, the title, and the website, then build a brief the rep can dial from.
-
-Answer ONLY with JSON, no preamble, no fences:
-
-{
- "company": "clean company name",
- "title": "the job title of the person being called",
- "website": "url or empty string",
- "what_they_do": "one plain sentence a rep can say out loud, hedged if you are inferring it from the name alone",
- "size_signal": "headcount, offices or growth signal ONLY if it appears in the source text, else 'not found'",
- "receipts": [
-   {"fact": "a specific checkable detail phrased so a rep can say it out loud on a call", "where": "where it came from, or your reasoning if inferred", "confidence": "verified", "quote": "the exact words from the source text that prove this"}
- ],
- "role_scope": "what someone with this exact title actually owns day to day at a company this size and shape, one sentence",
- "role_kpis": ["2 to 4 things this person is personally measured on"],
- "offshore_roles": ["3 to 5 specific roles this company plausibly hires offshore, based on what they actually do"],
- "role_pain": "the operational tension this person feels between their targets and their headcount budget, one sentence",
- "hook": "the single most specific non generic observation that could open this call",
- "avoid": "anything a rep should not say to this company, one sentence"
-}
-
-Rules for receipts, these matter more than anything else:
-- Give 3 to 5 receipts. Order them most specific first.
-- Mark confidence "verified" ONLY for a fact that appears in the source text above, and include the exact proving words in "quote". A verified receipt with no quote will be rejected.
-- Mark confidence "inferred" for anything that is a reasonable read on the role or industry rather than something you were shown. Leave "quote" empty and put your reasoning in "where".
-- If the source text is thin, return fewer verified receipts. Never pad.
-- Never invent a receipt. An empty receipts list is far better than a wrong one, because the rep will be caught on the call.
-- Prefer receipts that touch headcount: open roles, team locations, recent expansion, service lines that need people.`
-}
-
-/**
- * Strip the brief down to what the WRITER needs.
- *
- * `quote` and `where` exist so the rep can check a receipt before dialling; the writer
- * never uses them, and a quote can run 30 tokens each. `hook` and `website` are unused.
- * Dropping them, and dropping the pretty-printing, cuts the priciest part of the request
- * without removing anything the spiel is built from.
- */
-function writerBrief(brief: Brief): string {
-  const slim = {
-    company: brief.company,
-    title: brief.title,
-    what_they_do: brief.what_they_do,
-    size_signal: brief.size_signal,
-    role_scope: brief.role_scope,
-    role_kpis: brief.role_kpis,
-    offshore_roles: brief.offshore_roles,
-    role_pain: brief.role_pain,
-    avoid: brief.avoid,
-    receipts: (brief.receipts || []).map(r => ({ fact: r.fact, confidence: r.confidence })),
-  }
-  return JSON.stringify(slim)
-}
-
-/**
- * Everything in the spiel request that does NOT change between leads: the exemplar, the
- * OA positioning, the craft and homework rules, the beat requirements, the output format
- * and the length ceiling.
- *
- * It is split out so it can be sent as its own cached content block. It is roughly 1,300
- * tokens that were previously re-billed at full rate on every single build, purely
- * because the lead-specific brief sat in the middle of the prompt. Byte-identical across
- * builds for a given rep, which is what makes a cache hit possible.
- */
-export function spielStablePrefix(oa: OAProfile, tone: Tone, pacing: boolean, days: string): string {
-  return `You write cold call spiels for outbound SDRs at Outsource Accelerator.
-
-Reproduce the STRUCTURE and VOICE of this exemplar, but rewrite every line so it is specific to the company and role you are given below. Do not reuse the exemplar's phrasing verbatim. Never reuse "Pretty bananas".
-
-EXEMPLAR:
-"""
-${EXEMPLAR}
-"""
-
-${oaBlock(oa)}
-
-${HOMEWORK_RULES}
-
-${styleRules(tone, pacing)}
-
-Beat requirements:
-1. thumbnail: who Outsource Accelerator is, one breath. This beat MUST contain the
-   following clause character for character, with nothing swapped, shortened or
-   pluralised: "${identityClause(oa.positioning)}"
-   Do not substitute a synonym for what kind of marketplace we are. After that clause,
-   in the same breath, frame it for this company's industry so it lands as specific
-   rather than boilerplate.
-2. homework: the proof the rep did the work. Lead with the strongest receipt, said plainly, and hedge it if it is marked inferred. Two sentences maximum. This is the beat that buys the next thirty seconds.
-3. observation: the tension inside this person's specific remit, using role_scope and
-   role_kpis. Not a generic market statement, and not a verdict on their performance.
-   Name the squeeze structurally, what the role is accountable for versus what local
-   headcount costs, or what peers in the same seat say. Never assert that they are
-   behind, missing targets, or not hitting the numbers they are measured on.
-4. question: the reframe. Name the actual roles from offshore_roles and the cost angle, and tie it to a metric this person is measured on. Ends in a question mark.
-5. superpower: why pre-vetted firms beats the alternative this person is currently stuck with.
-6. howitlands: what it feels like in practice, one short line, tied to their actual operation.
-7. ask: soft permission for 15 minutes. Name the objection you expect from this role first, then ask. Address the person as (Name) so the rep fills it in live.
-8. calendar: close with these options: ${days}.
-
-Respond ONLY with JSON, no preamble, no fences:
-{"beats":[{"id":"thumbnail","text":"..."},{"id":"homework","text":"..."},{"id":"observation","text":"..."},{"id":"question","text":"..."},{"id":"superpower","text":"..."},{"id":"howitlands","text":"..."},{"id":"ask","text":"..."},{"id":"calendar","text":"..."}]}
-
-Length: aim for 150 to 185 words across all eight beats combined, and never exceed 190.
-That is roughly a minute of speech. Count before you answer. If you are over, cut adjectives
-and subordinate clauses from the middle beats, not from the homework beat.`
-}
 
 /**
  * Turn a lean, plain-text spiel into beats.
@@ -590,53 +379,25 @@ VOICE: spoken, short clauses, contractions${pacing ? ', ellipses as pacing marks
 LENGTH: 150 to 185 words across all eight, never more than 190. Count before answering.`
 }
 
-/** The only part that changes per lead. Sent after the cached prefix. */
-export function spielLeadBlock(raw: string, brief: Brief | null): string {
-  const noReceipts = brief && !(brief.receipts || []).length
-  return `${
-    brief
-      ? `RESEARCH BRIEF:
-${writerBrief(brief)}`
-      : `LEAD, unparsed, work out the company and title yourself: ${raw}
-You have NO research. Do not state any specific fact about this company. Write the homework beat as an honest role level observation instead, with no invented details.`
-  }
-${
-  noReceipts
-    ? `
-NO RECEIPTS WERE FOUND FOR THIS COMPANY. This is the case that gets reps caught, so it
-overrides anything above that sounds like permission to be specific:
-- You have not seen anything. Do not write "I was looking at your careers page and saw",
-  "I noticed", or any phrasing that claims you observed a fact about this company.
-- Do not state their staffing mix, headcount, locations, tooling, clients or open roles
-  as fact. The offshore roles in the brief are your inference, not something they told you.
-- Open the homework beat with an explicit hedge that invites correction, for example
-  "correct me if I'm off, but it looks like...", and build it from the role's remit
-  rather than from the company.
-`
-    : ''
-}
-Write the eight beats for this lead now, as JSON only.
-
-AND IT OVERRIDES EVERY RULE ABOVE: the eight beats together must total no more than 190
-words. Count them. A rep reads this out loud on a cold call and anything longer gets cut
-off by the prospect, so a shorter spiel that follows the rules beats a richer one that
-runs long. If obeying a craft rule would push you over, drop the rule.`
-}
-
 export function buildRerollPrompt(
   beat: Beat,
   fullScript: string,
-  brief: Brief | null,
   raw: string,
+  /** The rep's pasted source, so a rerolled homework beat stays grounded in it. */
+  source: string,
   oa: OAProfile,
   tone: Tone,
   pacing: boolean,
 ): string {
+  const seen = source.trim()
+    ? `WHAT THE REP ACTUALLY SAW, the only facts you may claim:\n${source.slice(0, 2500)}`
+    : 'The rep saw nothing about this company, so claim nothing about it.'
   return `Rewrite one beat of a cold call spiel. Same job, different angle. Do not repeat the current wording.
 
 ${oaBlock(oa)}
 
-${brief ? `RESEARCH BRIEF:\n${JSON.stringify(brief, null, 2)}` : `LEAD, unparsed: ${raw}`}
+LEAD: ${raw}
+${seen}
 
 ${HOMEWORK_RULES}
 

@@ -1,1 +1,6 @@
 dc-dashboard-pages
+
+# Build output and dependencies for the v2 call script. These are generated: the
+# deployable bundle is committed under call-script/public/v2 instead.
+call-script-v2/node_modules/
+call-script-v2/dist/
