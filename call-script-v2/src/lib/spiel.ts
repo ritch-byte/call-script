@@ -75,12 +75,19 @@ export function closingBeats(days: string): Beat[] {
     {
       ...BEATS[6],
       fixed: true,
+      // All five moves of the screenplay close, in 54 words instead of 77.
+      //
+      // The first version was a transcription of the reference doc: 77 words and eight
+      // ellipses in one breath. A rep on the floor read it aloud and said it had got long
+      // and the fillers were hard to pronounce, which is the only test that counts. The
+      // moves are what matter, not the ellipsis count: the disarm, the 14-then-15
+      // correction, the coffee-break framing, folks who look like you guys, and the back
+      // pocket exit. All five survive; 23 words and seven ellipses do not.
       text:
-        "But super simple, (Name)... I know my timing's probably off here... but I just " +
-        'wanted to see if you would be completely opposed to carving out 14... 15 minutes... ' +
-        'for more of a coffee-break style chat... walk through what this actually looks like ' +
-        'in practice with folks who look like you guys... and then from there you keep us in ' +
-        "the back pocket or you don't.",
+        "But super simple, (Name)... I know my timing's probably off, but would you be " +
+        'completely opposed to carving out 14, 15 minutes? More of a coffee-break style ' +
+        'chat, walk through what this looks like for folks who look like you guys. Then ' +
+        "from there, you keep us in the back pocket or you don't.",
     },
     {
       ...BEATS[7],
@@ -138,8 +145,11 @@ export const DEFAULT_OA: OAProfile = {
     'the leading marketplace for global talent networks, built specifically for connecting businesses to vetted offshore firms',
   network: '4,000+ pre-vetted BPO and staffing firms',
   savings: 'up to 70% less than local hiring cost',
+  // "enterprise-grade infrastructure" is four-and-five syllables back to back and the
+  // writer quotes this line almost verbatim, so it went straight into the rep's mouth.
+  // A rep reading at pace on a live call stumbled on it. Same meaning, sayable.
   proof:
-    'enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers',
+    'real systems, real data security, managed teams, not random freelancers',
   mechanic:
     'we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one',
 }
@@ -157,6 +167,11 @@ export const SUPERSEDED_POSITIONING = [
   "the world's leading marketplace for offshore staffing, built specifically for connecting businesses to vetted offshore firms",
 ]
 
+/** Proof lines retired for the same reason, here because they were hard to say aloud. */
+export const SUPERSEDED_PROOF = [
+  'enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers',
+]
+
 /**
  * Bring a saved profile up to date. A field the rep never touched (still equal to
  * a retired default) is moved to the current default; anything they actually
@@ -167,6 +182,12 @@ export function migrateProfile(saved: Partial<OAProfile> | null | undefined): OA
   const norm = (s: string) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase()
   if (SUPERSEDED_POSITIONING.some(old => norm(old) === norm(merged.positioning))) {
     merged.positioning = DEFAULT_OA.positioning
+  }
+  // Same rule for the proof line, which was retired for being hard to say out loud. A
+  // rep who never edited it should get the sayable version rather than keep the old one
+  // forever just because it is sitting in their localStorage.
+  if (SUPERSEDED_PROOF.some(old => norm(old) === norm(merged.proof))) {
+    merged.proof = DEFAULT_OA.proof
   }
   return merged
 }
@@ -632,15 +653,23 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
    name in one word what they get back, then ${oa.proof}.
-6. "And we do it in a way where," + ${oa.mechanic}. Close the beat by saying the team
-   feels like theirs, not like a vendor bolted on.
+6. "And we do it in a way where," + ${oa.mechanic}. End by saying the team feels like
+   theirs, not a vendor.
 
-VOICE: spoken, short clauses, contractions${pacing ? ', ellipses as pacing marks' : ', no ellipses'}. ${TONES[tone]} No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
+VOICE: spoken, short clauses, contractions${pacing ? ', and ellipses as pacing marks, but at most ONE per beat' : ', no ellipses'}. ${TONES[tone]} No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
-LENGTH overrides everything above, and you are running long. Budget, in words: beat 1 is
-25, beat 2 is 45, beat 3 is 45, beat 4 is 30, beat 5 is 20, beat 6 is 25. That is 190 and
-you should come in under it. Beats 1, 4, 5 and 6 are ONE short sentence each, no
-subclauses, no lists. Count each beat as you write it.`
+SAY IT ALOUD. A rep reads this at pace on a live call, so every word has to be easy to
+get out of your mouth. Short, common, spoken words. Nothing anyone could trip over: not
+"operationalised", "shepherding", "consolidation", "methodologies", "infrastructure".
+Where a plainer word exists, use the plainer one. Industry nouns are fine when they are
+what the person actually says; long Latin verbs never are.
+
+LENGTH overrides everything above, and you keep running long. Hard budget, in words:
+beat 1 is 20, beat 2 is 35, beat 3 is 30, beat 4 is 25, beat 5 is 16, beat 6 is 20. That
+totals 146 and going over it is a failure, not a stylistic choice. Beats 1, 4, 5 and 6
+are ONE short sentence each, no subclauses, no lists, no "and then" chains. Beat 3 is
+three very short sentences. Count the words in each beat as you finish it, and cut back
+to the budget before you move on.`
 }
 
 export function buildRerollPrompt(

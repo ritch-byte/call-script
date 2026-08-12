@@ -11,10 +11,14 @@
 // what not to say. Then the prompt was cut 16% with every rule kept, and this is where
 // it landed.
 //
-// MEASURED, five leads: 0.231, 0.250, 0.233, 0.221 and 0.245, mean 0.236, from
-// usage.input_tokens and usage.output_tokens on the real responses (~1015 in, ~270 out).
-// Rounded up to 0.24 because understating what the floor spends is the worse error.
-// $1.18 per 500 builds.
+// MEASURED, five leads: 0.233, 0.240, 0.249, 0.250 and 0.248, mean 0.244, from
+// usage.input_tokens and usage.output_tokens on the real responses. Rounded up to 0.25
+// because understating what the floor spends is the worse error. $1.22 per 500 builds.
+//
+// The number has crept: 0.19, 0.23, 0.24, 0.227 after the trim, now 0.244. Every step
+// is a rule added to the prompt, and a rule is input tokens on every build forever.
+// That is the real price of each fix, and it is worth saying out loud rather than
+// discovering later.
 //
 // This is 3c per 500 above the $1.15 the floor asked for, and the reason is prompt
 // tokens, not waste. Two rules were added to beat 2 after it was caught describing the
@@ -36,7 +40,7 @@
 // live risk in trimming, since the offshore rule lost its emphasis to get here. Each
 // repair costs about another 0.05, so if that rate ever climbs to one build in five it
 // gives the whole saving back. Re-measure if the prompt or the model changes.
-export const BUILD_COST_CENTS = 0.24
+export const BUILD_COST_CENTS = 0.25
 
 /** Dollars for a day of dialling at this rate. */
 export const dailyCost = (cents: number, builds: number) => (cents * builds) / 100

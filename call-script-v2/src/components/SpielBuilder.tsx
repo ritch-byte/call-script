@@ -119,7 +119,15 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   const totalSeconds = speakSeconds(fullScript)
   // The window governs the part we can actually shorten. The fixed opening is approved
   // wording, so counting it would leave the warning permanently lit and meaningless.
-  const writtenSeconds = speakSeconds(activeBeats.filter(b => !b.fixed).map(b => b.text).join(' '))
+  // Exclude the OPENING only, not everything fixed. The opening is a back-and-forth
+  // before the pitch and the rep cannot shorten it, so counting it would leave the
+  // warning permanently lit. The close is different: it is spoken in the same breath as
+  // the spiel and it is 30 seconds long. Filtering on `fixed` dropped it from the meter
+  // the moment the close stopped being generated, so the app reported 77s for a script
+  // that took 107s to say, and a rep on the floor noticed before this number did.
+  const writtenSeconds = speakSeconds(
+    activeBeats.filter(b => !b.id.startsWith('opening_')).map(b => b.text).join(' '),
+  )
   const rerollable = activeBeats.filter(b => !b.fixed)
   /** False while the box holds only the fixed opening and nothing has been generated. */
   const hasSpiel = rerollable.length > 0

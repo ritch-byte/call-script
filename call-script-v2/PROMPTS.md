@@ -7,8 +7,8 @@ actually sends.
 ## How a build works
 
 One button, one path, one price. The rep pastes a line (company, job title, website) and
-presses Build spiel. That is a single call on Haiku 4.5 costing 0.24 cents,
-so 500 builds a day is $1.20. There is no research
+presses Build spiel. That is a single call on Haiku 4.5 costing 0.25 cents,
+so 500 builds a day is $1.25. There is no research
 pass and no model choice, so a rep cannot land on an expensive setting.
 
 The eight beats come back as plain paragraphs rather than JSON, because the JSON
@@ -48,7 +48,7 @@ build:
 ```text
 Hey [Lead Name]? (Pause)
 
-Oh hey uhh, [Lead Name], it's [BDR Name] here over at Outsource Accelerator. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not? (pause)
+Oh hey uhh, [Lead Name], it's [BDR Name] here over at Outsource Accelerator. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not (pause)
 
 Appreciate that, yeah remind me uhh, have you heard of Outsource Accelerator just by the off chance?
 
@@ -101,16 +101,24 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
-   name in one word what they get back, then enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
-6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. Close the beat by saying the team
-   feels like theirs, not like a vendor bolted on.
+   name in one word what they get back, then real systems, real data security, managed teams, not random freelancers.
+6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End by saying the team feels like
+   theirs, not a vendor.
 
-VOICE: spoken, short clauses, contractions, ellipses as pacing marks. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
+VOICE: spoken, short clauses, contractions, and ellipses as pacing marks, but at most ONE per beat. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
-LENGTH overrides everything above, and you are running long. Budget, in words: beat 1 is
-25, beat 2 is 45, beat 3 is 45, beat 4 is 30, beat 5 is 20, beat 6 is 25. That is 190 and
-you should come in under it. Beats 1, 4, 5 and 6 are ONE short sentence each, no
-subclauses, no lists. Count each beat as you write it.
+SAY IT ALOUD. A rep reads this at pace on a live call, so every word has to be easy to
+get out of your mouth. Short, common, spoken words. Nothing anyone could trip over: not
+"operationalised", "shepherding", "consolidation", "methodologies", "infrastructure".
+Where a plainer word exists, use the plainer one. Industry nouns are fine when they are
+what the person actually says; long Latin verbs never are.
+
+LENGTH overrides everything above, and you keep running long. Hard budget, in words:
+beat 1 is 20, beat 2 is 35, beat 3 is 30, beat 4 is 25, beat 5 is 16, beat 6 is 20. That
+totals 146 and going over it is a failure, not a stylistic choice. Beats 1, 4, 5 and 6
+are ONE short sentence each, no subclauses, no lists, no "and then" chains. Beat 3 is
+three very short sentences. Count the words in each beat as you finish it, and cut back
+to the budget before you move on.
 ```
 
 ### With pasted source text
@@ -161,16 +169,24 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
-   name in one word what they get back, then enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers.
-6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. Close the beat by saying the team
-   feels like theirs, not like a vendor bolted on.
+   name in one word what they get back, then real systems, real data security, managed teams, not random freelancers.
+6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End by saying the team feels like
+   theirs, not a vendor.
 
-VOICE: spoken, short clauses, contractions, ellipses as pacing marks. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
+VOICE: spoken, short clauses, contractions, and ellipses as pacing marks, but at most ONE per beat. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
-LENGTH overrides everything above, and you are running long. Budget, in words: beat 1 is
-25, beat 2 is 45, beat 3 is 45, beat 4 is 30, beat 5 is 20, beat 6 is 25. That is 190 and
-you should come in under it. Beats 1, 4, 5 and 6 are ONE short sentence each, no
-subclauses, no lists. Count each beat as you write it.
+SAY IT ALOUD. A rep reads this at pace on a live call, so every word has to be easy to
+get out of your mouth. Short, common, spoken words. Nothing anyone could trip over: not
+"operationalised", "shepherding", "consolidation", "methodologies", "infrastructure".
+Where a plainer word exists, use the plainer one. Industry nouns are fine when they are
+what the person actually says; long Latin verbs never are.
+
+LENGTH overrides everything above, and you keep running long. Hard budget, in words:
+beat 1 is 20, beat 2 is 35, beat 3 is 30, beat 4 is 25, beat 5 is 16, beat 6 is 20. That
+totals 146 and going over it is a failure, not a stylistic choice. Beats 1, 4, 5 and 6
+are ONE short sentence each, no subclauses, no lists, no "and then" chains. Beat 3 is
+three very short sentences. Count the words in each beat as you finish it, and cut back
+to the budget before you move on.
 ```
 
 
@@ -188,7 +204,7 @@ OUTSOURCE ACCELERATOR, the seller:
 - Positioning: the leading marketplace for global talent networks, built specifically for connecting businesses to vetted offshore firms
 - Network: 4,000+ pre-vetted BPO and staffing firms
 - Cost angle: up to 70% less than local hiring cost
-- Credibility: enterprise-grade infrastructure, data security, and managed teams, not random remote freelancers
+- Credibility: real systems, real data security, managed teams, not random freelancers
 - How it works: we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one
 
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
