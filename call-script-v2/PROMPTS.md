@@ -33,7 +33,7 @@ Enforced in code after the model replies, which is what keeps a cheap single cal
 2. **The homework** — Proof the rep actually looked them up, one real detail
 3. **Change in the world** — What shifted, why it is worse than the last shift, and the part nobody can see
 4. **The big question** — The reframe, in this role's own metrics
-5. **Our superpower** — The outcome in one word, then why we are different
+5. **Our edge** — The outcome in one word, then why we are different
 6. **How it lands** — What it feels like, tied to their operation
 7. **The close** — Disarm, 14-15 minutes, coffee break, back pocket or not
 8. **The ask** — Would it be ridiculous, two days
@@ -79,11 +79,11 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
-2. THE HOMEWORK, the beat that buys the call. Word for word: "I did do a bit of homework
-   before I dialled... so correct me if I'm off, but you're most likely spending your days
+2. THE HOMEWORK, the beat that buys the call. Word for word: "I made some research about
+   your company... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two
    concrete activities joined by "and then", in the order the work happens. Then word for
-   word: "am I close?"
+   word: "right?"
    Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
    submissions, they do not hunt for clinical ops people. Beat 3 owns hiring, so naming it
    here announces the pitch before you have earned the call. Nothing about hiring,
@@ -103,7 +103,7 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
-5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
+5. "So in response to this, our edge lies in our access to pre-vetted firms." +
    name in one word what they get back, then real systems, real data security, managed teams, not random freelancers.
 6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End by saying the team feels like
    theirs, not a vendor.
@@ -150,11 +150,11 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
-2. THE HOMEWORK, the beat that buys the call. Word for word: "I did do a bit of homework
-   before I dialled... so correct me if I'm off, but you're most likely spending your days
+2. THE HOMEWORK, the beat that buys the call. Word for word: "I made some research about
+   your company... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two
    concrete activities joined by "and then", in the order the work happens. Then word for
-   word: "am I close?"
+   word: "right?"
    Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
    submissions, they do not hunt for clinical ops people. Beat 3 owns hiring, so naming it
    here announces the pitch before you have earned the call. Nothing about hiring,
@@ -174,7 +174,7 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
-5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
+5. "So in response to this, our edge lies in our access to pre-vetted firms." +
    name in one word what they get back, then real systems, real data security, managed teams, not random freelancers.
 6. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End by saying the team feels like
    theirs, not a vendor.

@@ -11,9 +11,9 @@
 // what not to say. Then the prompt was cut 16% with every rule kept, and this is where
 // it landed.
 //
-// MEASURED, five leads: 0.233, 0.240, 0.249, 0.250 and 0.248, mean 0.244, from
+// MEASURED, five leads: 0.242, 0.239, 0.236, 0.243 and 0.240, mean 0.240, from
 // usage.input_tokens and usage.output_tokens on the real responses. Rounded up to 0.25
-// because understating what the floor spends is the worse error. $1.22 per 500 builds.
+// because understating what the floor spends is the worse error. $1.20 per 500 builds.
 //
 // The number has crept: 0.19, 0.23, 0.24, 0.227 after the trim, now 0.244. Every step
 // is a rule added to the prompt, and a rule is input tokens on every build forever.

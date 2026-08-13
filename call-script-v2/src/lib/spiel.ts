@@ -26,11 +26,15 @@ export type Tone = 'measured' | 'house' | 'high'
 /**
  * Seconds the written part can run before it drags.
  *
- * Moved 80 -> 95 when the house frames and the homework beat went in. That is not the
- * threshold chasing the output: the structure genuinely got longer. The floor's own
- * exemplar is ~175 words and the homework beat adds ~40, so a correct spiel is now
- * 210-235 words, or 81-90 seconds. Measured builds land in that band, so 95 leaves the
- * amber flag meaning "this one is actually bloated" rather than lighting on every build.
+ * Counts everything after the opening, including the fixed close, because that is what
+ * the rep actually says in one breath. It excluded the close for a while, by filtering
+ * on `fixed`, and reported 77s for a script that took 107s: a rep on the floor caught
+ * that before this number did.
+ *
+ * Measured builds now land at 90-92s, so 95 leaves the amber flag meaning "this one is
+ * actually bloated" rather than lighting on every build. That band came back down from
+ * 99-105s when the close was cut to 41 words, which is the same complaint the floor
+ * raised: the fix for "it got long" was connective tissue in the close, not the beats.
  */
 export const WINDOW = 95
 
@@ -46,7 +50,7 @@ export const BEATS: Array<Omit<Beat, 'text'>> = [
   { id: 'homework',   label: 'The homework',   hint: 'Proof the rep actually looked them up, one real detail' },
   { id: 'observation',label: 'Change in the world', hint: 'What shifted, why it is worse than the last shift, and the part nobody can see' },
   { id: 'question',   label: 'The big question', hint: "The reframe, in this role's own metrics" },
-  { id: 'superpower', label: 'Our superpower', hint: 'The outcome in one word, then why we are different' },
+  { id: 'superpower', label: 'Our edge',       hint: 'The outcome in one word, then why we are different' },
   { id: 'howitlands', label: 'How it lands',   hint: 'What it feels like, tied to their operation' },
   { id: 'ask',        label: 'The close',      hint: 'Disarm, 14-15 minutes, coffee break, back pocket or not' },
   { id: 'calendar',   label: 'The ask',        hint: 'Would it be ridiculous, two days' },
@@ -75,19 +79,20 @@ export function closingBeats(days: string): Beat[] {
     {
       ...BEATS[6],
       fixed: true,
-      // All five moves of the screenplay close, in 54 words instead of 77.
+      // 41 words, down from 77 in the reference doc and 65 after the first trim.
       //
-      // The first version was a transcription of the reference doc: 77 words and eight
-      // ellipses in one breath. A rep on the floor read it aloud and said it had got long
-      // and the fillers were hard to pronounce, which is the only test that counts. The
-      // moves are what matter, not the ellipsis count: the disarm, the 14-then-15
-      // correction, the coffee-break framing, folks who look like you guys, and the back
-      // pocket exit. All five survive; 23 words and seven ellipses do not.
+      // Every cut here was to connective tissue, never to a move. What makes this close
+      // work is four pattern interrupts, and all four are still in it: "completely
+      // opposed", which is answered "no" by someone who means yes; "14, 15" landing as a
+      // number that was counted rather than rounded; the coffee-break framing that makes
+      // it small; and the back-pocket exit that removes the commitment entirely. What
+      // went was "carving out", "More of a", "walk through what this looks like", "who
+      // look like you guys" and "from there" - phrases a rep has to get through rather
+      // than land on.
       text:
-        "But super simple, (Name)... I know my timing's probably off, but would you be " +
-        'completely opposed to carving out 14, 15 minutes? More of a coffee-break style ' +
-        'chat, walk through what this looks like for folks who look like you guys. Then ' +
-        "from there, you keep us in the back pocket or you don't.",
+        "But super simple, (Name)... I know my timing's probably off. Would you be " +
+        'completely opposed to 14, 15 minutes? Coffee-break style, just what this looks ' +
+        "like for folks like you. Then you keep us in the back pocket or you don't.",
     },
     {
       ...BEATS[7],
@@ -198,19 +203,6 @@ export const TONES: Record<Tone, string> = {
   high: 'High energy, faster cadence, more pattern interrupt, still not salesy.',
 }
 
-const EXEMPLAR = `So yeah quick thumbnail on us. we are the leading Global Marketplace built specifically for connecting businesses to global talent networks...
-
-And so what we are seeing from a high-level... is that... most firms are stuck choosing between paying premium for local talents or gambling on unverified freelancers.
-
-So the big question is is it possible to secure world-class talent (if you're going after support/dev/admin) at 80% less than local hiring costs, without sacrificing quality?
-
-So in response to this, our superpower, lies in our access to pre-vetted firms. Think enterprise-grade infrastructure, data security, and managed teams... not just random remote workers.
-
-And we do it in a way where, you can plug into high-performing teams instantly... Pretty bananas in this space...
-
-But super simple (Name), I know people worry about risk of new partners, but I wanted to see if you'd be completely opposed to carving out 15 minutes for a coffee-break style chat, just to share our lesser-known approach to high-caliber staffing."
-
-Does Thursday or Friday afternoon work for you?`
 
 // ── Timing ────────────────────────────────────────────────────────────────
 
@@ -424,8 +416,8 @@ it belongs two beats later anyway.
 
 LEAD: ${raw}
 
-Keep the exact opening "I did do a bit of homework before I dialled... so correct me if I'm
-off, but you're most likely spending your days on" and the exact ending "am I close?".
+Keep the exact opening "I made some research about your company... so correct me if I'm
+off, but you're most likely spending your days on" and the exact ending "right?".
 Between them, name two concrete things this title actually does hour to hour, joined by
 "and then", in the order the work happens. Their vocabulary, one sentence. Do not mention
 hiring, recruiting, headcount, candidates, vacancies or filling seats.
@@ -449,8 +441,8 @@ describing a team they do not have gets the rep caught guessing in the first thi
 
 LEAD: ${raw}
 
-Keep the exact opening "I did do a bit of homework before I dialled... so correct me if I'm
-off, but you're most likely spending your days on" and the exact ending "am I close?".
+Keep the exact opening "I made some research about your company... so correct me if I'm
+off, but you're most likely spending your days on" and the exact ending "right?".
 Between them, name two concrete activities this title really does with the team they have
 in house today, joined by "and then", in the order the work happens. Their vocabulary, one
 sentence. The words offshore, offshoring, outsourced, outsourcing, BPO and nearshore must
@@ -547,10 +539,10 @@ const oaBlock = (oa: OAProfile) => `OUTSOURCE ACCELERATOR, the seller:
  */
 const BEAT_ANCHORS: Array<[string, RegExp]> = [
   ['thumbnail',   /so yeah,?\s*quick thumbnail on us/i],
-  ['homework',    /i did do a bit of homework/i],
+  ['homework',    /i made some research about your company/i],
   ['observation', /and so what we are seeing from a high[- ]?level/i],
   ['question',    /so the big question is/i],
-  ['superpower',  /so in response to this,?\s*our superpower/i],
+  ['superpower',  /so in response to this,?\s*our edge/i],
   ['howitlands',  /and we do it in a way where/i],
 ]
 
@@ -648,11 +640,11 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
-2. THE HOMEWORK, the beat that buys the call. Word for word: "I did do a bit of homework
-   before I dialled... so correct me if I'm off, but you're most likely spending your days
+2. THE HOMEWORK, the beat that buys the call. Word for word: "I made some research about
+   your company... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two
    concrete activities joined by "and then", in the order the work happens. Then word for
-   word: "am I close?"
+   word: "right?"
    Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
    submissions, they do not hunt for clinical ops people. Beat 3 owns hiring, so naming it
    here announces the pitch before you have earned the call. Nothing about hiring,
@@ -676,7 +668,7 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    roles this company would really hire offshore, at ${oa.savings}, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
-5. "So in response to this, our superpower lies in our access to pre-vetted firms." +
+5. "So in response to this, our edge lies in our access to pre-vetted firms." +
    name in one word what they get back, then ${oa.proof}.
 6. "And we do it in a way where," + ${oa.mechanic}. End by saying the team feels like
    theirs, not a vendor.
