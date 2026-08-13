@@ -222,7 +222,31 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         maxTokens: 700,
         messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing, days) }],
       })
-      const parsed = parseLeanSpiel(stripEmDash(textFrom(res)), days)
+      let parsed = parseLeanSpiel(stripEmDash(textFrom(res)), days)
+
+      // Roughly one build in five comes back with a beat missing, usually because the
+      // writer rephrased a frame so the anchors do not all match and the positional
+      // fallback shifts. A gap in the script is worse than anything else here: the rep
+      // is mid-call reading a hole. One retry costs about 0.25 and fixes it; if it
+      // fails twice, say so rather than hand over a broken script.
+      const missing = () => GENERATED_BEATS.filter(b => !(parsed.find(x => x.id === b.id)?.text || '').trim())
+      if (missing().length) {
+        setStage('A beat came back empty, rewriting')
+        try {
+          const again = await callAIRaw({
+            model: MODEL,
+            maxTokens: 700,
+            messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing, days) }],
+          })
+          const retry = parseLeanSpiel(stripEmDash(textFrom(again)), days)
+          if (!GENERATED_BEATS.some(b => !(retry.find(x => x.id === b.id)?.text || '').trim())) parsed = retry
+        } catch { /* keep what we have and warn below */ }
+      }
+      const stillMissing = missing()
+      if (stillMissing.length) {
+        setWarn(`${stillMissing.map(b => b.label).join(' and ')} came back empty. Reroll ${stillMissing.length > 1 ? 'those beats' : 'that beat'} or press Rebuild.`)
+      }
+
       const map = Object.fromEntries(parsed.map(x => [x.id, x.text]))
 
       // The positioning wording is a deliberate choice, and the fast writer sometimes

@@ -229,12 +229,33 @@ export const fmtTime = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 
 export const identityClause = (positioning: string) =>
   (positioning || '').split(',')[0].trim()
 
+/**
+ * The part of the positioning the writer has to say word for word.
+ *
+ * Cutting at the first comma threw away "built specifically for", and with it the hinge
+ * the floor uses to aim the sentence at this particular company. The writer then had to
+ * invent its own bridge and reached for filler: "which basically means we're the place
+ * where founders like you plug into world-class teams offshore".
+ *
+ * Keeping the stem through that phrase fixes both problems at once. The approved wording
+ * survives further, and the writer's own words now start exactly where the
+ * personalisation belongs, which is immediately after "for".
+ *
+ * Falls back to the identity clause when a rep has edited the phrase out of their
+ * positioning, so nothing is forced on a profile that no longer says it.
+ */
+export function positioningStem(positioning: string): string {
+  const p = (positioning || '').trim()
+  const m = /^(.*?\bbuilt specifically for)\b/i.exec(p)
+  return m ? m[1].trim() : identityClause(p)
+}
+
 const flatten = (s: string) =>
   (s || '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim()
 
-/** True when the thumbnail still carries the positioning line's own identity clause. */
+/** True when the thumbnail still carries the approved stem of the positioning line. */
 export function keepsIdentityClause(thumbnail: string, positioning: string): boolean {
-  const clause = flatten(identityClause(positioning))
+  const clause = flatten(positioningStem(positioning))
   if (clause.length < 8) return true // nothing distinctive to check against
   return flatten(thumbnail).includes(clause)
 }
@@ -244,15 +265,16 @@ export function keepsIdentityClause(thumbnail: string, positioning: string): boo
  * that, or pay for a slower model on every beat, rewrite just the thumbnail.
  */
 export function buildIntroRepairPrompt(thumbnail: string, positioning: string, tone: Tone, pacing: boolean): string {
-  return `Rewrite one line of a cold call opener. It must contain this clause word for word:
+  return `Rewrite one line of a cold call opener. It must contain this word for word:
 
-"${identityClause(positioning)}"
+"${positioningStem(positioning)}"
 
 The current version dropped or reworded it:
 "${thumbnail}"
 
-Keep the same job: say who we are in one breath, then frame it for this company's
-industry in the same sentence. Keep the industry framing that is already there.
+Keep the same job: say who we are in one breath, then finish the sentence by naming what
+THIS company actually is, in five or six words. Whatever follows "for" is the only part
+you invent, and it must be specific to them, never "businesses" or "companies like yours".
 
 ${styleRules(tone, pacing)}
 
@@ -605,7 +627,7 @@ export function buildLeanSpielPrompt(
   days: string,
 ): string {
   const grounded = source.trim().length > 0
-  const clause = identityClause(oa.positioning)
+  const clause = positioningStem(oa.positioning)
   return `Write a cold call opener for an SDR at Outsource Accelerator, ${clause}.
 
 LEAD: ${raw}
@@ -621,8 +643,11 @@ with this person's world. One or two short sentences per beat, never three, exce
 
 Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
 
-1. "So yeah quick thumbnail on us." + word for word "${clause}" + one clause framing it
-   for their industry.
+1. "So yeah quick thumbnail on us." + this word for word, ending on the word "for":
+   "${clause}" + then name what THIS company actually is, in five or six words, the way
+   someone there would describe the place. Not "businesses", not "companies like yours",
+   not "founders like you": their industry, their kind of firm. No bridge phrases like
+   "which basically means", the sentence already runs straight into it.
 2. THE HOMEWORK, the beat that buys the call. Word for word: "I did do a bit of homework
    before I dialled... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two

@@ -63,7 +63,7 @@ No? Oh okay, feel free to cut me off if it's not in your wheelhouse.
 Sent as a single user message. With **no** pasted source text:
 
 ```text
-Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for global talent networks.
+Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for global talent networks, built specifically for.
 
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 No research and no web access: you know nothing checkable about this company.
@@ -74,8 +74,11 @@ with this person's world. One or two short sentences per beat, never three, exce
 
 Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
 
-1. "So yeah quick thumbnail on us." + word for word "the leading marketplace for global talent networks" + one clause framing it
-   for their industry.
+1. "So yeah quick thumbnail on us." + this word for word, ending on the word "for":
+   "the leading marketplace for global talent networks, built specifically for" + then name what THIS company actually is, in five or six words, the way
+   someone there would describe the place. Not "businesses", not "companies like yours",
+   not "founders like you": their industry, their kind of firm. No bridge phrases like
+   "which basically means", the sentence already runs straight into it.
 2. THE HOMEWORK, the beat that buys the call. Word for word: "I did do a bit of homework
    before I dialled... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two
@@ -126,7 +129,7 @@ to the budget before you move on.
 The lead block and the homework instruction change; everything else is identical:
 
 ```text
-Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for global talent networks.
+Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for global talent networks, built specifically for.
 
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 THE ONLY FACTS YOU MAY CLAIM:
@@ -142,8 +145,11 @@ with this person's world. One or two short sentences per beat, never three, exce
 
 Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
 
-1. "So yeah quick thumbnail on us." + word for word "the leading marketplace for global talent networks" + one clause framing it
-   for their industry.
+1. "So yeah quick thumbnail on us." + this word for word, ending on the word "for":
+   "the leading marketplace for global talent networks, built specifically for" + then name what THIS company actually is, in five or six words, the way
+   someone there would describe the place. Not "businesses", not "companies like yours",
+   not "founders like you": their industry, their kind of firm. No bridge phrases like
+   "which basically means", the sentence already runs straight into it.
 2. THE HOMEWORK, the beat that buys the call. Word for word: "I did do a bit of homework
    before I dialled... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two
@@ -273,15 +279,16 @@ These only fire when a guard catches something, so most builds never pay for the
 ### The intro clause was paraphrased
 
 ```text
-Rewrite one line of a cold call opener. It must contain this clause word for word:
+Rewrite one line of a cold call opener. It must contain this word for word:
 
-"the leading marketplace for global talent networks"
+"the leading marketplace for global talent networks, built specifically for"
 
 The current version dropped or reworded it:
 "So quick thumbnail on us. We are the top offshore staffing site around."
 
-Keep the same job: say who we are in one breath, then frame it for this company's
-industry in the same sentence. Keep the industry framing that is already there.
+Keep the same job: say who we are in one breath, then finish the sentence by naming what
+THIS company actually is, in five or six words. Whatever follows "for" is the only part
+you invent, and it must be specific to them, never "businesses" or "companies like yours".
 
 STYLE RULES, non negotiable:
 - Never use em dashes. Use commas, periods, or ellipses instead.
