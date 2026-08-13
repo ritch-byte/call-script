@@ -245,6 +245,43 @@ export function positioningStem(positioning: string): string {
 const flatten = (s: string) =>
   (s || '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim()
 
+/**
+ * Whatever the writer added after the approved stem, i.e. everything past "for".
+ * Empty when the stem is missing, which keepsIdentityClause already catches.
+ */
+export function thumbnailTail(thumbnail: string, positioning: string): string {
+  const stem = flatten(positioningStem(positioning))
+  const flat = flatten(thumbnail)
+  const at = flat.indexOf(stem)
+  if (at === -1 || stem.length < 8) return ''
+  return (thumbnail.slice(at + stem.length) || '').replace(/^[\s,]+/, '').trim()
+}
+
+/**
+ * True when the thumbnail's tail sells at them instead of naming them.
+ *
+ * "built specifically for agencies and service firms scaling offshore" describes what we
+ * want them to do, not what they are. They are an agency; the offshoring is the thing we
+ * are calling to propose. Putting it here claims a plan they have not made, and it is the
+ * third time the writer has reached for our vocabulary to describe their world, after the
+ * homework beat's offshore team and its hiring day.
+ *
+ * Reuses the two guards already written for that beat, so the same word lists and the
+ * same stand-down for staffing and recruitment firms apply here without a third copy.
+ */
+export function tailPitchesAtThem(thumbnail: string, positioning: string, lead = ''): boolean {
+  const tail = thumbnailTail(thumbnail, positioning)
+  if (!tail) return false
+  // "digital agencies scaling their teams" got past the offshore and hiring lists by
+  // dropping the giveaway words while keeping the projection: growing the team is the
+  // outcome we sell, not a description of who they are. Narrow on purpose, so a company
+  // that genuinely is "a scaling fintech" still reads as a description of itself.
+  if (/\b(?:scal|grow|expand|build)\w*\s+(?:their|its|your|out)?\s*(?:teams?|headcount|capacity|operations?|ops)\b/i.test(tail)) {
+    return true
+  }
+  return presumesOffshore(tail, lead) || describesHiring(tail, lead)
+}
+
 /** True when the thumbnail still carries the approved stem of the positioning line. */
 export function keepsIdentityClause(thumbnail: string, positioning: string): boolean {
   const clause = flatten(positioningStem(positioning))
@@ -266,7 +303,10 @@ The current version dropped or reworded it:
 
 Keep the same job: say who we are in one breath, then finish the sentence by naming what
 THIS company actually is, in five or six words. Whatever follows "for" is the only part
-you invent, and it must be specific to them, never "businesses" or "companies like yours".
+you invent. It must be specific to them, never "businesses" or "companies like yours",
+and it must describe what they already are rather than what we want them to become:
+"agencies and service firms scaling offshore" is wrong, "independent creative agencies"
+is right. Nothing about offshore, outsourcing, hiring or scaling after "for".
 
 ${styleRules(tone, pacing)}
 
@@ -640,6 +680,9 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
+   Say what they ARE today, never what we want them to become. "agencies and service
+   firms scaling offshore" is wrong: they are an agency, the offshoring is the thing we
+   are ringing to propose. Nothing about offshore, outsourcing, hiring or scaling here.
 2. THE HOMEWORK, the beat that buys the call. Word for word: "I made some research about
    your company... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two

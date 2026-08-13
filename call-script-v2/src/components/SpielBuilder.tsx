@@ -6,7 +6,7 @@ import {
   wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
-  presumesOffshore, buildDeoffshorePrompt, describesHiring, buildRefocusPrompt,
+  presumesOffshore, buildDeoffshorePrompt, describesHiring, buildRefocusPrompt, tailPitchesAtThem,
   openingBeats, fillLeadName,
 } from '../lib/spiel'
 import type { Beat, OAProfile, Tone } from '../lib/spiel'
@@ -117,8 +117,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   const inSync = freeText === null
   const fullScript = inSync ? joinBeats(activeBeats) : (freeText as string)
   const totalSeconds = speakSeconds(fullScript)
-  // The window governs the part we can actually shorten. The fixed opening is approved
-  // wording, so counting it would leave the warning permanently lit and meaningless.
   // Exclude the OPENING only, not everything fixed. The opening is a back-and-forth
   // before the pitch and the rep cannot shorten it, so counting it would leave the
   // warning permanently lit. The close is different: it is spoken in the same breath as
@@ -252,7 +250,14 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
       // The positioning wording is a deliberate choice, and the fast writer sometimes
       // paraphrases it away. Repair that one line rather than lose it or pay for the
       // slower model on all eight beats.
-      if (map.thumbnail && !keepsIdentityClause(map.thumbnail, oa.positioning)) {
+      // Two ways the thumbnail goes wrong, one repair. Either it paraphrases the
+      // approved stem away, or it keeps the stem and then finishes the sentence with our
+      // pitch instead of their business ("...for agencies and service firms scaling
+      // offshore"). Same rewrite fixes both.
+      if (map.thumbnail && (
+        !keepsIdentityClause(map.thumbnail, oa.positioning) ||
+        tailPitchesAtThem(map.thumbnail, oa.positioning, raw)
+      )) {
         setStage('Fixing the intro wording')
         try {
           const fix = await callAIRaw({
@@ -261,7 +266,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             messages: [{ role: 'user', content: buildIntroRepairPrompt(map.thumbnail, oa.positioning, tone, pacing) }],
           })
           const repaired = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
-          if (repaired && keepsIdentityClause(repaired, oa.positioning)) map.thumbnail = repaired
+          if (repaired && keepsIdentityClause(repaired, oa.positioning) && !tailPitchesAtThem(repaired, oa.positioning, raw)) map.thumbnail = repaired
         } catch { /* keep the original line rather than fail the whole build */ }
       }
 

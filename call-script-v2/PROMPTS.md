@@ -79,6 +79,9 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
+   Say what they ARE today, never what we want them to become. "agencies and service
+   firms scaling offshore" is wrong: they are an agency, the offshoring is the thing we
+   are ringing to propose. Nothing about offshore, outsourcing, hiring or scaling here.
 2. THE HOMEWORK, the beat that buys the call. Word for word: "I made some research about
    your company... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two
@@ -150,6 +153,9 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
+   Say what they ARE today, never what we want them to become. "agencies and service
+   firms scaling offshore" is wrong: they are an agency, the offshoring is the thing we
+   are ringing to propose. Nothing about offshore, outsourcing, hiring or scaling here.
 2. THE HOMEWORK, the beat that buys the call. Word for word: "I made some research about
    your company... so correct me if I'm off, but you're most likely spending your days
    on" + what this title in this industry does hour to hour, in their vocabulary: two
@@ -288,7 +294,10 @@ The current version dropped or reworded it:
 
 Keep the same job: say who we are in one breath, then finish the sentence by naming what
 THIS company actually is, in five or six words. Whatever follows "for" is the only part
-you invent, and it must be specific to them, never "businesses" or "companies like yours".
+you invent. It must be specific to them, never "businesses" or "companies like yours",
+and it must describe what they already are rather than what we want them to become:
+"agencies and service firms scaling offshore" is wrong, "independent creative agencies"
+is right. Nothing about offshore, outsourcing, hiring or scaling after "for".
 
 STYLE RULES, non negotiable:
 - Never use em dashes. Use commas, periods, or ellipses instead.
