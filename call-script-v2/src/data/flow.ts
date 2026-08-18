@@ -96,7 +96,7 @@ export const flow: Record<string, FlowNode> = {
     script: "That's completely fair. Before I let you go though, just out of curiosity — do you handle all your hiring in-house or do you ever work with external partners for anything?",
     tip: "Schiffman's Ledge — don't fight the brush-off, acknowledge it and pivot with a single soft question. This is Discovery Q1 used as a hail mary. If they answer at all, you're back in the conversation. Stay calm and curious, not desperate.",
     options: [
-      { label: 'They answer — back in the conversation', next: 'discovery_q2', type: 'positive' },
+      { label: 'They answer — back in the conversation', next: 'qualify_role', type: 'positive' },
       { label: 'Hard no / hung up', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -111,7 +111,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'we don't supply the staff ourselves' is the line that does the work: it says what we are before they guess, and a marketplace is easier to say yes to than a vendor. Keep the discovery question binary; don't stack more on top of it.",
     options: [
-      { label: 'On the radar / they engage', next: 'discovery_q2', type: 'positive', banks: ['company'], elaborated: true },
+      { label: 'On the radar / they engage', next: 'qualify_role', type: 'positive', banks: ['company'], elaborated: true },
       { label: 'Not interested', next: 'obj_pitch_recover', type: 'objection' },
       { label: 'Not hiring / budget concern', next: 'obj_not_hiring', type: 'objection' },
     ],
@@ -127,39 +127,12 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "Schiffman's Ledge — don't fight the 'not interested,' acknowledge it and pivot with one soft question. If they answer at all, you're back in the conversation and into discovery. Stay calm and curious, not pushy.",
     options: [
-      { label: 'They answer — back in the conversation', next: 'discovery_q2', type: 'positive' },
+      { label: 'They answer — back in the conversation', next: 'qualify_role', type: 'positive' },
       { label: 'Hard no / hangs up', next: 'end_not_interested', type: 'end' },
     ],
   },
 
-  // ── DISCOVERY Q2 — HIRING FRICTION ───────────────────────────────────────
 
-  discovery_q2: {
-    id: 'discovery_q2',
-    title: 'Discovery Q2: Hiring Friction',
-    script: "Awesome — and how's that working out for you so far, in terms of finding great talents?",
-    waitForAnswer: true,
-    tip: "SPIN — Implication: if they share any friction, multiply it before moving on. Try: 'When a key role sits open longer than expected, what does that cost you — project delays, the team absorbing extra load, or lost revenue?' Get them to say the cost out loud. A gap they can quantify is a gap worth closing.",
-    options: [
-      { label: 'They share friction / challenges', next: 'discovery_priority', type: 'positive', banks: ['need'], elaborated: true },
-      { label: 'Team is doing fine / no real issues', next: 'discovery_priority', type: 'positive', elaborated: true },
-    ],
-  },
-
-  // ── DISCOVERY BRIDGE — WHAT THEY PRIORITIZE (Move 3) ─────────────────────
-
-  discovery_priority: {
-    id: 'discovery_priority',
-    topic: 'role',
-    title: 'Discovery: What They Prioritize',
-    script: "Thanks for sharing that. And what type of talent do you usually prioritize when you're bringing people on?",
-    waitForAnswer: true,
-    tip: "Move 3 bridge question — keep it open and curious, you're just getting them talking about their world. Whatever they name here is the thread you pull into the five must-knows.",
-    options: [
-      { label: 'They open up about their hiring', next: 'qualify_role', type: 'positive', elaborated: true },
-      { label: 'Not really hiring / no priorities', next: 'obj_not_hiring', type: 'objection' },
-    ],
-  },
 
   // ── QUALIFY — THE FIVE MUST-KNOWS (Move 4) ───────────────────────────────
 
@@ -521,7 +494,7 @@ export const flow: Record<string, FlowNode> = {
     options: [
       { label: 'Cost / budget concern', next: 'obj_budget', type: 'objection' },
       { label: 'Tried offshore before', next: 'obj_tried_before', type: 'objection' },
-      { label: "They're open again / other", next: 'discovery_q2', type: 'positive' },
+      { label: "They're open again / other", next: 'qualify_role', type: 'positive' },
       { label: 'Hard no', next: 'end_not_interested', type: 'end' },
     ],
   },
@@ -571,7 +544,7 @@ export const flow: Record<string, FlowNode> = {
     isObjection: true,
     tip: "Approved reframe (Carl / David, UBC Digital): 'strategic resource, not replacement' — the single most effective line in the approved set, use it verbatim. Challenge the status quo gently: 'doing fine' is not the same as 'doing it optimally.' Then get them to name their friction point.",
     options: [
-      { label: 'They mention a challenge (time / cost / skill)', next: 'discovery_priority', type: 'positive' },
+      { label: 'They mention a challenge (time / cost / skill)', next: 'qualify_role', type: 'positive' },
       { label: 'Genuinely no challenges', next: 'obj_no_challenges', type: 'objection' },
     ],
   },

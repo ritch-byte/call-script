@@ -25,8 +25,6 @@ type StepEntry = {
 const MAIN_FLOW = [
   'opening',
   'pitch_q1',
-  'discovery_q2',
-  'discovery_priority',
   'qualify_role',
   'value_offer',
   'qualify_fulltime',
