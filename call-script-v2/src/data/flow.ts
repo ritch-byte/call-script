@@ -373,7 +373,7 @@ export const flow: Record<string, FlowNode> = {
       label: "What they want out of the call, in their words (goes to the partner brief)",
       placeholder: 'e.g. "whether we can actually get a senior dev for that money"',
     },
-    tip: "THE RECAP IS THE RECORD — this is what the analyzer reads, so read their timeframe back in THEIR words, not a window you would prefer. Then ask what they want out of the call and write it down. That answer predicts attendance far better than a yes to 'can I count on you', which is a compliance answer anyone gives. It also goes to the partner, who can then open on the thing the lead actually came for. Wait for an audible yes on the recap; a nod is not evidence on the recording.",
+    tip: "THE RECAP IS THE RECORD — this is what the analyzer reads, so read their timeframe back in THEIR words, not a window you would prefer. Then ask what they want out of the call and write it down. That answer predicts attendance far better than a yes to a commitment question, which is a compliance answer anyone gives. It also goes to the partner, who can then open on the thing the lead actually came for. Wait for an audible yes on the recap; a nod is not evidence on the recording.",
     options: [
       { label: 'Confirms, and says what they want from it', next: 'close_authority', type: 'positive', elaborated: true, buyingSignal: true },
       { label: 'Confirms, but nothing specific they want', next: 'close_authority', type: 'positive', passiveRisk: true },
@@ -403,9 +403,9 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_timeline_far',
     title: 'Timeline 3+ Months (AQPC)',
     isObjection: true,
-    script: "I completely understand, you've got your standards, and honestly I'm right there with you.\n\nCan I ask, is it the skills, the experience, the culture fit, or the pricing?\n\nWhatever it is, that's exactly what gets expounded and explained on the discovery call, and that's the whole reason we're setting up this free consultative meeting for you.\n\n(processing the invitation now...) So can I count on you to attend our meeting?",
+    script: "I completely understand, you've got your standards, and honestly I'm right there with you.\n\nCan I ask, is it the skills, the experience, the culture fit, or the pricing?\n\nWhatever it is, that's exactly what gets expounded and explained on the discovery call, and that's the whole reason we're setting up this free consultative meeting for you.\n\n(processing the invitation now...) So is that {MEETING_LENGTH} worth having, or is offshore not really on the table right now?",
     waitForAnswer: true,
-    tip: "AQPC: Acknowledge their standards, Question to surface the real concern (skills, experience, culture fit, or pricing), Pivot to the discovery call as where it all gets answered, then Close for attendance. A '3+ months' stall is usually a smokescreen for one of those four — surface it, then drive straight back to the meeting.",
+    tip: "AQPC: Acknowledge their standards, Question to surface the real concern (skills, experience, culture fit, or pricing), Pivot to the discovery call as where it all gets answered, then close by giving them permission to say no, which is what makes the yes mean anything. A '3+ months' stall is usually a smokescreen for one of those four — surface it, then drive straight back to the meeting.",
     options: [
       { label: "Yes — I'll be there", next: 'end_booked', type: 'positive', banks: ['dc_agreed'] },
       { label: 'Still not ready / firmly 3+ months', next: 'obj_not_interested_late', type: 'objection' },
@@ -434,7 +434,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'value_prop',
     title: 'Value Prop + Research',
     script: "Perfect — and that's exactly the scenario we help with every day.\n\nHere's what most business leaders don't realize: the roles they're hiring locally are available at world-class quality offshore — dedicated, full-time staff — at {SAVINGS_CLAIM}. Not freelancers, not shared resources. One person, fully committed to your business, your hours, your systems.\n\nAnd before I called, I did some research on your company specifically...\n\n{geminiResearch}",
-    tip: "Gap Selling: tie this to what they shared. 'You mentioned hiring [role] takes time and costs are high — here's what that looks like differently.' Make savings concrete: '$60K locally is typically $12–18K offshore; three of those is over $100K a year saved.' Numbers they can picture beat percentages. Then go to the offer.",
+    tip: "Gap Selling: tie this to what they shared. 'You mentioned hiring [role] takes time and costs are high — here's what that looks like differently.' Do NOT convert their local salary into an offshore figure, and do not quote a rate. Pricing is the partner's to do against the real spec, and a number said here becomes the anchor they have to negotiate against. Our own market claim is the only figure we give. Then go to the offer.",
     options: [
       { label: 'Lead is engaged / curious', next: 'two_meeting', type: 'positive' },
       { label: 'Already outsourcing / need to think', next: 'obj_already_outsourcing', type: 'objection' },
