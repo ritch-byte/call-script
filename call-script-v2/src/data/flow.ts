@@ -46,6 +46,14 @@ export const SALARY_TABLE: SalaryRow[] = [
   { role: 'Project Coordinator',     us: '$55–75K', offshore: '$12–20K', savings: '~72%' },
 ]
 
+/**
+ * The savings figure, in one place.
+ *
+ * It is said out loud on nearly every call, so it should be edited once rather than
+ * hunted through the script. Interpolated into {SAVINGS_CLAIM} by CallScreen.
+ */
+export const SAVINGS_CLAIM = 'at around 80% less than local hiring'
+
 export const flow: Record<string, FlowNode> = {
 
   // ── OPENING (unchanged — intro stays intact) ─────────────────────────────
@@ -81,9 +89,9 @@ export const flow: Record<string, FlowNode> = {
     id: 'pitch_q1',
     topic: 'current_setup',
     title: 'Value Hook + Discovery Q1',
-    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah we are just trying to reach out to all businesses across different industries, mainly because salaries for specialized local talent is really getting expensive. Right? So I work with a team that focuses on helping leaders like you handle their growth without increasing their expenses, usually by connecting you with our global talent network that provide world class talent at 80% less than local hiring.\n\nJust out of curiosity — for your hiring right now, do you keep everything in-house, or do you ever work with external partners for anything?",
+    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah, I'm reaching out because salaries for specialised local talent keep climbing. I work with a team that helps leaders handle growth without growing the payroll, we're an outsourcing marketplace, so we don't supply the staff ourselves, we match you to the vetted firms that already do this work. Most come in {SAVINGS_CLAIM}. Is that even on your radar at the moment?\n\nJust out of curiosity — for your hiring right now, do you keep everything in-house, or do you ever work with external partners for anything?",
     waitForAnswer: true,
-    tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'Grow headcount without growing the expense' is the v5 hook. Keep the discovery question binary; don't stack more on top of it.",
+    tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'we don't supply the staff ourselves' is the line that does the work: it says what we are before they guess, and a marketplace is easier to say yes to than a vendor. Keep the discovery question binary; don't stack more on top of it.",
     options: [
       { label: 'They answer (in-house / external / mix)', next: 'discovery_q2', type: 'positive', banks: ['company'], elaborated: true },
       { label: 'Not interested', next: 'obj_pitch_recover', type: 'objection' },

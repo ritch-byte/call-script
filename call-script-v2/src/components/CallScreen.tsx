@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE } from '../data/flow'
+import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, SAVINGS_CLAIM } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
@@ -46,6 +46,7 @@ function interpolate(text: string, leadName: string, yourName: string, geminiRes
     .replace(/{yourName}/g, yourName || '[BDR Name]')
     .replace(/{geminiResearch}/g, geminiResearch)
     .replace(/{hiringSetup}/g, ctx.hiringSetup ?? 'team')
+    .replace(/{SAVINGS_CLAIM}/g, SAVINGS_CLAIM)
     .trimEnd()
 }
 
