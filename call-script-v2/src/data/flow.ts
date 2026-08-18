@@ -52,7 +52,17 @@ export const SALARY_TABLE: SalaryRow[] = [
  * It is said out loud on nearly every call, so it should be edited once rather than
  * hunted through the script. Interpolated into {SAVINGS_CLAIM} by CallScreen.
  */
-export const SAVINGS_CLAIM = 'at around 80% less than local hiring'
+export const SAVINGS_PCT = 'around 80%'
+export const SAVINGS_CLAIM = `${SAVINGS_PCT} less than local hiring`
+
+/**
+ * How long each partner call runs, in one place.
+ *
+ * "one 30-minute block" was read as thirty minutes per partner and booked as two
+ * back-to-back half hours on a lead who had asked for fifteen. Saying the per-partner
+ * length is the fix, so this carries "each" and the nodes do not have to remember to.
+ */
+export const MEETING_LENGTH = '15 minutes each'
 
 export const flow: Record<string, FlowNode> = {
 
@@ -200,14 +210,14 @@ export const flow: Record<string, FlowNode> = {
     id: 'qualify_timeline',
     topic: 'timeline',
     title: 'Qualify ④ Timeline',
-    script: "And if the right person showed up, would you be looking to bring them on within a few weeks, or more like one to two months?",
+    script: "And if the right person showed up, what sort of timeframe would you be working to?",
     waitForAnswer: true,
-    tip: "Must-Know 4 of 5 (timeline). Give them a choice between two in-window options — a few weeks or one to two months — so either answer keeps them inside the qualifying window. If they push further out than that, don't gate it here; you'll firm it up in the recap. ANALYZER: timeline is the #1 flag reason — it credits the window in the buyer's OWN words, inside ~1-2 months. '2-3 months / 90 days / next year / no timeframe' flags or kills, and 'maybe / possibly / probably' reads as UNCLEAR. Land an explicit 'one to two months.'",
+    tip: "Must-Know 4 of 5 (timeline). OPEN question — do not offer options and do not name a window. Record the timeframe the lead gives, in their words. Beyond two months is a real answer: set a dated callback rather than converting it. Do not manufacture the phrase — an honest 'three months' logged as a callback is worth more to the partner than a coached 'one to two'. ANALYZER: timeline is the #1 flag reason and it credits the buyer's OWN words, so what they actually said is what goes on the record.",
     options: [
-      { label: 'Within a few weeks', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
-      { label: 'One to two months', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
+      { label: 'They say weeks', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
+      { label: 'They say one to two months', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
       { label: 'Just a bare "yeah / yes" (no real window)', next: 'obj_timeline_disco', type: 'objection', passiveRisk: true },
-      { label: 'More than 2 months / further out', next: 'obj_timeline_disco', type: 'objection' },
+      { label: 'They say longer than two months', next: 'obj_timeline_disco', type: 'objection' },
     ],
   },
 
@@ -217,12 +227,12 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_timeline_disco',
     title: 'Qualify: Timeline Further Out',
     isObjection: true,
-    script: "Got it, thanks for sharing! I understand you're planning to hire in about three months, but I believe it's best to start now. The first month is typically spent on onboarding, reviewing the terms, and signing the contract. After that, recruiting and onboarding the right candidate usually takes another 1 to 2 months, so starting now helps keep everything on track.\n\nNow when the right candidate shows up for you, will you be hiring that person as soon as possible or within 1 to 2 months?",
+    script: "That's useful, thanks. The one thing I'd say is that terms, onboarding and getting the right person actually in place usually takes a month or two on its own, so the planning tends to be worth doing early. Either way I'll note three months.\n\nWould it be more useful to see the cost picture now, or should I come back to you nearer the time?",
     waitForAnswer: true,
-    tip: "Pull the timeline into the ~1-2 month window so the call qualifies. Approved line (Vince / Kaito): 'Even if it's two months, it's planning.' Don't argue, reframe it as 'options ready when you are.' HARD STOP: if they're firmly 4+ months with no flexibility, they don't qualify — note it and let them go rather than manufacture a false yes. ANALYZER: '2-3 months / 90 days' scores just outside the window and flags, and 'maybe / possibly / probably' reads as UNCLEAR — convert it to an explicit 'yes, one to two months' in their words before you book.",
+    tip: "Do NOT convert the timeline. This node used to end by asking them to re-state it as one to two months, which put soft leads in front of partners and is the mechanical reason only half arrived valid. The onboarding reasoning is sound and stays, because early planning is genuinely true; the ask at the end is now a choice between booking on that value and a dated callback. Log what they actually said. ANALYZER: a real 'three months' with a callback beats a coached 'one to two' — the coached one books and does not show.",
     options: [
-      { label: 'Open to the next month or two after all', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
-      { label: 'Maybe, if the fit is right', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
+      { label: 'Book on planning value', next: 'qualify_dm', type: 'positive' },
+      { label: 'Set dated callback', next: 'end_callback', type: 'positive' },
       { label: 'Firmly 3+ months, no flexibility', next: 'obj_not_interested_late', type: 'objection', refuses: ['hiring'] },
     ],
   },
@@ -318,8 +328,8 @@ export const flow: Record<string, FlowNode> = {
   two_meeting: {
     id: 'two_meeting',
     title: 'Two-Meeting Explainer',
-    script: "So here's how it'll work, I'll set you up with two quick back-to-back sessions, each with a different partner, slightly different pricing and approach, so you get a proper apples-to-apples comparison in one 30-minute block instead of having to chase it all down yourself.",
-    tip: "Say the two-meeting explainer BEFORE the calendar ask, every call — it pre-empts the 'why two meetings?' objection that hit 5 of 18 scripts. 'Apples to apples, one 30-minute block' is the cleanest framing. Then go straight into the trial close.",
+    script: "So here's how it'll work, two quick back-to-back sessions, {MEETING_LENGTH}, with a different partner on each. Slightly different pricing and approach, so you get a proper apples-to-apples comparison in one sitting instead of chasing it all down yourself.",
+    tip: "Say the two-meeting explainer BEFORE the calendar ask, every call — it pre-empts the 'why two meetings?' objection that hit 5 of 18 scripts. 'Apples to apples, {MEETING_LENGTH}' is the cleanest framing. Then go straight into the trial close.",
     options: [
       { label: 'Makes sense', next: 'close_recap', type: 'positive' },
       { label: '"Why two meetings? / just one?"', next: 'obj_two_meetings', type: 'objection' },
@@ -330,7 +340,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_two_meetings',
     title: 'Objection: Why Two Meetings?',
     isObjection: true,
-    script: "Yeah, good question. So we're a marketplace, not just one agency, so I line you up with two partners back to back. Each one shows you their pricing and a few sample CVs, and they go about it a little differently, so you basically get an apples-to-apples comparison in one 30-minute sitting instead of chasing it all down yourself. It's meant to save you time, not eat more of it.",
+    script: "Yeah, good question. So we're a marketplace, not just one agency, so I line you up with two partners back to back. Each one shows you their pricing approach and how they'd actually run the role, and they go about it a little differently, so you basically get an apples-to-apples comparison in one sitting instead of chasing it all down yourself. It's meant to save you time, not eat more of it.",
     tip: "Approved pattern (Mickey / Jamar, Seashell Group): 'Oh, for comparison — that makes sense.' Frame the second partner as more choice, not more work. Don't lose the booking over it — if they insist on one, accommodate and keep moving.",
     options: [
       { label: 'Understood — open to it', next: 'close_recap', type: 'positive' },
@@ -360,7 +370,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_parttime',
     title: 'Qualify: Part-Time Rebuttal',
     isObjection: true,
-    script: "Yeah, I get wanting to dip a toe in first. Here's the thing though, because the rates are up to 80% lower, a lot of folks end up getting a dedicated full-time person for what they'd have spent on part-time help locally. It's a full 40-hour week over there, so you're getting all eight hours a day and still saving. If the numbers actually stacked up, would you be open to just keeping it as a full-time seat?",
+    script: "Yeah, I get wanting to dip a toe in first. Here's the thing though, because the rates come in {SAVINGS_CLAIM}, a lot of folks end up getting a dedicated full-time person for what they'd have spent on part-time help locally. It's a full 40-hour week over there, so you're getting all eight hours a day and still saving. If the numbers actually stacked up, would you be open to just keeping it as a full-time seat?",
     waitForAnswer: true,
     tip: "We only place full-time, dedicated talent — part-time/project reads as a non-dedicated (disqualified) lead. Approved reframe (Summer / Jimmy): 'eight hours paid anyway, you still save.' Convert to a full-time yes; if they'll only ever do part-time, they don't qualify. ANALYZER: Gate 3 needs 'full-time, dedicated, just for me' from the buyer's mouth — 'shared / project / a few hours' kills it.",
     options: [
@@ -405,7 +415,7 @@ export const flow: Record<string, FlowNode> = {
   value_prop: {
     id: 'value_prop',
     title: 'Value Prop + Research',
-    script: "Perfect — and that's exactly the scenario we help with every day.\n\nHere's what most business leaders don't realize: the roles they're hiring locally are available at world-class quality offshore — dedicated, full-time staff — at 50 to 80 percent of the cost. Not freelancers, not shared resources. One person, fully committed to your business, your hours, your systems.\n\nAnd before I called, I did some research on your company specifically...\n\n{geminiResearch}",
+    script: "Perfect — and that's exactly the scenario we help with every day.\n\nHere's what most business leaders don't realize: the roles they're hiring locally are available at world-class quality offshore — dedicated, full-time staff — at {SAVINGS_CLAIM}. Not freelancers, not shared resources. One person, fully committed to your business, your hours, your systems.\n\nAnd before I called, I did some research on your company specifically...\n\n{geminiResearch}",
     tip: "Gap Selling: tie this to what they shared. 'You mentioned hiring [role] takes time and costs are high — here's what that looks like differently.' Make savings concrete: '$60K locally is typically $12–18K offshore; three of those is over $100K a year saved.' Numbers they can picture beat percentages. Then go to the offer.",
     options: [
       { label: 'Lead is engaged / curious', next: 'two_meeting', type: 'positive' },
@@ -444,7 +454,7 @@ export const flow: Record<string, FlowNode> = {
   obj_timing: {
     id: 'obj_timing',
     title: 'Objection: Timing / Who Are You',
-    script: "No worries at all, give me 30 seconds and if it's not relevant I'll happily let you go.\n\nSo I'm {yourName} over at Outsource Accelerator, we basically help businesses cut their hiring costs by 50 to 80 percent using really strong offshore talent. Is that even on your radar at the moment?",
+    script: "No worries at all, give me 30 seconds and if it's not relevant I'll happily let you go.\n\nSo I'm {yourName} over at Outsource Accelerator, we basically help businesses cut hiring costs by {SAVINGS_PCT} using really strong offshore talent. Is that even on your radar at the moment?",
     isObjection: true,
     tip: "Smart Calling: answer the 'who are you' cleanly and fast — name, company, one-line value prop. Then re-qualify with a soft question. Don't re-pitch. If they give you 30 seconds, move straight to pitch_q1.",
     options: [
@@ -508,7 +518,7 @@ export const flow: Record<string, FlowNode> = {
   obj_budget: {
     id: 'obj_budget',
     title: 'Objection: Budget / Cost / Rates',
-    script: "I hear you, and honestly that's the whole reason I'm calling, we're not adding to your costs, we're cutting them.\n\nFor talent in the Philippines you're usually looking at $3 to $9 an hour depending on the role and experience, and for what you mentioned you'd land somewhere in the middle. The exact number we nail down on the call. But to make it real, if you're paying around $60K locally, that same role offshore is often $12 to 18K. Have two or three of those and that's over $100K a year back in your pocket.\n\nWorth 30 minutes just to see the actual numbers for your roles?",
+    script: "I hear you, and honestly that's the whole reason I'm calling, we're not adding to your costs, we're cutting them.\n\nHonest answer, I'm not going to quote you a rate, because the partners price against your actual spec and I'd rather you got a real number than a wrong one from me. What I can tell you is they typically come in {SAVINGS_CLAIM}. Getting the exact figure for your role is the main thing that call is for. Fair enough?",
     isObjection: true,
     tip: "The $3-$9/hr range is a verbatim approved line (Vince / Paul, 465 Office) — use it, convert for UK/EU (£2.25–£7.65). Never fully deflect pricing. Then quantify the gap in dollars, not percentages: '$100K a year back' beats '80% savings.'",
     options: [
@@ -520,7 +530,7 @@ export const flow: Record<string, FlowNode> = {
   obj_doing_fine: {
     id: 'obj_doing_fine',
     title: "Objection: Team is Doing Fine",
-    script: "Good to hear, and I'm not calling to change anything you've got going. I'd honestly just like to be a resource for you on the salary-cost side, since most of our partners come in up to 80% under local hiring. It's all laid out on a free call, pricing and a few CVs, so it's worth 30 minutes just to have that number on file.\n\nQuick one though, when a key role opens up, what's the bigger headache for you, the time it takes, the cost, or actually finding the right skill set?",
+    script: "Good to hear, and I'm not calling to change anything you've got going. I'd honestly just like to be a resource for you on the salary-cost side, since most of our partners come in {SAVINGS_CLAIM}. It's all laid out on a free call, how the model actually works and what the real cost comparison looks like for your roles, so it's worth {MEETING_LENGTH} just to have that number on file.\n\nQuick one though, when a key role opens up, what's the bigger headache for you, the time it takes, the cost, or actually finding the right skill set?",
     isObjection: true,
     tip: "Approved reframe (Carl / David, UBC Digital): 'strategic resource, not replacement' — the single most effective line in the approved set, use it verbatim. Challenge the status quo gently: 'doing fine' is not the same as 'doing it optimally.' Then get them to name their friction point.",
     options: [
