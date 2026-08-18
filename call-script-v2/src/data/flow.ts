@@ -89,11 +89,11 @@ export const flow: Record<string, FlowNode> = {
     id: 'pitch_q1',
     topic: 'current_setup',
     title: 'Value Hook + Discovery Q1',
-    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah, I'm reaching out because salaries for specialised local talent keep climbing. I work with a team that helps leaders handle growth without growing the payroll, we're an outsourcing marketplace, so we don't supply the staff ourselves, we match you to the vetted firms that already do this work. Most come in {SAVINGS_CLAIM}. Is that even on your radar at the moment?\n\nJust out of curiosity — for your hiring right now, do you keep everything in-house, or do you ever work with external partners for anything?",
+    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah, I'm reaching out because salaries for specialised local talent keep climbing. I work with a team that helps leaders handle growth without growing the payroll, we're an outsourcing marketplace, so we don't supply the staff ourselves, we match you to the vetted firms that already do this work. Most come in {SAVINGS_CLAIM}. Is that even on your radar at the moment?",
     waitForAnswer: true,
     tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'we don't supply the staff ourselves' is the line that does the work: it says what we are before they guess, and a marketplace is easier to say yes to than a vendor. Keep the discovery question binary; don't stack more on top of it.",
     options: [
-      { label: 'They answer (in-house / external / mix)', next: 'discovery_q2', type: 'positive', banks: ['company'], elaborated: true },
+      { label: 'On the radar / they engage', next: 'discovery_q2', type: 'positive', banks: ['company'], elaborated: true },
       { label: 'Not interested', next: 'obj_pitch_recover', type: 'objection' },
       { label: 'Not hiring / budget concern', next: 'obj_not_hiring', type: 'objection' },
     ],
