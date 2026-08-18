@@ -37,6 +37,7 @@ const MAIN_FLOW = [
   'qualify_budget',
   'two_meeting',
   'close_recap',
+  'close_authority',
   'end_booked',
 ]
 
@@ -49,6 +50,10 @@ function interpolate(text: string, leadName: string, yourName: string, geminiRes
     .replace(/{SAVINGS_CLAIM}/g, SAVINGS_CLAIM)
     .replace(/{SAVINGS_PCT}/g, SAVINGS_PCT)
     .replace(/{MEETING_LENGTH}/g, MEETING_LENGTH)
+    // Both fall back to what the rep would have said anyway, so a skipped capture
+    // reads as a slightly vaguer sentence rather than a placeholder on the prompter.
+    .replace(/{role}/g, ctx.roleWanted?.trim() || 'that role')
+    .replace(/{statedTimelineVerbatim}/g, ctx.statedTimelineVerbatim?.trim() || 'that timeframe you mentioned')
     .trimEnd()
 }
 
@@ -472,6 +477,23 @@ export default function CallScreen({ onReset }: Props) {
                   line ? <p key={i}>{line}</p> : <br key={i} />
                 )}
               </div>
+
+              {node.recordField && (
+                <div className="inline-research-form">
+                  <div className="inline-research-label">{node.recordField.label}</div>
+                  <textarea
+                    className="gen-paste-input"
+                    placeholder={node.recordField.placeholder}
+                    value={context[node.recordField.key] ?? ''}
+                    onChange={e => {
+                      const key = node.recordField!.key
+                      const val = e.target.value
+                      setContext(prev => ({ ...prev, [key]: val }))
+                    }}
+                    rows={2}
+                  />
+                </div>
+              )}
 
               {(['value_prop', 'obj_no_role'].includes(step.nodeId)) && (
                 <div className="inline-research-form">

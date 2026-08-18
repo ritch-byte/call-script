@@ -8,6 +8,14 @@ export interface FlowNode {
   isObjection?: boolean
   isEnd?: boolean
   topic?: string          // scorecard: feeds conversation depth
+  /**
+   * Ask the rep to type what the lead actually said, into context[key].
+   *
+   * FlowOption.capture cannot do this: it stores a fixed string chosen by which button
+   * was clicked, so it can record that an answer was in a category but never the words.
+   * The partner brief and {statedTimelineVerbatim} both need the words.
+   */
+  recordField?: { key: string; label: string; placeholder?: string }
 }
 
 export interface FlowOption {
@@ -212,6 +220,11 @@ export const flow: Record<string, FlowNode> = {
     title: 'Qualify ④ Timeline',
     script: "And if the right person showed up, what sort of timeframe would you be working to?",
     waitForAnswer: true,
+    recordField: {
+      key: 'statedTimelineVerbatim',
+      label: 'Their timeframe, in their words',
+      placeholder: 'e.g. "probably after the new year" / "next two months"',
+    },
     tip: "Must-Know 4 of 5 (timeline). OPEN question — do not offer options and do not name a window. Record the timeframe the lead gives, in their words. Beyond two months is a real answer: set a dated callback rather than converting it. Do not manufacture the phrase — an honest 'three months' logged as a callback is worth more to the partner than a coached 'one to two'. ANALYZER: timeline is the #1 flag reason and it credits the buyer's OWN words, so what they actually said is what goes on the record.",
     options: [
       { label: 'They say weeks', next: 'qualify_dm', type: 'positive', banks: ['timeline', 'hiring'] },
@@ -352,14 +365,19 @@ export const flow: Record<string, FlowNode> = {
 
   close_recap: {
     id: 'close_recap',
-    title: 'Recap + Commitment (4 Criteria)',
-    script: "Quick recap so we're on the same page: we've got the discovery call locked in with our sourcing partners, for a full-time, dedicated, offshore hire built right into your team. Okay?\n\nPerfect, so [their exact timeline]. And since you're one of the people who'd make that call, can I count on you to attend the meeting?",
+    title: 'Recap + What They Want From It',
+    script: "Quick recap so we're on the same page: discovery call locked in with two of our partners, full-time dedicated offshore hire for {role}, and you said {statedTimelineVerbatim}. Okay?\n\nOut of those two calls, what's the main thing you'd want to walk away knowing?",
     waitForAnswer: true,
-    tip: "THE RECAP IS THE RECORD — this is what the analyzer reads. Recap the three gates and END ON A QUESTION ('did I get that right?'), then WAIT for an audible 'yes.' A nod or 'mhmm' isn't evidence on the recording; the analyzer credits what the BUYER says, not your summary. Name the window out loud — 'one to two months' (or 'thirty to sixty days'), NEVER '1-3 months', '2-3 months' or '90 days.' Get a spoken yes on all three — timeline, offshore, full-time; miss one and it's disqualified. The calendar was already floated earlier, so just confirm the day here and get the commitment to attend.",
+    recordField: {
+      key: 'dcObjective',
+      label: "What they want out of the call, in their words (goes to the partner brief)",
+      placeholder: 'e.g. "whether we can actually get a senior dev for that money"',
+    },
+    tip: "THE RECAP IS THE RECORD — this is what the analyzer reads, so read their timeframe back in THEIR words, not a window you would prefer. Then ask what they want out of the call and write it down. That answer predicts attendance far better than a yes to 'can I count on you', which is a compliance answer anyone gives. It also goes to the partner, who can then open on the thing the lead actually came for. Wait for an audible yes on the recap; a nod is not evidence on the recording.",
     options: [
-      { label: 'Clean — commits, 1-2 months, full-time, offshore, in the room', next: 'end_booked', type: 'positive', banks: ['dc_agreed'], elaborated: true, buyingSignal: true },
+      { label: 'Confirms, and says what they want from it', next: 'close_authority', type: 'positive', elaborated: true, buyingSignal: true },
+      { label: 'Confirms, but nothing specific they want', next: 'close_authority', type: 'positive', passiveRisk: true },
       { label: 'Timeline is 3+ months / no firm date', next: 'obj_timeline_far', type: 'objection' },
-      { label: 'Needs to check with a partner / boss', next: 'obj_authority_late', type: 'objection' },
       { label: 'Not sure / wants to think', next: 'obj_think_about_it', type: 'objection' },
     ],
   },
@@ -425,6 +443,25 @@ export const flow: Record<string, FlowNode> = {
   },
 
   // ── END STATES ───────────────────────────────────────────────────────────
+
+  close_authority: {
+    id: 'close_authority',
+    topic: 'decision',
+    title: 'Who Signs It Off',
+    script: "And is it just you signing this off, or is someone else in on the decision?",
+    waitForAnswer: true,
+    recordField: {
+      key: 'signOffOwner',
+      label: 'Who signs off (goes to the partner brief)',
+      placeholder: 'e.g. "just me" / "me and my co-founder Dana"',
+    },
+    tip: "Asked here, before the calendar goes in, rather than discovered at the meeting. A second name is not a problem, it is a person to invite: get it now and the partner walks in knowing who is in the room. This is also the one commitment ask left in the close, so do not stack another on top of it.",
+    options: [
+      { label: 'Just them', next: 'end_booked', type: 'positive', banks: ['dc_agreed', 'decision_maker', 'authority'], elaborated: true },
+      { label: 'Names someone else, happy to bring them', next: 'end_booked', type: 'positive', banks: ['dc_agreed', 'authority'], elaborated: true },
+      { label: 'Has to check with someone first', next: 'obj_authority_late', type: 'objection' },
+    ],
+  },
 
   end_booked: {
     id: 'end_booked',
