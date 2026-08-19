@@ -11,27 +11,26 @@
 // what not to say. Then the prompt was cut 16% with every rule kept, and this is where
 // it landed.
 //
-// MEASURED, five leads: 0.273, 0.275, 0.276, 0.259 and 0.260, mean 0.269, from
-// usage.input_tokens and usage.output_tokens. Rounded up to 0.28. $1.34 per 500 builds.
+// MEASURED, four leads: 0.309, 0.311, 0.327 and 0.302, mean 0.312, from
+// usage.input_tokens and usage.output_tokens. Rounded up to 0.32. $1.56 per 500 builds.
 //
-// WHERE THE MONEY ACTUALLY IS. The prompt reached 1524 tokens against 250 tokens of
-// spiel, six times the size of what it produces, and 55% of the bill. Every fix asked
-// for during the day became a rule, and a rule is input tokens on every build forever,
-// so the instructions grew while the script did not. The floor asked why shortening the
-// spiel made it dearer; that is the answer.
+// The branch costs about 0.043 of that. Beat 7, the suggestion for a lead who cannot
+// name a role, is written on every build but read on maybe a third of them. Generating
+// it on demand instead would average cheaper, and would put a pause in the middle of a
+// live call at the exact moment the lead is deciding whether to stay on the phone. That
+// trade was made deliberately in favour of the rep.
 //
-// Cut back to ~1450 by deleting the length rules, which had failed four separate ways
-// and were pure cost, and by removing a second worked example and two restatements of
-// constraints that presumesOffshore, describesHiring and tailPitchesAtThem already
-// enforce in code and repair. Guards fired 0 of 5 afterwards, so none of it was load
-// bearing. 0.295 -> 0.269.
+// WHERE THE MONEY IS. The prompt is still larger than the spiel it produces. Every fix
+// asked for during the day became a rule, and a rule is input tokens on every build
+// forever, which is why the cost rose while the script got shorter. A cut in the other
+// direction is always available: the length rules were deleted once for being 122 tokens
+// of instruction that four separate versions had failed to make work, and the guards
+// fired 0 of 5 afterwards, which is the honest test of whether prompt text was load
+// bearing.
 //
-// PROMPT-BASED LENGTH CONTROL IS EXHAUSTED. Four attempts: a global word budget, a
-// per-beat budget, budgets moved to the end, and caps written inline beside each beat.
-// Every one lands at 89-102 seconds. The beats carry required content and the fixed
-// frames alone are ~55 words. The only lever left is structural: beats 5 and 6 are both
-// about us, and merging them saves 15-20 words and puts us in the story once rather than
-// twice. That drops one of the floor's own frames, so it is their call, not a cleanup.
+// SPEAK TIME finally moved, and not by asking. Five attempts at word budgets all landed
+// at 89-102 seconds. Replacing the 41-word screenplay close with a 12-word question took
+// it to 75. The length was never in the beats.
 //
 // The number has crept all day: 0.19, 0.23, 0.24, 0.227 after the trim, 0.244, 0.25,
 // now 0.264. Every step is a rule added to the prompt, and a rule is input tokens on
@@ -60,7 +59,7 @@
 // live risk in trimming, since the offshore rule lost its emphasis to get here. Each
 // repair costs about another 0.05, so if that rate ever climbs to one build in five it
 // gives the whole saving back. Re-measure if the prompt or the model changes.
-export const BUILD_COST_CENTS = 0.28
+export const BUILD_COST_CENTS = 0.32
 
 /** Dollars for a day of dialling at this rate. */
 export const dailyCost = (cents: number, builds: number) => (cents * builds) / 100

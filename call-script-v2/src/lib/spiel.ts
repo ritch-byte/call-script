@@ -11,6 +11,8 @@ export interface Beat {
   text: string
   /** Approved call-script wording, not model output. Never rerolled, never regenerated. */
   fixed?: boolean
+  /** Written for this lead but kept out of the prompter: a branch the rep may not need. */
+  aside?: boolean
 }
 
 export interface OAProfile {
@@ -52,59 +54,49 @@ export const BEATS: Array<Omit<Beat, 'text'>> = [
   { id: 'question',   label: 'The big question', hint: "The reframe, in this role's own metrics" },
   { id: 'superpower', label: 'Our edge',       hint: 'The outcome in one word, then why we are different' },
   { id: 'howitlands', label: 'How it lands',   hint: 'What it feels like, tied to their operation' },
-  { id: 'ask',        label: 'The close',      hint: 'Disarm, 14-15 minutes, coffee break, back pocket or not' },
-  { id: 'calendar',   label: 'Open the door',  hint: 'What talent they prioritise, so the call keeps going' },
+  { id: 'ask',        label: 'The question',   hint: 'What talent they prioritise. One ask, and it opens the branch' },
 ]
 
-/** Only these are written for the lead. The rest is the floor's fixed wording. */
-export const GENERATED_BEATS = BEATS.slice(0, 6)
+/**
+ * Written for the lead but held back from the prompter.
+ *
+ * The rep only reads this if the lead cannot name a role, which is a branch, not part of
+ * the spiel. It is generated with everything else so it is on screen the instant it is
+ * needed rather than after a second call the lead would hear as silence.
+ */
+export const NO_ROLE_BEAT: Omit<Beat, 'text'> = {
+  id: 'noRole',
+  label: 'If they cannot name a role',
+  hint: 'Suggest the roles their kind of firm actually offshores, and what it frees up',
+  aside: true,
+}
+
+/** Written for this lead: the six in the box, plus the aside the branch may need. */
+export const GENERATED_BEATS = [...BEATS.slice(0, 6), NO_ROLE_BEAT]
 
 /**
- * The close, word for word from the house screenplay.
+ * The one question the spiel ends on, fixed in code.
  *
- * Held in code rather than asked of the model, for three reasons. It carries no
- * information about this lead, so generating it buys nothing. It is the most
- * load-bearing wording in the call and the least tolerant of paraphrase: the disarm,
- * the 14-then-15 correction that makes the number sound counted rather than scripted,
- * the back-pocket exit that removes the commitment, and "would it be ridiculous",
- * which is answered by "no" from someone who means yes. And the model demonstrably
- * does paraphrase it: while the calendar line was generated it drifted to "does
- * Thursday or Friday work better for you?", losing the negative frame entirely.
+ * It used to end on the screenplay close, the disarm and the 14-15 minutes and the back
+ * pocket, and then a slot. That asked for a meeting before anyone had said what the
+ * meeting would be about, so the rep was booking a date on nothing and the partner got
+ * briefed on nothing.
  *
- * Fixing it also pays for the Change in the World beat, which genuinely does need
- * this lead's industry.
+ * Asking what talent they prioritise does the opposite: it is cheap for them to answer,
+ * and the answer decides which way the call goes. Name it and the rep reads the offer.
+ * Cannot name it and the rep suggests roles. Either way the call keeps moving, which a
+ * yes-or-no on a calendar slot does not.
+ *
+ * Fixed rather than generated because it carries nothing about this lead, and because
+ * the writer paraphrases exactly this kind of line: it drifted "does Thursday or Friday
+ * work for you" into "work better for you" while it owned the calendar ask.
  */
 export function closingBeats(): Beat[] {
   return [
     {
       ...BEATS[6],
       fixed: true,
-      // 41 words, down from 77 in the reference doc and 65 after the first trim.
-      //
-      // Every cut here was to connective tissue, never to a move. What makes this close
-      // work is four pattern interrupts, and all four are still in it: "completely
-      // opposed", which is answered "no" by someone who means yes; "14, 15" landing as a
-      // number that was counted rather than rounded; the coffee-break framing that makes
-      // it small; and the back-pocket exit that removes the commitment entirely. What
-      // went was "carving out", "More of a", "walk through what this looks like", "who
-      // look like you guys" and "from there" - phrases a rep has to get through rather
-      // than land on.
-      text:
-        "But super simple, (Name)... I know my timing's probably off. Would you be " +
-        'completely opposed to 14, 15 minutes? Coffee-break style, just what this looks ' +
-        "like for folks like you. Then you keep us in the back pocket or you don't.",
-    },
-    {
-      ...BEATS[7],
-      fixed: true,
-      // The spiel used to close for a slot. It now ends by opening discovery instead,
-      // because a date pinned before we know the role is a date booked on nothing: the
-      // rep has no idea yet what the partner would even be briefed on. "Either way"
-      // picks up the back-pocket exit, so a no to the meeting still leaves a question
-      // they can answer, and the slot gets set later once there is a role to book about.
-      text:
-        'Either way, what type of talent do you usually prioritize when you are ' +
-        'bringing people on?',
+      text: 'Just curious, (Name), what type of talent does your team normally prioritize?',
     },
   ]
 }
@@ -634,8 +626,22 @@ function splitByAnchors(raw: string): Record<string, string> | null {
   const out: Record<string, string> = {}
   hits.forEach((h, i) => {
     const end = i + 1 < hits.length ? hits[i + 1].at : raw.length
-    out[h.id] = oneParagraph(raw.slice(h.at, end).trim())
+    out[h.id] = raw.slice(h.at, end).trim()
   })
+
+  // Beat 7 has no frame to anchor on, so it arrives inside the last segment. It is the
+  // paragraph after beat 6, so split there: the blank line the model was asked for is
+  // the only boundary either of us has.
+  const tail = out.howitlands || ''
+  // Prefer the blank line that was asked for; accept a single newline, because the model
+  // sometimes separates paragraphs with one and that is still the boundary.
+  const brk = tail.search(/\n\s*\n/) !== -1 ? tail.search(/\n\s*\n/) : tail.search(/\n/)
+  if (brk !== -1) {
+    out.noRole = tail.slice(brk).trim()
+    out.howitlands = tail.slice(0, brk).trim()
+  }
+
+  for (const k of Object.keys(out)) out[k] = oneParagraph(out[k])
   return out
 }
 
@@ -645,8 +651,9 @@ export function parseLeanSpiel(raw: string): Beat[] {
   const anchored = splitByAnchors(clean)
   if (anchored) {
     return [
-      ...GENERATED_BEATS.map(b => ({ ...b, text: anchored[b.id] || '' })),
+      ...GENERATED_BEATS.slice(0, 6).map(b => ({ ...b, text: anchored[b.id] || '' })),
       ...closingBeats(),
+      { ...NO_ROLE_BEAT, text: anchored.noRole || '' },
     ]
   }
 
@@ -658,9 +665,12 @@ export function parseLeanSpiel(raw: string): Beat[] {
   // Six from the model, then the floor's own close. If the model wrote an ask anyway
   // despite being told not to, the extra paragraphs fall off here rather than competing
   // with the real close.
+  // Six beats, then the fixed question, then the aside. The aside is generated last so a
+  // short response loses the branch rather than the spiel.
   return [
-    ...GENERATED_BEATS.map((b, i) => ({ ...b, text: oneParagraph(parts[i] || '') })),
+    ...GENERATED_BEATS.slice(0, 6).map((b, i) => ({ ...b, text: oneParagraph(parts[i] || '') })),
     ...closingBeats(),
+    { ...NO_ROLE_BEAT, text: oneParagraph(parts[6] || '') },
   ]
 }
 
@@ -700,11 +710,13 @@ ${
     : 'No research and no web access: you know nothing checkable about this company.'
 }
 
-6 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
+7 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
 Keep each opening phrase word for word, that is how the floor talks, and fill the rest
 with this person's world. One or two short sentences per beat, never three, except beat 3.
 
-Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
+Beats 1 to 6 are the spiel. Beat 7 is a branch the rep may never read, written now so it
+is there if they need it. The closing question is already written: no ask, no meeting
+request, no sign-off anywhere.
 
 ONE STORY, NOT SIX CLAIMS. After the thumbnail, THEY are the subject and we do not
 appear again until beat 5. Each beat picks up what the last one put down: 2 names their
@@ -757,6 +769,12 @@ from their world, never adjectives.
    beat 3 just described, not at us in general.
 6. "And we do it in a way where," 16 WORDS MAX. + ${oa.mechanic}. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
+
+7. IF THEY CANNOT NAME A ROLE. 35 WORDS MAX. Not part of the spiel: the rep reads this
+   only when the answer to the closing question is a shrug. Name two or three roles a
+   firm like theirs really does hand over first, the ones from beat 4, and say what it
+   frees up for the person on the phone in their own terms. Open, not a pitch: end on a
+   question that is easy to answer.
 
 VOICE: spoken, short clauses, contractions${pacing ? ', and ellipses as pacing marks, but at most ONE per beat' : ', no ellipses'}. ${TONES[tone]} No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 

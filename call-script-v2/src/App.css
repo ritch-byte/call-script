@@ -2184,6 +2184,71 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
 
 /* ── Qualification trigger, sits under the spiel ── */
 
+/* The branch off the closing question. Both scripts exist before the rep asks, so this
+   is a choice between two things already on screen, not a request that loads one. */
+.spiel-branch { margin-top: 18px; }
+.spiel-branch-q {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+.spiel-branch-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+.spiel-branch-btn {
+  flex: 1 1 200px;
+  background: var(--white);
+  border: 1.5px solid var(--blue-muted);
+  border-radius: var(--radius);
+  padding: 11px 14px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.spiel-branch-btn:hover { border-color: var(--blue); box-shadow: var(--shadow-active); }
+.spiel-branch-btn.is-on {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: var(--white);
+}
+.spiel-branch-script {
+  margin-top: 10px;
+  background: var(--white);
+  border: 1.5px solid var(--blue-muted);
+  border-left: 4px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+.spiel-branch-script p {
+  margin: 0 0 11px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--blue-dark);
+}
+.spiel-branch-script p:last-of-type { margin-bottom: 0; }
+.spiel-branch-empty { color: var(--text-2); font-style: italic; }
+.spiel-branch-copy {
+  margin-top: 12px;
+  background: none;
+  border: 1px solid var(--blue-muted);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+}
+.spiel-branch-copy:hover { border-color: var(--blue); }
+
 .spiel-qual-open {
   display: block;
   width: 100%;

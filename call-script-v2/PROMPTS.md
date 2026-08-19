@@ -7,8 +7,8 @@ actually sends.
 ## How a build works
 
 One button, one path, one price. The rep pastes a line (company, job title, website) and
-presses Build spiel. That is a single call on Haiku 4.5 costing 0.28 cents,
-so 500 builds a day is $1.40. There is no research
+presses Build spiel. That is a single call on Haiku 4.5 costing 0.32 cents,
+so 500 builds a day is $1.60. There is no research
 pass and no model choice, so a rep cannot land on an expensive setting.
 
 The eight beats come back as plain paragraphs rather than JSON, because the JSON
@@ -35,8 +35,7 @@ Enforced in code after the model replies, which is what keeps a cheap single cal
 4. **The big question** — The reframe, in this role's own metrics
 5. **Our edge** — The outcome in one word, then why we are different
 6. **How it lands** — What it feels like, tied to their operation
-7. **The close** — Disarm, 14-15 minutes, coffee break, back pocket or not
-8. **Open the door** — What talent they prioritise, so the call keeps going
+7. **The question** — What talent they prioritise. One ask, and it opens the branch
 
 ### The opening
 
@@ -68,11 +67,13 @@ Write a cold call opener for an SDR at Outsource Accelerator, the leading market
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 No research and no web access: you know nothing checkable about this company.
 
-6 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
+7 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
 Keep each opening phrase word for word, that is how the floor talks, and fill the rest
 with this person's world. One or two short sentences per beat, never three, except beat 3.
 
-Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
+Beats 1 to 6 are the spiel. Beat 7 is a branch the rep may never read, written now so it
+is there if they need it. The closing question is already written: no ask, no meeting
+request, no sign-off anywhere.
 
 ONE STORY, NOT SIX CLAIMS. After the thumbnail, THEY are the subject and we do not
 appear again until beat 5. Each beat picks up what the last one put down: 2 names their
@@ -122,6 +123,12 @@ from their world, never adjectives.
 6. "And we do it in a way where," 16 WORDS MAX. + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
 
+7. IF THEY CANNOT NAME A ROLE. 35 WORDS MAX. Not part of the spiel: the rep reads this
+   only when the answer to the closing question is a shrug. Name two or three roles a
+   firm like theirs really does hand over first, the ones from beat 4, and say what it
+   frees up for the person on the phone in their own terms. Open, not a pitch: end on a
+   question that is easy to answer.
+
 VOICE: spoken, short clauses, contractions, and ellipses as pacing marks, but at most ONE per beat. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
 SAY IT ALOUD. A rep reads this at pace on a live call, so every word has to be easy to
@@ -148,11 +155,13 @@ brands in the UK and Ireland, with fulfilment centres in Manchester, Leeds and D
 Careers: hiring a Customer Support Advisor (Manchester, 2 positions).
 """
 
-6 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
+7 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble.
 Keep each opening phrase word for word, that is how the floor talks, and fill the rest
 with this person's world. One or two short sentences per beat, never three, except beat 3.
 
-Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
+Beats 1 to 6 are the spiel. Beat 7 is a branch the rep may never read, written now so it
+is there if they need it. The closing question is already written: no ask, no meeting
+request, no sign-off anywhere.
 
 ONE STORY, NOT SIX CLAIMS. After the thumbnail, THEY are the subject and we do not
 appear again until beat 5. Each beat picks up what the last one put down: 2 names their
@@ -201,6 +210,12 @@ from their world, never adjectives.
    beat 3 just described, not at us in general.
 6. "And we do it in a way where," 16 WORDS MAX. + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
+
+7. IF THEY CANNOT NAME A ROLE. 35 WORDS MAX. Not part of the spiel: the rep reads this
+   only when the answer to the closing question is a shrug. Name two or three roles a
+   firm like theirs really does hand over first, the ones from beat 4, and say what it
+   frees up for the person on the phone in their own terms. Open, not a pitch: end on a
+   question that is easy to answer.
 
 VOICE: spoken, short clauses, contractions, and ellipses as pacing marks, but at most ONE per beat. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 

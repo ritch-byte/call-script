@@ -70,6 +70,8 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
 
   // ── Post-booking qualification ──
   const [qualOpen, setQualOpen] = useState(false)
+  /** Which way the closing question went: '' until the rep says. */
+  const [rolePath, setRolePath] = useState<'' | 'named' | 'none'>('')
   const [bookedWhen, setBookedWhen] = useState('')
   const [roleWanted, setRoleWanted] = useState('')
   const [gates, setGates] = useState<Record<string, GateAnswer>>({})
@@ -112,7 +114,16 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     return () => clearInterval(t)
   }, [busy])
 
-  const activeBeats = useMemo(() => (beats ? beats.filter(b => b.text.trim()) : []), [beats])
+  // The aside is generated with the spiel but is a branch, not part of it, so it stays
+  // out of the prompter, the copy, the word count and the reroll list.
+  const activeBeats = useMemo(
+    () => (beats ? beats.filter(b => b.text.trim() && !b.aside) : []),
+    [beats],
+  )
+  const noRoleAside = useMemo(
+    () => (beats || []).find(b => b.aside && b.text.trim())?.text ?? '',
+    [beats],
+  )
   const inSync = freeText === null
   const fullScript = inSync ? joinBeats(activeBeats) : (freeText as string)
   const totalSeconds = speakSeconds(fullScript)
@@ -153,6 +164,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
     setFreeText(null)
     setBeats(openingBeats(leadName, yourName))
     setQualOpen(false)
+    setRolePath('')
     setQualStep(0)
     setGates({})
     setRoleWanted('')
@@ -586,8 +598,65 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             </div>
           )}
 
-          {/* Straight under the script, because this is the next thing that happens on a
-              live call. Reroll is an editing action and sits below it. */}
+          {/* The spiel ends on "what talent does your team normally prioritize", so the
+              next thing on the call is whichever way they answered. Both scripts are
+              ready before the rep asks, because the pause while something loads is the
+              pause the lead uses to get off the phone. */}
+          {hasSpiel && !qualOpen && (
+            <div className="spiel-branch">
+              <div className="spiel-branch-q">They answered the question. Which way?</div>
+              <div className="spiel-branch-buttons">
+                <button
+                  className={`spiel-branch-btn${rolePath === 'named' ? ' is-on' : ''}`}
+                  onClick={() => setRolePath(p => (p === 'named' ? '' : 'named'))}
+                >
+                  They named a role
+                </button>
+                <button
+                  className={`spiel-branch-btn${rolePath === 'none' ? ' is-on' : ''}`}
+                  onClick={() => setRolePath(p => (p === 'none' ? '' : 'none'))}
+                >
+                  They couldn't name one
+                </button>
+              </div>
+
+              {rolePath === 'named' && (
+                <div className="spiel-branch-script">
+                  {/* Read from the call script rather than copied, so the offer the floor
+                      reads here and the offer in the live call tool cannot drift apart. */}
+                  {(flow.value_offer?.script ?? '').split(/\n{2,}/).map((line, i) => (
+                    <p key={i}>{fillLeadName(line, leadName)}</p>
+                  ))}
+                  <button
+                    className="spiel-branch-copy"
+                    onClick={() => copy(fillLeadName(flow.value_offer?.script ?? '', leadName), 'offer')}
+                  >
+                    {copied === 'offer' ? 'Copied' : 'Copy this'}
+                  </button>
+                </div>
+              )}
+
+              {rolePath === 'none' && (
+                <div className="spiel-branch-script">
+                  {noRoleAside
+                    ? <p>{fillLeadName(noRoleAside, leadName)}</p>
+                    : <p className="spiel-branch-empty">
+                        No suggestion was written for this lead. Press Rebuild, or name two
+                        roles their kind of firm hands over first.
+                      </p>}
+                  {noRoleAside && (
+                    <button
+                      className="spiel-branch-copy"
+                      onClick={() => copy(fillLeadName(noRoleAside, leadName), 'norole')}
+                    >
+                      {copied === 'norole' ? 'Copied' : 'Copy this'}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {hasSpiel && !qualOpen && (
             <button className="spiel-qual-open" onClick={() => setQualOpen(true)}>
               They're interested, or they gave me a date. Qualify now
