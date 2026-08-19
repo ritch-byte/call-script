@@ -7,8 +7,8 @@ actually sends.
 ## How a build works
 
 One button, one path, one price. The rep pastes a line (company, job title, website) and
-presses Build spiel. That is a single call on Haiku 4.5 costing 0.3 cents,
-so 500 builds a day is $1.50. There is no research
+presses Build spiel. That is a single call on Haiku 4.5 costing 0.28 cents,
+so 500 builds a day is $1.40. There is no research
 pass and no model choice, so a rep cannot land on an expensive setting.
 
 The eight beats come back as plain paragraphs rather than JSON, because the JSON
@@ -85,12 +85,9 @@ from their world, never adjectives.
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
-   Say what they ARE today, never what we want them to become. "agencies and service
-   firms scaling offshore" is wrong: they are an agency, the offshoring is the thing we
-   are ringing to propose. Nothing about offshore, outsourcing, hiring or scaling here.
-   The tail is a NOUN PHRASE naming their kind of firm and it ends there. "post-production
-   studios" is right. "post-production studios scaling their teams" is wrong, and so is
-   any ending that describes what they are trying to do rather than what they are.
+   The tail is a NOUN PHRASE naming what they ARE, and it ends there. "post-production
+   studios" is right; "post-production studios scaling their teams" is wrong, because that
+   is what we are ringing to propose, not what they are.
 2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX. Word for word, using the real company name
    from the lead line rather than "your company": "I made some research about [company]...
    so correct me if I'm off, but [their job title]s like you are most likely" + the two
@@ -98,17 +95,13 @@ from their world, never adjectives.
    the seat, not someone reading a list.
    Then two concrete things that title does hour to hour, joined by "and then", in their
    vocabulary and in the order the work happens. Then word for word: "right?"
-   Pick the two a team could actually take off their hands, the operational work, not
-   board-level strategy. That is what makes the rest of the call make sense.
-   Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
-   submissions, they do not hunt for clinical ops people. Beat 3 owns hiring. Nothing
-   about hiring, headcount or filling seats, and nothing about offshore, outsourced, BPO
-   or nearshore either: they have done none of it, which is why we are calling.
+   Pick the two a team could take off their hands, the operational work. Their day is the
+   WORK, never the staffing of it. Beat 3 owns hiring, and naming it here announces the
+   pitch before you have earned the call, so nothing about hiring, recruiting, headcount
+   or filling seats, and nothing about offshore, outsourced, BPO or nearshore either.
    Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
-     them signed, and then getting them actually live."
-     Practice Manager, dental: "the surgery rota across both sites, and then the insurance
-     claims nobody else has time to chase." You have seen nothing, so this is inference: that is why it hedges and ends in a question.
+     them signed, and then getting them actually live." You have seen nothing, so this is inference: that is why it hedges and ends in a question.
 3. CHANGE IN THE WORLD, the beat that earns the call, 28 WORDS MAX. and the turn in the story. Three
    short sentences, 45 words at the very most. "And so what we are seeing from a high
    level... is that..." then the before and the after, told about THEIR operation rather
@@ -137,12 +130,7 @@ get out of your mouth. Short, common, spoken words. Nothing anyone could trip ov
 Where a plainer word exists, use the plainer one. Industry nouns are fine when they are
 what the person actually says; long Latin verbs never are.
 
-LENGTH overrides everything above, and the floor says it still runs long. Hard budget,
-in words: beat 1 is 18, beat 2 is 32, beat 3 is 28, beat 4 is 22, beat 5 is 14, beat 6 is
-16. That totals 130 and going over it is a failure, not a stylistic choice. Beats 1, 4, 5
-and 6 are ONE short sentence each, no subclauses, no lists, no "and then" chains. Beat 3
-is three very short sentences. Count the words in each beat as you finish it and cut back
-before you move on. If a word is not carrying meaning, it is costing the rep breath.
+Beats 1, 4, 5 and 6 are ONE short sentence each. No subclauses, no lists.
 ```
 
 ### With pasted source text
@@ -177,12 +165,9 @@ from their world, never adjectives.
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
-   Say what they ARE today, never what we want them to become. "agencies and service
-   firms scaling offshore" is wrong: they are an agency, the offshoring is the thing we
-   are ringing to propose. Nothing about offshore, outsourcing, hiring or scaling here.
-   The tail is a NOUN PHRASE naming their kind of firm and it ends there. "post-production
-   studios" is right. "post-production studios scaling their teams" is wrong, and so is
-   any ending that describes what they are trying to do rather than what they are.
+   The tail is a NOUN PHRASE naming what they ARE, and it ends there. "post-production
+   studios" is right; "post-production studios scaling their teams" is wrong, because that
+   is what we are ringing to propose, not what they are.
 2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX. Word for word, using the real company name
    from the lead line rather than "your company": "I made some research about [company]...
    so correct me if I'm off, but [their job title]s like you are most likely" + the two
@@ -190,17 +175,13 @@ from their world, never adjectives.
    the seat, not someone reading a list.
    Then two concrete things that title does hour to hour, joined by "and then", in their
    vocabulary and in the order the work happens. Then word for word: "right?"
-   Pick the two a team could actually take off their hands, the operational work, not
-   board-level strategy. That is what makes the rest of the call make sense.
-   Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
-   submissions, they do not hunt for clinical ops people. Beat 3 owns hiring. Nothing
-   about hiring, headcount or filling seats, and nothing about offshore, outsourced, BPO
-   or nearshore either: they have done none of it, which is why we are calling.
+   Pick the two a team could take off their hands, the operational work. Their day is the
+   WORK, never the staffing of it. Beat 3 owns hiring, and naming it here announces the
+   pitch before you have earned the call, so nothing about hiring, recruiting, headcount
+   or filling seats, and nothing about offshore, outsourced, BPO or nearshore either.
    Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
-     them signed, and then getting them actually live."
-     Practice Manager, dental: "the surgery rota across both sites, and then the insurance
-     claims nobody else has time to chase." Ground it in the facts above, claim nothing beyond them.
+     them signed, and then getting them actually live." Ground it in the facts above, claim nothing beyond them.
 3. CHANGE IN THE WORLD, the beat that earns the call, 28 WORDS MAX. and the turn in the story. Three
    short sentences, 45 words at the very most. "And so what we are seeing from a high
    level... is that..." then the before and the after, told about THEIR operation rather
@@ -229,12 +210,7 @@ get out of your mouth. Short, common, spoken words. Nothing anyone could trip ov
 Where a plainer word exists, use the plainer one. Industry nouns are fine when they are
 what the person actually says; long Latin verbs never are.
 
-LENGTH overrides everything above, and the floor says it still runs long. Hard budget,
-in words: beat 1 is 18, beat 2 is 32, beat 3 is 28, beat 4 is 22, beat 5 is 14, beat 6 is
-16. That totals 130 and going over it is a failure, not a stylistic choice. Beats 1, 4, 5
-and 6 are ONE short sentence each, no subclauses, no lists, no "and then" chains. Beat 3
-is three very short sentences. Count the words in each beat as you finish it and cut back
-before you move on. If a word is not carrying meaning, it is costing the rep breath.
+Beats 1, 4, 5 and 6 are ONE short sentence each. No subclauses, no lists.
 ```
 
 
