@@ -276,7 +276,7 @@ export function tailPitchesAtThem(thumbnail: string, positioning: string, lead =
   // dropping the giveaway words while keeping the projection: growing the team is the
   // outcome we sell, not a description of who they are. Narrow on purpose, so a company
   // that genuinely is "a scaling fintech" still reads as a description of itself.
-  if (/\b(?:scal|grow|expand|build)\w*\s+(?:(?:their|its|your|out|the)\s+){0,2}(?:teams?|headcount|capacity|operations?|ops|crews?|staff|bench|roster|workforce)\b/i.test(tail)) {
+  if (/(?<![-\w])(?:scal|grow|expand|build)\w*\s+(?:[\w-]+\s+){0,3}(?:teams?|headcount|capacity|operations?|ops|crews?|staff|bench|roster|workforce)\b/i.test(tail)) {
     return true
   }
   return presumesOffshore(tail, lead) || describesHiring(tail, lead)
