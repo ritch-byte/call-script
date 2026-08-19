@@ -713,8 +713,11 @@ from their world, never adjectives.
    level... is that..." then the before and the after, told about THEIR operation rather
    than their industry in general: what filling this seat used to take, what it takes now,
    and the part nobody puts a number on, a seat sitting open or a hire that does not
-   stick. Give the before and after as real units, weeks or months, not "harder" or
-   "tougher". About the market, never their failing.
+   stick.
+   THE BEFORE AND AFTER MUST BE ACTUAL NUMBERS. "three weeks, now it's eight" works.
+   "weeks, now months" does not, and neither does "harder" or "tougher" - those are the
+   same sentence every other caller makes. Pick figures that are true of this kind of
+   role in this kind of firm and say them.
 4. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at ${oa.savings}, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
