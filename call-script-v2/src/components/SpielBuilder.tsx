@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { callAIRaw, textFrom, stripEmDash } from '../lib/ai'
 import {
   BEATS, GENERATED_BEATS, DEFAULT_OA, TONES, WINDOW,
-  buildRerollPrompt, buildLeanSpielPrompt, parseLeanSpiel,
+  buildLeanSpielPrompt, parseLeanSpiel,
   wordCount, speakSeconds, fmtTime,
   oneParagraph, joinBeats, remapParagraphs, migrateProfile, normalizeLead,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
@@ -63,7 +63,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   const [beats, setBeats] = useState<Beat[] | null>(() => openingBeats(leadName, yourName))
   /**
    * The spiel shows as one editable block. Beats stay the source of truth so
-   * reroll keeps working; freeText only takes over when a hand edit changes the
+   * editing round-trips; freeText only takes over when a hand edit changes the
    * paragraph count and we can no longer map text back onto beats.
    */
   const [freeText, setFreeText] = useState<string | null>(null)
@@ -82,7 +82,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
 
   const [stage, setStage] = useState('')
   const [busy, setBusy] = useState('')
-  const [rolling, setRolling] = useState('')
   const [err, setErr] = useState('')
   const [warn, setWarn] = useState('')
   const [copied, setCopied] = useState('')
@@ -115,7 +114,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   }, [busy])
 
   // The aside is generated with the spiel but is a branch, not part of it, so it stays
-  // out of the prompter, the copy, the word count and the reroll list.
+  // out of the prompter, the copy and the word count.
   const activeBeats = useMemo(
     () => (beats ? beats.filter(b => b.text.trim() && !b.aside) : []),
     [beats],
@@ -136,9 +135,8 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   const writtenSeconds = speakSeconds(
     activeBeats.filter(b => !b.id.startsWith('opening_')).map(b => b.text).join(' '),
   )
-  const rerollable = activeBeats.filter(b => !b.fixed)
   /** False while the box holds only the fixed opening and nothing has been generated. */
-  const hasSpiel = rerollable.length > 0
+  const hasSpiel = activeBeats.some(b => !b.fixed)
   /** Is there anything from this lead worth clearing? Hides Reset on a fresh page. */
   const dirty = !!(raw.trim() || source.trim() || hasSpiel || qualOpen)
 
@@ -187,7 +185,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
 
   /**
    * Rewrite the whole spiel from one textarea. If the paragraph count still
-   * matches the beats we map each paragraph back onto its beat, so reroll and
+   * matches the beats we map each paragraph back onto its beat, so editing and
    * the call-script hand-off keep working through ordinary edits.
    */
   function editScript(value: string) {
@@ -253,7 +251,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
       }
       const stillMissing = missing()
       if (stillMissing.length) {
-        setWarn(`${stillMissing.map(b => b.label).join(' and ')} came back empty. Reroll ${stillMissing.length > 1 ? 'those beats' : 'that beat'} or press Rebuild.`)
+        setWarn(`${stillMissing.map(b => b.label).join(' and ')} came back empty. Press Rebuild.`)
       }
 
       const map = Object.fromEntries(parsed.map(x => [x.id, x.text]))
@@ -344,7 +342,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
         return [
           ...(opening.length ? opening : openingBeats(leadName, yourName)),
           // Keep the parsed beats rather than rebuilding from BEATS, so the close keeps
-          // its fixed flag and the UI does not offer to reroll the house wording.
+          // its fixed flag and the house wording stays marked as approved.
           ...parsed.map(x => ({ ...x, text: fillLeadName(map[x.id] || '', leadName) })),
         ]
       })
@@ -353,50 +351,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
       setErr(`Could not write the spiel: ${msg}. Press build again.`)
     } finally {
       setBusy(''); setStage('')
-    }
-  }
-
-  async function reroll(id: string) {
-    if (!beats) return
-    setErr(''); setRolling(id)
-    try {
-      const beat = beats.find(x => x.id === id)!
-      const res = await callAIRaw({
-        model: MODEL,
-        maxTokens: 500,
-        messages: [{ role: 'user', content: buildRerollPrompt(beat, fullScript, raw, source, oa, tone, pacing) }],
-      })
-      let next = fillLeadName(oneParagraph(stripEmDash(textFrom(res).replace(/^["']|["']$/g, ''))), leadName)
-      // Same guard as on a full build: a reroll must not land a verdict either.
-      if (readsAccusatory(next)) {
-        try {
-          const fix = await callAIRaw({
-            model: MODEL,
-            maxTokens: 400,
-            messages: [{ role: 'user', content: buildReframePrompt(next, beat.hint, '', tone, pacing) }],
-          })
-          const reframed = oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, '')))
-          if (reframed && !readsAccusatory(reframed)) next = reframed
-        } catch { /* keep what we have */ }
-      }
-      // And a rerolled homework beat must not invent an offshore team either.
-      if (id === 'homework' && presumesOffshore(next, raw)) {
-        try {
-          const fix = await callAIRaw({
-            model: MODEL,
-            maxTokens: 400,
-            messages: [{ role: 'user', content: buildDeoffshorePrompt(next, raw, tone, pacing) }],
-          })
-          const fixed = fillLeadName(oneParagraph(stripEmDash(textFrom(fix).replace(/^["']|["']$/g, ''))), leadName)
-          if (fixed && !presumesOffshore(fixed, raw)) next = fixed
-        } catch { /* keep what we have */ }
-      }
-      setBeats(prev => (prev ? prev.map(x => (x.id === id ? { ...x, text: next } : x)) : prev))
-      setFreeText(null)
-    } catch (e) {
-      setErr(`Reroll failed: ${e instanceof Error ? e.message : String(e)}`)
-    } finally {
-      setRolling('')
     }
   }
 
@@ -577,7 +531,7 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
           {writtenSeconds > WINDOW && (
             <div className="spiel-warn">
               The written part is running long for a cold open, {fmtTime(writtenSeconds)} after the
-              opening. Reroll the longest beat or trim it by hand before the rep dials.
+              opening. Trim the longest beat by hand before the rep dials.
             </div>
           )}
 
@@ -671,31 +625,11 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             </button>
           )}
 
-          {hasSpiel && (
-          <div className="spiel-reroll">
-            <span className="spiel-reroll-label">Reroll a beat</span>
-            {inSync ? (
-              <div className="spiel-reroll-row">
-                {rerollable.map(b => (
-                  <button
-                    key={b.id}
-                    className="spiel-btn-ghost spiel-btn-small"
-                    onClick={() => reroll(b.id)}
-                    disabled={!!rolling || !!busy}
-                    title={b.hint}
-                  >
-                    {rolling === b.id ? '...' : b.label}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="spiel-reroll-off">
-                Your edits changed the paragraph count, so single beats can no longer be
-                rerolled. Put it back to {activeBeats.length} paragraphs separated by a blank
-                line, or hit Rebuild to start fresh.
-              </div>
-            )}
-          </div>
+          {!inSync && hasSpiel && (
+            <div className="spiel-reroll-off">
+              Your edits changed the paragraph count, so the beats no longer map onto the
+              text. That only matters if you Rebuild, which starts fresh anyway.
+            </div>
           )}
 
           {qualOpen && (

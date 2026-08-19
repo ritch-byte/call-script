@@ -1990,18 +1990,6 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
   color: var(--text-2);
 }
 
-.spiel-reroll { margin: 14px 0 4px; }
-.spiel-reroll-label {
-  display: block;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  margin-bottom: 6px;
-}
-.spiel-reroll-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .spiel-reroll-off {
   font-size: 13px;
   line-height: 1.55;

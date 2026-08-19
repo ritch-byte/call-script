@@ -2,7 +2,7 @@
 // PROMPTS.md. Run `npm run prompts` after changing a prompt so the doc cannot drift.
 import { writeFileSync } from 'fs'
 import {
-  buildLeanSpielPrompt, buildRerollPrompt, buildIntroRepairPrompt, buildReframePrompt,
+  buildLeanSpielPrompt, buildIntroRepairPrompt, buildReframePrompt,
   openingParagraphs, DEFAULT_OA, BEATS,
 } from '../src/lib/spiel'
 import { BUILD_COST_CENTS, dailyCost, money } from '../src/data/costs'
@@ -78,17 +78,6 @@ ${fence(buildLeanSpielPrompt(LEAD, '', OA, 'house', true, DAYS))}
 The lead block and the homework instruction change; everything else is identical:
 
 ${fence(buildLeanSpielPrompt(LEAD, SOURCE, OA, 'house', true, DAYS))}
-`)
-
-out.push(`
----
-
-## 2. Reroll one beat
-
-Only fires when the rep taps a beat in the reroll strip. It carries the pasted source, so a
-rerolled homework beat stays as grounded as the original.
-
-${fence(buildRerollPrompt({ ...BEATS[1], text: 'I was on your careers page and saw you are hiring two support advisors.' }, '(the full script so far)', LEAD, SOURCE, OA, 'house', true))}
 `)
 
 out.push(`

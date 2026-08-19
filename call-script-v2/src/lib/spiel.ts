@@ -586,17 +586,6 @@ const styleRules = (tone: Tone, pacing: boolean) => `STYLE RULES, non negotiable
 
 ${GLENCOCO_WRITING_RULES}`
 
-const HOMEWORK_RULES = `HOMEWORK RULES, these are what make the call land:
-
-The rep must sound like someone who spent ten minutes on this company before dialling, not someone reading a template. That means:
-
-1. Only claim what you were actually shown. If there is source text above, use one real detail from it, said the way a person who looked would say it: "I was on your careers page and saw you're hiring three more support reps", not "I noticed your commitment to excellence".
-2. If there is no source text, you have seen nothing about this company. Do not write "I saw" or "I noticed". Hedge out loud and invite the correction: "correct me if I'm off, but it looks like most of your delivery team sits in Manchester". A hedge that invites correction builds more credibility than false certainty, and it opens the conversation.
-3. Speak to the ROLE, not the company. This person owns a specific remit and gets measured on specific things. Use their vocabulary and their numbers, not generic business language. A support leader hears backlog, response time, cost per ticket. An engineering leader hears velocity, hiring pipeline, burn.
-4. Do not flatter. No "impressive growth", no "love what you're building". Observation, then tension, then question.
-5. Do not reveal how you found the information. No "according to your LinkedIn". Just say what you saw.
-6. This person has not offshored anything, which is why we are calling. Describe the work they do with the team they have in house today. Never put an offshore, outsourced, BPO or nearshore team in their day. Naming a team they do not have is the fastest way to be caught guessing.`
-
 const oaBlock = (oa: OAProfile) => `OUTSOURCE ACCELERATOR, the seller:
 - Positioning: ${oa.positioning}
 - Network: ${oa.network}
@@ -806,44 +795,5 @@ Where a plainer word exists, use the plainer one. Industry nouns are fine when t
 what the person actually says; long Latin verbs never are.
 
 Beats 1, 4, 5 and 6 are ONE short sentence each. No subclauses, no lists.`
-}
-
-export function buildRerollPrompt(
-  beat: Beat,
-  fullScript: string,
-  raw: string,
-  /** The rep's pasted source, so a rerolled homework beat stays grounded in it. */
-  source: string,
-  oa: OAProfile,
-  tone: Tone,
-  pacing: boolean,
-): string {
-  const seen = source.trim()
-    ? `WHAT THE REP ACTUALLY SAW, the only facts you may claim:\n${source.slice(0, 2500)}`
-    : 'The rep saw nothing about this company, so claim nothing about it.'
-  return `Rewrite one beat of a cold call spiel. Same job, different angle. Do not repeat the current wording.
-
-${oaBlock(oa)}
-
-LEAD: ${raw}
-${seen}
-
-${HOMEWORK_RULES}
-
-FULL CURRENT SPIEL, for continuity:
-"""
-${fullScript}
-"""
-
-Rewrite this beat only. Its job: ${beat.hint}.
-Current version: "${beat.text}"
-
-${
-  beat.id === 'homework'
-    ? 'Use a DIFFERENT receipt from the brief than the one currently used. Same rules apply: nothing outside the receipts list, hedge anything inferred.\n'
-    : ''
-}${styleRules(tone, pacing)}
-
-Respond with the new line of spoken script and nothing else. No labels, no quotes, no commentary.`
 }
 
