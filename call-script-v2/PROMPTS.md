@@ -62,7 +62,7 @@ No? Oh okay, feel free to cut me off if it's not in your wheelhouse.
 Sent as a single user message. With **no** pasted source text:
 
 ```text
-Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for global talent networks, built specifically for.
+Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for offshore staffing firms, built specifically for.
 
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 No research and no web access: you know nothing checkable about this company.
@@ -82,7 +82,7 @@ answer to something already on the table. Never restart on a new topic. Concrete
 from their world, never adjectives.
 
 1. "So yeah quick thumbnail on us." 18 WORDS MAX. + this word for word, ending on the word "for":
-   "the leading marketplace for global talent networks, built specifically for" + then name what THIS company actually is, in five or six words, the way
+   "the leading marketplace for offshore staffing firms, built specifically for" + then name what THIS company actually is, in five or six words, the way
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
@@ -147,7 +147,7 @@ Beats 1, 4, 5 and 6 are ONE short sentence each. No subclauses, no lists.
 The lead block and the homework instruction change; everything else is identical:
 
 ```text
-Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for global talent networks, built specifically for.
+Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for offshore staffing firms, built specifically for.
 
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 THE ONLY FACTS YOU MAY CLAIM:
@@ -172,7 +172,7 @@ answer to something already on the table. Never restart on a new topic. Concrete
 from their world, never adjectives.
 
 1. "So yeah quick thumbnail on us." 18 WORDS MAX. + this word for word, ending on the word "for":
-   "the leading marketplace for global talent networks, built specifically for" + then name what THIS company actually is, in five or six words, the way
+   "the leading marketplace for offshore staffing firms, built specifically for" + then name what THIS company actually is, in five or six words, the way
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
    "which basically means", the sentence already runs straight into it.
@@ -244,7 +244,7 @@ These only fire when a guard catches something, so most builds never pay for the
 ```text
 Rewrite one line of a cold call opener. It must contain this word for word:
 
-"the leading marketplace for global talent networks, built specifically for"
+"the leading marketplace for offshore staffing firms, built specifically for"
 
 The current version dropped or reworded it:
 "So quick thumbnail on us. We are the top offshore staffing site around."

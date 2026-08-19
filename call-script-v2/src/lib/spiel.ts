@@ -165,7 +165,7 @@ export function openingBeats(leadName: string, yourName: string): Beat[] {
 
 export const DEFAULT_OA: OAProfile = {
   positioning:
-    'the leading marketplace for global talent networks, built specifically for connecting businesses to vetted offshore firms',
+    'the leading marketplace for offshore staffing firms, built specifically for connecting businesses to vetted offshore firms',
   network: '4,000+ pre-vetted BPO and staffing firms',
   savings: 'up to 70% less than local hiring cost',
   // "enterprise-grade infrastructure" is four-and-five syllables back to back and the
@@ -186,6 +186,7 @@ export const DEFAULT_OA: OAProfile = {
  * retired line.
  */
 export const SUPERSEDED_POSITIONING = [
+  'the leading marketplace for global talent networks, built specifically for connecting businesses to vetted offshore firms',
   "the world's leading outsourcing marketplace, built specifically for connecting businesses to vetted offshore staffing firms",
   "the world's leading marketplace for offshore staffing, built specifically for connecting businesses to vetted offshore firms",
 ]
