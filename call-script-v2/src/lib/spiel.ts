@@ -71,6 +71,25 @@ export const NO_ROLE_BEAT: Omit<Beat, 'text'> = {
   aside: true,
 }
 
+/**
+ * The question the no-role branch ends on, fixed rather than written.
+ *
+ * The writer kept closing it on a pain question - "what's the biggest bottleneck you're
+ * hitting right now" - which asks the lead to diagnose themselves after they have just
+ * said they do not know. This asks them to add to a list that is already in front of
+ * them, which is a far easier thing to answer, and it keeps the branch pointed at a role
+ * rather than at a problem.
+ */
+export const NO_ROLE_ASK =
+  'Aside from the roles I mentioned, what type of role would you also like to add to your team?'
+
+/** Append the fixed ask, unless a rebuild already left it there. */
+export const withNoRoleAsk = (text: string) => {
+  const body = (text || '').trim()
+  if (!body) return ''
+  return body.includes(NO_ROLE_ASK) ? body : `${body} ${NO_ROLE_ASK}`
+}
+
 /** Written for this lead: the six in the box, plus the aside the branch may need. */
 export const GENERATED_BEATS = [...BEATS.slice(0, 6), NO_ROLE_BEAT]
 
@@ -653,7 +672,7 @@ export function parseLeanSpiel(raw: string): Beat[] {
     return [
       ...GENERATED_BEATS.slice(0, 6).map(b => ({ ...b, text: anchored[b.id] || '' })),
       ...closingBeats(),
-      { ...NO_ROLE_BEAT, text: anchored.noRole || '' },
+      { ...NO_ROLE_BEAT, text: withNoRoleAsk(anchored.noRole || '') },
     ]
   }
 
@@ -670,7 +689,7 @@ export function parseLeanSpiel(raw: string): Beat[] {
   return [
     ...GENERATED_BEATS.slice(0, 6).map((b, i) => ({ ...b, text: oneParagraph(parts[i] || '') })),
     ...closingBeats(),
-    { ...NO_ROLE_BEAT, text: oneParagraph(parts[6] || '') },
+    { ...NO_ROLE_BEAT, text: withNoRoleAsk(oneParagraph(parts[6] || '')) },
   ]
 }
 
@@ -770,11 +789,13 @@ from their world, never adjectives.
 6. "And we do it in a way where," 16 WORDS MAX. + ${oa.mechanic}. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
 
-7. IF THEY CANNOT NAME A ROLE. 35 WORDS MAX. Not part of the spiel: the rep reads this
+7. IF THEY CANNOT NAME A ROLE. 30 WORDS MAX. Not part of the spiel: the rep reads this
    only when the answer to the closing question is a shrug. Name two or three roles a
    firm like theirs really does hand over first, the ones from beat 4, and say what it
-   frees up for the person on the phone in their own terms. Open, not a pitch: end on a
-   question that is easy to answer.
+   frees up for the person on the phone in their own terms. Speak TO them as "you", never
+   about them in the third person: this is read aloud to their face. Do NOT end on a
+   question and do not ask about bottlenecks; the question that follows is already
+   written.
 
 VOICE: spoken, short clauses, contractions${pacing ? ', and ellipses as pacing marks, but at most ONE per beat' : ', no ellipses'}. ${TONES[tone]} No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 

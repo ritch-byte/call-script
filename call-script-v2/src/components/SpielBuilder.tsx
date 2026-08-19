@@ -586,7 +586,14 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             className="spiel-script"
             value={fullScript}
             onChange={e => editScript(e.target.value)}
-            rows={Math.max(14, fullScript.split('\n').length + Math.ceil(fullScript.length / 74))}
+            // Count the lines the box will actually render: each paragraph wraps to at
+            // least one row, blank lines are one row. The old formula added the newline
+            // count to a whole-string wrap estimate, which counted every paragraph twice
+            // and left a screen of dead space under a short spiel.
+            rows={Math.max(
+              8,
+              fullScript.split('\n').reduce((n, line) => n + Math.max(1, Math.ceil(line.length / 74)), 0) + 1,
+            )}
             spellCheck={false}
           />
 

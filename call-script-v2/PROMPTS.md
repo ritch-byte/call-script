@@ -123,11 +123,13 @@ from their world, never adjectives.
 6. "And we do it in a way where," 16 WORDS MAX. + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
 
-7. IF THEY CANNOT NAME A ROLE. 35 WORDS MAX. Not part of the spiel: the rep reads this
+7. IF THEY CANNOT NAME A ROLE. 30 WORDS MAX. Not part of the spiel: the rep reads this
    only when the answer to the closing question is a shrug. Name two or three roles a
    firm like theirs really does hand over first, the ones from beat 4, and say what it
-   frees up for the person on the phone in their own terms. Open, not a pitch: end on a
-   question that is easy to answer.
+   frees up for the person on the phone in their own terms. Speak TO them as "you", never
+   about them in the third person: this is read aloud to their face. Do NOT end on a
+   question and do not ask about bottlenecks; the question that follows is already
+   written.
 
 VOICE: spoken, short clauses, contractions, and ellipses as pacing marks, but at most ONE per beat. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 
@@ -211,11 +213,13 @@ from their world, never adjectives.
 6. "And we do it in a way where," 16 WORDS MAX. + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
 
-7. IF THEY CANNOT NAME A ROLE. 35 WORDS MAX. Not part of the spiel: the rep reads this
+7. IF THEY CANNOT NAME A ROLE. 30 WORDS MAX. Not part of the spiel: the rep reads this
    only when the answer to the closing question is a shrug. Name two or three roles a
    firm like theirs really does hand over first, the ones from beat 4, and say what it
-   frees up for the person on the phone in their own terms. Open, not a pitch: end on a
-   question that is easy to answer.
+   frees up for the person on the phone in their own terms. Speak TO them as "you", never
+   about them in the third person: this is read aloud to their face. Do NOT end on a
+   question and do not ask about bottlenecks; the question that follows is already
+   written.
 
 VOICE: spoken, short clauses, contractions, and ellipses as pacing marks, but at most ONE per beat. The house voice in the exemplar. Conversational fillers, ellipsis pacing, light swagger. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 

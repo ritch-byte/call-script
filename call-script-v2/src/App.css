@@ -1990,7 +1990,7 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
   color: var(--text-2);
 }
 
-.spiel-reroll { margin: 12px 0 4px; }
+.spiel-reroll { margin: 14px 0 4px; }
 .spiel-reroll-label {
   display: block;
   font-family: 'DM Sans', sans-serif;
@@ -2186,7 +2186,7 @@ body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
 
 /* The branch off the closing question. Both scripts exist before the rep asks, so this
    is a choice between two things already on screen, not a request that loads one. */
-.spiel-branch { margin-top: 18px; }
+.spiel-branch { margin-top: 10px; }
 .spiel-branch-q {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
