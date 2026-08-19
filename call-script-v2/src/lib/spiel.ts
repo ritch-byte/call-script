@@ -276,7 +276,7 @@ export function tailPitchesAtThem(thumbnail: string, positioning: string, lead =
   // dropping the giveaway words while keeping the projection: growing the team is the
   // outcome we sell, not a description of who they are. Narrow on purpose, so a company
   // that genuinely is "a scaling fintech" still reads as a description of itself.
-  if (/\b(?:scal|grow|expand|build)\w*\s+(?:their|its|your|out)?\s*(?:teams?|headcount|capacity|operations?|ops)\b/i.test(tail)) {
+  if (/\b(?:scal|grow|expand|build)\w*\s+(?:(?:their|its|your|out|the)\s+){0,2}(?:teams?|headcount|capacity|operations?|ops|crews?|staff|bench|roster|workforce)\b/i.test(tail)) {
     return true
   }
   return presumesOffshore(tail, lead) || describesHiring(tail, lead)
@@ -675,6 +675,12 @@ with this person's world. One or two short sentences per beat, never three, exce
 
 Stop after beat 6. The close is already written: no ask, no meeting request, no sign-off.
 
+ONE STORY, NOT SIX CLAIMS. After the thumbnail, THEY are the subject and we do not
+appear again until beat 5. Each beat picks up what the last one put down: 2 names their
+day, 3 says what changed about that day, 4 prices it, and only then do we turn up as the
+answer to something already on the table. Never restart on a new topic. Concrete nouns
+from their world, never adjectives.
+
 1. "So yeah quick thumbnail on us." + this word for word, ending on the word "for":
    "${clause}" + then name what THIS company actually is, in five or six words, the way
    someone there would describe the place. Not "businesses", not "companies like yours",
@@ -684,8 +690,8 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
    firms scaling offshore" is wrong: they are an agency, the offshoring is the thing we
    are ringing to propose. Nothing about offshore, outsourcing, hiring or scaling here.
 2. THE HOMEWORK, the beat that buys the call. Word for word: "I made some research about
-   your company... so correct me if I'm off, but you're most likely spending your days
-   on" + what this title in this industry does hour to hour, in their vocabulary: two
+   [their company name]... so correct me if I'm off, but you're most likely spending your
+   days on" - use the actual company name from the lead line, not "your company" + what this title in this industry does hour to hour, in their vocabulary: two
    concrete activities joined by "and then", in the order the work happens. Then word for
    word: "right?"
    Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
@@ -702,19 +708,22 @@ Stop after beat 6. The close is already written: no ask, no meeting request, no 
        ? ' Ground it in the facts above, claim nothing beyond them.'
        : ' You have seen nothing, so this is inference: that is why it hedges and ends in a question.'
    }
-3. CHANGE IN THE WORLD, the beat that earns the call. Three short sentences, 45 words at
-   the very most. "And so what we are seeing from a high level... is that..." then: what
-   filling this seat used to take, what it takes now and why this squeeze is worse, and
-   the part nobody costs, an open seat or a hire that does not work out. About the market,
-   never their failing.
+3. CHANGE IN THE WORLD, the beat that earns the call, and the turn in the story. Three
+   short sentences, 45 words at the very most. "And so what we are seeing from a high
+   level... is that..." then the before and the after, told about THEIR operation rather
+   than their industry in general: what filling this seat used to take, what it takes now,
+   and the part nobody puts a number on, a seat sitting open or a hire that does not
+   stick. Give the before and after as real units, weeks or months, not "harder" or
+   "tougher". About the market, never their failing.
 4. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at ${oa.savings}, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
 5. "So in response to this, our edge lies in our access to pre-vetted firms." +
-   name in one word what they get back, then ${oa.proof}.
-6. "And we do it in a way where," + ${oa.mechanic}. End by saying the team feels like
-   theirs, not a vendor.
+   name in one word what they get back, then ${oa.proof}. Aim it at the exact problem
+   beat 3 just described, not at us in general.
+6. "And we do it in a way where," + ${oa.mechanic}. End inside THEIR operation, on what
+   it feels like once it is running: the team feels like theirs, not a vendor.
 
 VOICE: spoken, short clauses, contractions${pacing ? ', and ellipses as pacing marks, but at most ONE per beat' : ', no ellipses'}. ${TONES[tone]} No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
 

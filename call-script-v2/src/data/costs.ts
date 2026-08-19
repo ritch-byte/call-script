@@ -11,14 +11,16 @@
 // what not to say. Then the prompt was cut 16% with every rule kept, and this is where
 // it landed.
 //
-// MEASURED, five leads: 0.248, 0.254, 0.250, 0.249 and 0.249, mean 0.250, from
-// usage.input_tokens and usage.output_tokens on the real responses. Rounded up to 0.25
-// because understating what the floor spends is the worse error. $1.25 per 500 builds.
+// MEASURED, four leads: 0.252, 0.263, 0.272 and 0.270, mean 0.264, from
+// usage.input_tokens and usage.output_tokens on the real responses. Rounded up to 0.27
+// because understating what the floor spends is the worse error. $1.32 per 500 builds.
 //
-// The number has crept: 0.19, 0.23, 0.24, 0.227 after the trim, now 0.244. Every step
-// is a rule added to the prompt, and a rule is input tokens on every build forever.
-// That is the real price of each fix, and it is worth saying out loud rather than
-// discovering later.
+// The number has crept all day: 0.19, 0.23, 0.24, 0.227 after the trim, 0.244, 0.25,
+// now 0.264. Every step is a rule added to the prompt, and a rule is input tokens on
+// every build forever. The last one bought the most: the story rule, which made the
+// beats one narrative about the lead rather than six separate claims, and which is what
+// finally got a real before-and-after into beat 3 and the company's name into beat 2.
+// At the floor's ~550 builds a day this is about \$44 a month against \$31 at 0.19.
 //
 // This is 3c per 500 above the $1.15 the floor asked for, and the reason is prompt
 // tokens, not waste. Two rules were added to beat 2 after it was caught describing the
@@ -40,7 +42,7 @@
 // live risk in trimming, since the offshore rule lost its emphasis to get here. Each
 // repair costs about another 0.05, so if that rate ever climbs to one build in five it
 // gives the whole saving back. Re-measure if the prompt or the model changes.
-export const BUILD_COST_CENTS = 0.25
+export const BUILD_COST_CENTS = 0.27
 
 /** Dollars for a day of dialling at this rate. */
 export const dailyCost = (cents: number, builds: number) => (cents * builds) / 100
