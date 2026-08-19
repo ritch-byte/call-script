@@ -501,6 +501,28 @@ Respond with the rewritten line only. No labels, no quotes, no commentary.`
  */
 export const oneParagraph = (s: string) => (s || '').replace(/\n{2,}/g, '\n').trim()
 
+/**
+ * Tidy a lead line pasted straight out of a spreadsheet.
+ *
+ * Three adjacent cells copy as tab-separated text, and a copied block usually carries a
+ * trailing newline, so a row lands in the box as one run-on string with tabs in it.
+ * Blank cells leave doubled separators behind. This turns any of that into the
+ * comma-separated line the builder already reads, so a rep can select job title, company
+ * and industry, paste, and press Enter.
+ *
+ * Deliberately does not work out which field is which. The prompt reads the whole line
+ * and can tell a job title from an industry; guessing column order would only be wrong
+ * the first time someone reorders their sheet.
+ */
+export function normalizeLead(text: string): string {
+  return (text || '')
+    .replace(/[\t\r\n]+/g, ', ')
+    .replace(/\s*[,;|]\s*/g, ', ')
+    .replace(/(?:,\s*){2,}/g, ', ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^[\s,]+|[\s,]+$/g, '')
+}
+
 /** The spiel as it appears in the single edit box. */
 export const joinBeats = (beats: Beat[]) =>
   beats.map(b => b.text.trim()).filter(Boolean).join('\n\n')

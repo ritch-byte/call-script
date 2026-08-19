@@ -4,7 +4,7 @@ import {
   BEATS, GENERATED_BEATS, DEFAULT_OA, TONES, WINDOW,
   buildRerollPrompt, buildLeanSpielPrompt, parseLeanSpiel,
   wordCount, speakSeconds, fmtTime,
-  oneParagraph, joinBeats, remapParagraphs, migrateProfile,
+  oneParagraph, joinBeats, remapParagraphs, migrateProfile, normalizeLead,
   keepsIdentityClause, buildIntroRepairPrompt, readsAccusatory, buildReframePrompt,
   presumesOffshore, buildDeoffshorePrompt, describesHiring, buildRefocusPrompt, tailPitchesAtThem,
   openingBeats, fillLeadName,
@@ -419,15 +419,23 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
           ref={leadInput}
           className="spiel-lead-input"
           value={raw}
-          onChange={e => setRaw(e.target.value)}
+          onChange={e => setRaw(normalizeLead(e.target.value))}
+          onPaste={e => {
+            // Three adjacent cells copy as tab-separated text. Normalise on the way in
+            // rather than leaving tabs in the string the prompt reads.
+            const text = e.clipboardData.getData('text')
+            if (!/[\t\r\n]/.test(text)) return
+            e.preventDefault()
+            setRaw(prev => normalizeLead(prev ? `${prev}, ${text}` : text))
+          }}
           onKeyDown={e => { if (e.key === 'Enter' && raw.trim() && !busy) run() }}
-          placeholder="Northbeam Logistics, VP of Customer Operations, northbeam.com"
+          placeholder="VP of Customer Operations, Northbeam Logistics, logistics"
         />
         <button className="spiel-btn-primary" onClick={run} disabled={!raw.trim() || !!busy}>
           {busy === 'run' ? 'Working...' : 'Build spiel'}
         </button>
       </div>
-      <div className="spiel-hint">Company, job title, website. Any order, any separator. Enter to build.</div>
+      <div className="spiel-hint">Paste job title, company and industry straight from the sheet. Any order, any separator. Enter to build.</div>
 
       {/* ── Source paste: the only way to get a claimable fact ── */}
       <button className="spiel-disclosure" onClick={() => setShowSource(v => !v)}>
