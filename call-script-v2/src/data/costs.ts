@@ -20,7 +20,7 @@
 // every build forever. The last one bought the most: the story rule, which made the
 // beats one narrative about the lead rather than six separate claims, and which is what
 // finally got a real before-and-after into beat 3 and the company's name into beat 2.
-// At the floor's ~550 builds a day this is about \$44 a month against \$31 at 0.19.
+// At the floor's ~550 builds a day this is about $44 a month against $31 at 0.19.
 //
 // This is 3c per 500 above the $1.15 the floor asked for, and the reason is prompt
 // tokens, not waste. Two rules were added to beat 2 after it was caught describing the
