@@ -53,7 +53,7 @@ export const BEATS: Array<Omit<Beat, 'text'>> = [
   { id: 'superpower', label: 'Our edge',       hint: 'The outcome in one word, then why we are different' },
   { id: 'howitlands', label: 'How it lands',   hint: 'What it feels like, tied to their operation' },
   { id: 'ask',        label: 'The close',      hint: 'Disarm, 14-15 minutes, coffee break, back pocket or not' },
-  { id: 'calendar',   label: 'The ask',        hint: 'Would it be ridiculous, two days' },
+  { id: 'calendar',   label: 'Open the door',  hint: 'What talent they prioritise, so the call keeps going' },
 ]
 
 /** Only these are written for the lead. The rest is the floor's fixed wording. */
@@ -74,7 +74,7 @@ export const GENERATED_BEATS = BEATS.slice(0, 6)
  * Fixing it also pays for the Change in the World beat, which genuinely does need
  * this lead's industry.
  */
-export function closingBeats(days: string): Beat[] {
+export function closingBeats(): Beat[] {
   return [
     {
       ...BEATS[6],
@@ -97,7 +97,14 @@ export function closingBeats(days: string): Beat[] {
     {
       ...BEATS[7],
       fixed: true,
-      text: `Would it be ridiculous to loop up... say... ${days}?`,
+      // The spiel used to close for a slot. It now ends by opening discovery instead,
+      // because a date pinned before we know the role is a date booked on nothing: the
+      // rep has no idea yet what the partner would even be briefed on. "Either way"
+      // picks up the back-pocket exit, so a no to the meeting still leaves a question
+      // they can answer, and the slot gets set later once there is a role to book about.
+      text:
+        'Either way, what type of talent do you usually prioritize when you are ' +
+        'bringing people on?',
     },
   ]
 }
@@ -456,8 +463,8 @@ it belongs two beats later anyway.
 
 LEAD: ${raw}
 
-Keep the exact opening "I made some research about your company... so correct me if I'm
-off, but you're most likely spending your days on" and the exact ending "right?".
+Keep the exact opening "I made some research about [their company]... so correct me if
+I'm off, but [job title]s like you are most likely" and the exact ending "right?".
 Between them, name two concrete things this title actually does hour to hour, joined by
 "and then", in the order the work happens. Their vocabulary, one sentence. Do not mention
 hiring, recruiting, headcount, candidates, vacancies or filling seats.
@@ -481,8 +488,8 @@ describing a team they do not have gets the rep caught guessing in the first thi
 
 LEAD: ${raw}
 
-Keep the exact opening "I made some research about your company... so correct me if I'm
-off, but you're most likely spending your days on" and the exact ending "right?".
+Keep the exact opening "I made some research about [their company]... so correct me if
+I'm off, but [job title]s like you are most likely" and the exact ending "right?".
 Between them, name two concrete activities this title really does with the team they have
 in house today, joined by "and then", in the order the work happens. Their vocabulary, one
 sentence. The words offshore, offshoring, outsourced, outsourcing, BPO and nearshore must
@@ -601,7 +608,7 @@ const oaBlock = (oa: OAProfile) => `OUTSOURCE ACCELERATOR, the seller:
  */
 const BEAT_ANCHORS: Array<[string, RegExp]> = [
   ['thumbnail',   /so yeah,?\s*quick thumbnail on us/i],
-  ['homework',    /i made some research about your company/i],
+  ['homework',    /i made some research about/i],
   ['observation', /and so what we are seeing from a high[- ]?level/i],
   ['question',    /so the big question is/i],
   ['superpower',  /so in response to this,?\s*our edge/i],
@@ -629,14 +636,14 @@ function splitByAnchors(raw: string): Record<string, string> | null {
   return out
 }
 
-export function parseLeanSpiel(raw: string, days: string): Beat[] {
+export function parseLeanSpiel(raw: string): Beat[] {
   const clean = (raw || '').trim()
 
   const anchored = splitByAnchors(clean)
   if (anchored) {
     return [
       ...GENERATED_BEATS.map(b => ({ ...b, text: anchored[b.id] || '' })),
-      ...closingBeats(days),
+      ...closingBeats(),
     ]
   }
 
@@ -650,7 +657,7 @@ export function parseLeanSpiel(raw: string, days: string): Beat[] {
   // with the real close.
   return [
     ...GENERATED_BEATS.map((b, i) => ({ ...b, text: oneParagraph(parts[i] || '') })),
-    ...closingBeats(days),
+    ...closingBeats(),
   ]
 }
 
@@ -678,7 +685,6 @@ export function buildLeanSpielPrompt(
   oa: OAProfile,
   tone: Tone,
   pacing: boolean,
-  days: string,
 ): string {
   const grounded = source.trim().length > 0
   const clause = positioningStem(oa.positioning)
@@ -703,7 +709,7 @@ day, 3 says what changed about that day, 4 prices it, and only then do we turn u
 answer to something already on the table. Never restart on a new topic. Concrete nouns
 from their world, never adjectives.
 
-1. "So yeah quick thumbnail on us." + this word for word, ending on the word "for":
+1. "So yeah quick thumbnail on us." 18 WORDS MAX. + this word for word, ending on the word "for":
    "${clause}" + then name what THIS company actually is, in five or six words, the way
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
@@ -711,16 +717,22 @@ from their world, never adjectives.
    Say what they ARE today, never what we want them to become. "agencies and service
    firms scaling offshore" is wrong: they are an agency, the offshoring is the thing we
    are ringing to propose. Nothing about offshore, outsourcing, hiring or scaling here.
-2. THE HOMEWORK, the beat that buys the call. Word for word: "I made some research about
-   [their company name]... so correct me if I'm off, but you're most likely spending your
-   days on" - use the actual company name from the lead line, not "your company" + what this title in this industry does hour to hour, in their vocabulary: two
-   concrete activities joined by "and then", in the order the work happens. Then word for
-   word: "right?"
+   The tail is a NOUN PHRASE naming their kind of firm and it ends there. "post-production
+   studios" is right. "post-production studios scaling their teams" is wrong, and so is
+   any ending that describes what they are trying to do rather than what they are.
+2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX. Word for word, using the real company name
+   from the lead line rather than "your company": "I made some research about [company]...
+   so correct me if I'm off, but [their job title]s like you are most likely" + the two
+   activities. Saying the title back is what makes it land: they hear someone who knows
+   the seat, not someone reading a list.
+   Then two concrete things that title does hour to hour, joined by "and then", in their
+   vocabulary and in the order the work happens. Then word for word: "right?"
+   Pick the two a team could actually take off their hands, the operational work, not
+   board-level strategy. That is what makes the rest of the call make sense.
    Their day is the WORK, never the staffing of it: a clinical ops lead runs trials and
-   submissions, they do not hunt for clinical ops people. Beat 3 owns hiring, so naming it
-   here announces the pitch before you have earned the call. Nothing about hiring,
-   headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore
-   either: they have done none of it, which is why we are calling.
+   submissions, they do not hunt for clinical ops people. Beat 3 owns hiring. Nothing
+   about hiring, headcount or filling seats, and nothing about offshore, outsourced, BPO
+   or nearshore either: they have done none of it, which is why we are calling.
    Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
      them signed, and then getting them actually live."
@@ -730,7 +742,7 @@ from their world, never adjectives.
        ? ' Ground it in the facts above, claim nothing beyond them.'
        : ' You have seen nothing, so this is inference: that is why it hedges and ends in a question.'
    }
-3. CHANGE IN THE WORLD, the beat that earns the call, and the turn in the story. Three
+3. CHANGE IN THE WORLD, the beat that earns the call, 28 WORDS MAX. and the turn in the story. Three
    short sentences, 45 words at the very most. "And so what we are seeing from a high
    level... is that..." then the before and the after, told about THEIR operation rather
    than their industry in general: what filling this seat used to take, what it takes now,
@@ -740,14 +752,14 @@ from their world, never adjectives.
    "weeks, now months" does not, and neither does "harder" or "tougher" - those are the
    same sentence every other caller makes. Pick figures that are true of this kind of
    role in this kind of firm and say them.
-4. "So the big question is" + can they secure world class talent, naming two or three
+4. "So the big question is" 22 WORDS MAX. + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at ${oa.savings}, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
-5. "So in response to this, our edge lies in our access to pre-vetted firms." +
+5. "So in response to this, our edge lies in our access to pre-vetted firms." 14 WORDS MAX. +
    name in one word what they get back, then ${oa.proof}. Aim it at the exact problem
    beat 3 just described, not at us in general.
-6. "And we do it in a way where," + ${oa.mechanic}. End inside THEIR operation, on what
+6. "And we do it in a way where," 16 WORDS MAX. + ${oa.mechanic}. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
 
 VOICE: spoken, short clauses, contractions${pacing ? ', and ellipses as pacing marks, but at most ONE per beat' : ', no ellipses'}. ${TONES[tone]} No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service. Their words, nothing that could appear on a website.
@@ -758,12 +770,12 @@ get out of your mouth. Short, common, spoken words. Nothing anyone could trip ov
 Where a plainer word exists, use the plainer one. Industry nouns are fine when they are
 what the person actually says; long Latin verbs never are.
 
-LENGTH overrides everything above, and you keep running long. Hard budget, in words:
-beat 1 is 20, beat 2 is 35, beat 3 is 30, beat 4 is 25, beat 5 is 16, beat 6 is 20. That
-totals 146 and going over it is a failure, not a stylistic choice. Beats 1, 4, 5 and 6
-are ONE short sentence each, no subclauses, no lists, no "and then" chains. Beat 3 is
-three very short sentences. Count the words in each beat as you finish it, and cut back
-to the budget before you move on.`
+LENGTH overrides everything above, and the floor says it still runs long. Hard budget,
+in words: beat 1 is 18, beat 2 is 32, beat 3 is 28, beat 4 is 22, beat 5 is 14, beat 6 is
+16. That totals 130 and going over it is a failure, not a stylistic choice. Beats 1, 4, 5
+and 6 are ONE short sentence each, no subclauses, no lists, no "and then" chains. Beat 3
+is three very short sentences. Count the words in each beat as you finish it and cut back
+before you move on. If a word is not carrying meaning, it is costing the rep breath.`
 }
 
 export function buildRerollPrompt(

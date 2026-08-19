@@ -56,7 +56,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
   })
   const [tone, setTone] = useState<Tone>('house')
   const [pacing, setPacing] = useState(true)
-  const [days, setDays] = useState('Thursday or Friday afternoon')
   const [showSettings, setShowSettings] = useState(false)
 
   // The opening is fixed wording that needs no model call, so it is on the prompter
@@ -218,9 +217,9 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
       const res = await callAIRaw({
         model: MODEL,
         maxTokens: 700,
-        messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing, days) }],
+        messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing) }],
       })
-      let parsed = parseLeanSpiel(stripEmDash(textFrom(res)), days)
+      let parsed = parseLeanSpiel(stripEmDash(textFrom(res)))
 
       // Roughly one build in five comes back with a beat missing, usually because the
       // writer rephrased a frame so the anchors do not all match and the positional
@@ -234,9 +233,9 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
           const again = await callAIRaw({
             model: MODEL,
             maxTokens: 700,
-            messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing, days) }],
+            messages: [{ role: 'user', content: buildLeanSpielPrompt(raw, source, oa, tone, pacing) }],
           })
-          const retry = parseLeanSpiel(stripEmDash(textFrom(again)), days)
+          const retry = parseLeanSpiel(stripEmDash(textFrom(again)))
           if (!GENERATED_BEATS.some(b => !(retry.find(x => x.id === b.id)?.text || '').trim())) parsed = retry
         } catch { /* keep what we have and warn below */ }
       }
@@ -486,9 +485,6 @@ export default function SpielBuilder({ leadName = '', yourName = '', onUseInCall
             <input type="checkbox" checked={pacing} onChange={() => setPacing(v => !v)} />
             <span>Ellipsis pacing marks</span>
           </label>
-
-          <label className="spiel-label">Calendar options</label>
-          <input className="spiel-field" value={days} onChange={e => setDays(e.target.value)} />
 
           <div className="spiel-panel-note spiel-panel-note-warn">
             The partner network figure is inconsistent across our assets. Set the correct number here

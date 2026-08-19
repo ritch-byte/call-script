@@ -11,9 +11,20 @@
 // what not to say. Then the prompt was cut 16% with every rule kept, and this is where
 // it landed.
 //
-// MEASURED, four leads: 0.252, 0.263, 0.272 and 0.270, mean 0.264, from
-// usage.input_tokens and usage.output_tokens on the real responses. Rounded up to 0.27
-// because understating what the floor spends is the worse error. $1.32 per 500 builds.
+// MEASURED, four leads: 0.289, 0.302, 0.300 and 0.289, mean 0.295, from
+// usage.input_tokens and usage.output_tokens on the real responses. Rounded up to 0.30
+// because understating what the floor spends is the worse error. $1.48 per 500 builds.
+//
+// PROMPT-BASED LENGTH CONTROL IS EXHAUSTED. Four attempts now: a global word budget, a
+// per-beat budget, per-beat budgets moved to the end, and per-beat caps written inline
+// beside each beat. Every one lands at 183-207 written words and 92-102 seconds. The
+// beats carry required content - fixed frames, two named activities, two real numbers,
+// two or three roles, a cost figure - and the frames alone are about 55 words. Asking
+// more firmly does not create room that is not there.
+//
+// The only lever left is structural: beats 5 and 6 are both about us, and merging them
+// would save 15-20 words and put us in the story once rather than twice. That drops one
+// of the floor's own frames, so it is their call, not a cleanup.
 //
 // The number has crept all day: 0.19, 0.23, 0.24, 0.227 after the trim, 0.244, 0.25,
 // now 0.264. Every step is a rule added to the prompt, and a rule is input tokens on
@@ -42,7 +53,7 @@
 // live risk in trimming, since the offshore rule lost its emphasis to get here. Each
 // repair costs about another 0.05, so if that rate ever climbs to one build in five it
 // gives the whole saving back. Re-measure if the prompt or the model changes.
-export const BUILD_COST_CENTS = 0.27
+export const BUILD_COST_CENTS = 0.30
 
 /** Dollars for a day of dialling at this rate. */
 export const dailyCost = (cents: number, builds: number) => (cents * builds) / 100
