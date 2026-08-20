@@ -62,7 +62,7 @@ No? Oh okay, feel free to cut me off if it's not in your wheelhouse.
 Sent as a single user message. With **no** pasted source text:
 
 ```text
-Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for offshore staffing firms, built specifically for.
+Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for offshore staffing firms.
 
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 No research and no web access: you know nothing checkable about this company.
@@ -81,7 +81,7 @@ day, 3 says what changed about that day, 4 prices it, and only then do we turn u
 answer to something already on the table. Never restart on a new topic. Concrete nouns
 from their world, never adjectives.
 
-1. "So yeah quick thumbnail on us." 18 WORDS MAX. + this word for word, ending on the word "for":
+1. 18 WORDS MAX. "So yeah quick thumbnail on us." + this word for word, ending on "for":
    "the leading marketplace for offshore staffing firms, built specifically for" + then name what THIS company actually is, in five or six words, the way
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
@@ -89,7 +89,8 @@ from their world, never adjectives.
    The tail is a NOUN PHRASE naming what they ARE, and it ends there. "post-production
    studios" is right; "post-production studios scaling their teams" is wrong, because that
    is what we are ringing to propose, not what they are.
-2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX. Word for word, using the real company name
+2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX.
+   Word for word, using the real company name
    from the lead line rather than "your company": "I made some research about [company]...
    so correct me if I'm off, but [their job title]s like you are most likely" + the two
    activities. Saying the title back is what makes it land: they hear someone who knows
@@ -103,8 +104,8 @@ from their world, never adjectives.
    Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
      them signed, and then getting them actually live." You have seen nothing, so this is inference: that is why it hedges and ends in a question.
-3. CHANGE IN THE WORLD, the beat that earns the call, 28 WORDS MAX. and the turn in the story. Three
-   short sentences, 45 words at the very most. "And so what we are seeing from a high
+3. CHANGE IN THE WORLD, the beat that earns the call and the turn in the story.
+   THREE SHORT SENTENCES, 40 WORDS MAX. "And so what we are seeing from a high
    level... is that..." then the before and the after, told about THEIR operation rather
    than their industry in general: what filling this seat used to take, what it takes now,
    and the part nobody puts a number on, a seat sitting open or a hire that does not
@@ -113,14 +114,14 @@ from their world, never adjectives.
    "weeks, now months" does not, and neither does "harder" or "tougher" - those are the
    same sentence every other caller makes. Pick figures that are true of this kind of
    role in this kind of firm and say them.
-4. "So the big question is" 22 WORDS MAX. + can they secure world class talent, naming two or three
+4. 22 WORDS MAX. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
-5. "So in response to this, our edge lies in our access to pre-vetted firms." 14 WORDS MAX. +
+5. 14 WORDS MAX. "So in response to this, our edge lies in our access to pre-vetted firms." +
    name in one word what they get back, then real systems, real data security, managed teams, not random freelancers. Aim it at the exact problem
    beat 3 just described, not at us in general.
-6. "And we do it in a way where," 16 WORDS MAX. + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End inside THEIR operation, on what
+6. 16 WORDS MAX. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
 
 7. IF THEY CANNOT NAME A ROLE. 30 WORDS MAX. Not part of the spiel: the rep reads this
@@ -147,7 +148,7 @@ Beats 1, 4, 5 and 6 are ONE short sentence each. No subclauses, no lists.
 The lead block and the homework instruction change; everything else is identical:
 
 ```text
-Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for offshore staffing firms, built specifically for.
+Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for offshore staffing firms.
 
 LEAD: Northbeam Logistics, VP of Customer Operations, northbeam.com
 THE ONLY FACTS YOU MAY CLAIM:
@@ -171,7 +172,7 @@ day, 3 says what changed about that day, 4 prices it, and only then do we turn u
 answer to something already on the table. Never restart on a new topic. Concrete nouns
 from their world, never adjectives.
 
-1. "So yeah quick thumbnail on us." 18 WORDS MAX. + this word for word, ending on the word "for":
+1. 18 WORDS MAX. "So yeah quick thumbnail on us." + this word for word, ending on "for":
    "the leading marketplace for offshore staffing firms, built specifically for" + then name what THIS company actually is, in five or six words, the way
    someone there would describe the place. Not "businesses", not "companies like yours",
    not "founders like you": their industry, their kind of firm. No bridge phrases like
@@ -179,7 +180,8 @@ from their world, never adjectives.
    The tail is a NOUN PHRASE naming what they ARE, and it ends there. "post-production
    studios" is right; "post-production studios scaling their teams" is wrong, because that
    is what we are ringing to propose, not what they are.
-2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX. Word for word, using the real company name
+2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX.
+   Word for word, using the real company name
    from the lead line rather than "your company": "I made some research about [company]...
    so correct me if I'm off, but [their job title]s like you are most likely" + the two
    activities. Saying the title back is what makes it land: they hear someone who knows
@@ -193,8 +195,8 @@ from their world, never adjectives.
    Shape only, never reuse the words, the industries, or "across the X markets":
      Head of Partnerships: "carrier and partner deals across the SEA markets... getting
      them signed, and then getting them actually live." Ground it in the facts above, claim nothing beyond them.
-3. CHANGE IN THE WORLD, the beat that earns the call, 28 WORDS MAX. and the turn in the story. Three
-   short sentences, 45 words at the very most. "And so what we are seeing from a high
+3. CHANGE IN THE WORLD, the beat that earns the call and the turn in the story.
+   THREE SHORT SENTENCES, 40 WORDS MAX. "And so what we are seeing from a high
    level... is that..." then the before and the after, told about THEIR operation rather
    than their industry in general: what filling this seat used to take, what it takes now,
    and the part nobody puts a number on, a seat sitting open or a hire that does not
@@ -203,14 +205,14 @@ from their world, never adjectives.
    "weeks, now months" does not, and neither does "harder" or "tougher" - those are the
    same sentence every other caller makes. Pick figures that are true of this kind of
    role in this kind of firm and say them.
-4. "So the big question is" 22 WORDS MAX. + can they secure world class talent, naming two or three
+4. 22 WORDS MAX. "So the big question is" + can they secure world class talent, naming two or three
    roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing
    quality? Ends in a question mark. The cost comparison IS this beat: the number and
    what they pay locally must both appear, or the beat has failed.
-5. "So in response to this, our edge lies in our access to pre-vetted firms." 14 WORDS MAX. +
+5. 14 WORDS MAX. "So in response to this, our edge lies in our access to pre-vetted firms." +
    name in one word what they get back, then real systems, real data security, managed teams, not random freelancers. Aim it at the exact problem
    beat 3 just described, not at us in general.
-6. "And we do it in a way where," 16 WORDS MAX. + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End inside THEIR operation, on what
+6. 16 WORDS MAX. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need, so you plug into a high-performing team instead of building one. End inside THEIR operation, on what
    it feels like once it is running: the team feels like theirs, not a vendor.
 
 7. IF THEY CANNOT NAME A ROLE. 30 WORDS MAX. Not part of the spiel: the rep reads this
