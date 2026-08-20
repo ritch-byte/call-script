@@ -11,10 +11,19 @@
  *   - Two characters were repaired: the dash class in the response cleanup and the dot
  *     separator in the parsed-lead line had both been mangled to latin-1 in transit.
  *
- * THE PROMPT IN buildPrompt IS BYTE FOR BYTE THE ORIGINAL, including its indentation.
- * Every phrase in it was tuned against live calls: the word for word locks, the word
- * caps, the banned words, the delivery marks. Do not reformat it, do not "improve" it,
- * and do not let a formatter re-wrap the template literal.
+ * THE PROMPT IN buildPrompt IS THE ORIGINAL, including its indentation, with ONE addition
+ * recorded below. Every phrase in it was tuned against live calls: the word for word
+ * locks, the word caps, the banned words, the delivery marks. Do not reformat it, do not
+ * "improve" it, and do not let a formatter re-wrap the template literal.
+ *
+ * THE ONE ADDITION, to beat 4, and the reason. A rep ran three leads and every spiel
+ * named roles that cannot be done offshore: a hotel's GM, front office manager and
+ * housekeeping lead; a restaurant's kitchen staff and floor managers. Beat 4 asked for
+ * "roles this company would really hire offshore" but never said how to tell, so the
+ * writer named the roles the company obviously hires, which for anywhere physical are all
+ * on site. It now carries the test - could this person do the whole job on a laptop, with
+ * nobody needing them in the building - and the failing examples from those calls. Nothing
+ * else in the string moved.
  *
  * There is deliberately no regenerate button. A rep finishes the call and moves to the
  * next lead.
@@ -349,6 +358,7 @@ export function buildPrompt({
   3. CHANGE IN THE WORLD, the beat that earns the call and the turn in the story. THREE SHORT SENTENCES, 40 WORDS MAX. "And so what we are seeing from a high level... is that..." then the before and the after, told about THEIR operation: what filling this seat used to take, what it takes now, and the part nobody puts a number on. THE BEFORE AND AFTER MUST BE ACTUAL NUMBERS. "three weeks, now it's eight" works. "weeks, now months" does not, and neither does "harder".
 
   4. 22 WORDS MAX. "So the big question is" + can they secure world class talent, naming two or three roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing quality? The cost comparison IS this beat.
+  THE ROLES MUST BE DOABLE FROM ANOTHER COUNTRY. Put every role through that test before you name it: could this person do the whole job on a laptop, with nobody needing them in the building? A hotel's GM, front office manager and housekeeping lead all fail it; its reservations agents, revenue analysts and accounts payable clerks pass. A restaurant's kitchen staff and floor managers fail; its bookkeeping, payroll admin, supplier ordering and social media pass. Where the work itself is physical, on site or hands on, the offshorable roles are the back office behind it and never the floor.
 
   5. 14 WORDS MAX. "So in response to this, our edge lies in our access to pre-vetted firms." + name in one word what they get back, then real systems, real data security, managed teams, not random freelancers.
 
