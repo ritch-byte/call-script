@@ -261,6 +261,7 @@ The industry was not given. Work it out from the company name and the website ad
 
   4. 22 WORDS MAX. "So the big question is" + can they secure world class talent, naming two or three roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing quality? The cost comparison IS this beat.
   THE ROLES MUST BE DOABLE FROM ANOTHER COUNTRY. Put every role through that test before you name it: could this person do the whole job on a laptop, with nobody needing them in the building? A hotel's GM, front office manager and housekeeping lead all fail it; its reservations agents, revenue analysts and accounts payable clerks pass. A restaurant's kitchen staff and floor managers fail; its bookkeeping, payroll admin, supplier ordering and social media pass. Where the work itself is physical, on site or hands on, the offshorable roles are the back office behind it and never the floor.
+  NAME THREE, AND MAKE ONE OF THEM GENERAL. One or two tied to this person's own remit, and then one that any firm in this industry needs whatever seat you are talking to: the bookkeeping, the admin support, the payroll, the customer support sitting behind the operation. Say the general one last. It is the safety net, because if the specific roles are not the ones they happen to be short of, that one still lands.
 
   5. 14 WORDS MAX. "So in response to this, our edge lies in our access to pre-vetted firms." + name in one word what they get back, then real systems, real data security, managed teams, not random freelancers.
 
