@@ -11,14 +11,14 @@
  *   - Two characters were repaired: the dash class in the response cleanup and the dot
  *     separator in the parsed-lead line had both been mangled to latin-1 in transit.
  *
- * THE PROMPT IN buildPrompt IS THE ORIGINAL, including its indentation, with ONE addition
- * recorded below. Every phrase in it was tuned against live calls: the word for word
+ * THE PROMPT IN buildPrompt IS THE ORIGINAL, including its indentation, with THREE
+ * additions recorded below. Every phrase in it was tuned against live calls: the word for word
  * locks, the word caps, the banned words, the delivery marks. Do not reformat it, do not
  * "improve" it, and do not let a formatter re-wrap the template literal.
  *
- * THE ADDITIONS, both to beat 4, and the reasons.
+ * THE ADDITIONS, and the reasons.
  *
- * ONE. A rep ran three leads and every spiel
+ * ONE, beat 4. A rep ran three leads and every spiel
  * named roles that cannot be done offshore: a hotel's GM, front office manager and
  * housekeeping lead; a restaurant's kitchen staff and floor managers. Beat 4 asked for
  * "roles this company would really hire offshore" but never said how to tell, so the
@@ -26,19 +26,27 @@
  * on site. It now carries the test - could this person do the whole job on a laptop, with
  * nobody needing them in the building - and the failing examples from those calls.
  *
- * TWO. The beat now has to name three roles, one or two on this person's own remit and
+ * TWO, beat 4. The beat now has to name three roles, one or two on this person's own remit and
  * then one that any firm in the industry needs whatever seat is on the phone: the
  * bookkeeping, the admin, the payroll, the support behind the operation. It goes last and
  * it is the safety net, because the specific roles are a guess about what they are short
  * of and the general one is not.
  *
- * Nothing else in the string moved, and 20 checks confirm it.
+ * THREE, beat 3 and one paragraph of context. The read now stops after beat 2 and asks
+ * what roles the team prioritises. A lead who names one goes straight to the offer, so
+ * beats 3 to 7 are the fallback rather than the main path, and beat 3 opens "I see," so it
+ * picks the conversation up from a shrug instead of continuing a monologue. The writer is
+ * told this, because a beat written as the middle of a monologue reads wrong as the thing
+ * you say after silence.
+ *
+ * Nothing else in the string moved, and the checks confirm it.
  *
  * There is deliberately no regenerate button. A rep finishes the call and moves to the
  * next lead.
  */
 import { useState, useMemo } from 'react'
 import { callAI } from '../lib/ai'
+import { flow } from '../data/flow'
 
 /** Pinned here rather than in a proxy. One click, one call, about 0.36c a spiel. */
 const MODEL = 'claude-haiku-4-5-20251001'
@@ -356,6 +364,8 @@ export function buildPrompt({
 
   It is one continuous read, start to finish. Beats 1 to 6 carry no ask, no meeting request and no sign-off. The ask lives in beat 7 and nowhere else.
 
+  The rep stops after beat 2 and asks what roles the team prioritises. If the lead names one, the rep goes straight to the offer and beats 3 to 7 are never read. Beats 3 to 7 are what the rep falls back on when the answer is vague or there is no role, so beat 3 has to pick the conversation up from a shrug rather than continue a monologue.
+
   The rep has ALREADY opened the call before beat 1: they greeted the lead by name, gave their own name, said they are from Outsource Accelerator, asked for half a minute and got it. So do not greet, do not introduce yourself, do not name Outsource Accelerator again, do not ask for permission or for time. Start cold on the thumbnail.
 
   ONE STORY, NOT SIX CLAIMS. The company name is context for you only. Do not say it anywhere in the spiel: the rep refers to "your company". After the thumbnail, THEY are the subject and we do not appear again until beat 5. Each beat picks up what the last one put down: 2 names their day, 3 says what changed about that day, 4 prices it, and only then do we turn up as the answer to something already on the table. Never restart on a new topic. Concrete nouns from their world, never adjectives.
@@ -364,7 +374,7 @@ export function buildPrompt({
 
   2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX. Word for word, saying "your company" and never the company's actual name: "I made some research about your company... so correct me if I'm off, but ${plural} like you are most likely" + the two activities. Say the title back exactly like that, plural and unchanged. Saying the title back is what makes it land. Then two concrete things that title does hour to hour, joined by "and then". Then word for word: "right?" Pick the two a team could take off their hands, the operational work. Their day is the WORK, never the staffing of it. Beat 3 owns hiring, so nothing about hiring, recruiting, headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore either. Shape only, never reuse the words or "across the X markets": Head of Partnerships: "carrier and partner deals across the SEA markets... getting them signed, and then getting them actually live."
 
-  3. CHANGE IN THE WORLD, the beat that earns the call and the turn in the story. THREE SHORT SENTENCES, 40 WORDS MAX. "And so what we are seeing from a high level... is that..." then the before and the after, told about THEIR operation: what filling this seat used to take, what it takes now, and the part nobody puts a number on. THE BEFORE AND AFTER MUST BE ACTUAL NUMBERS. "three weeks, now it's eight" works. "weeks, now months" does not, and neither does "harder".
+  3. CHANGE IN THE WORLD, the beat that earns the call and the turn in the story. THREE SHORT SENTENCES, 40 WORDS MAX. "I see, and so what we are seeing from a high level... is that..." then the before and the after, told about THEIR operation: what filling this seat used to take, what it takes now, and the part nobody puts a number on. THE BEFORE AND AFTER MUST BE ACTUAL NUMBERS. "three weeks, now it's eight" works. "weeks, now months" does not, and neither does "harder".
 
   4. 22 WORDS MAX. "So the big question is" + can they secure world class talent, naming two or three roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing quality? The cost comparison IS this beat.
   THE ROLES MUST BE DOABLE FROM ANOTHER COUNTRY. Put every role through that test before you name it: could this person do the whole job on a laptop, with nobody needing them in the building? A hotel's GM, front office manager and housekeeping lead all fail it; its reservations agents, revenue analysts and accounts payable clerks pass. A restaurant's kitchen staff and floor managers fail; its bookkeeping, payroll admin, supplier ordering and social media pass. Where the work itself is physical, on site or hands on, the offshorable roles are the back office behind it and never the floor.
@@ -478,10 +488,35 @@ export default function SpielBuilder() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  /** Which way the roles question went. '' until the rep says. */
+  const [path, setPath] = useState<'' | 'role' | 'vague'>('')
 
   const { title, company, industry, url, contact } = useMemo(() => parseLead(leadLine), [leadLine])
   const ready = Boolean(title.trim() && company.trim())
   const intro = useMemo(() => buildIntro(contact), [contact])
+
+  /**
+   * The read stops here and waits. Beats 1 and 2 have done their job, and what the lead
+   * says next decides whether the rest of the pitch is needed at all.
+   *
+   * Fixed rather than generated: it carries nothing about this lead, and the whole branch
+   * hangs off the exact question, so it is not the model's to reword.
+   */
+  const rolesQuestion = useMemo(() => {
+    const lead = (contact || '').split(/\s+/)[0] || '[Lead Name]'
+    return `But I'm just curious ${lead}, what type of roles does your team currently prioritize?`
+  }, [contact])
+
+  /* Beats 1 and 2, then the question. Beats 3 to 7 only if the answer was a shrug. */
+  const opening = spiel.slice(0, 2)
+  const rest = spiel.slice(2)
+  /* The offer, read from the call script so this and the live flow cannot drift apart. */
+  const offer = (flow.value_offer?.script ?? '').split(/\n{2,}/).map(s => s.trim()).filter(Boolean)
+
+  /* Everything up to the question, then the buttons, then whichever branch was tapped. */
+  const head = [...intro, ...opening, ...(opening.length ? [rolesQuestion] : [])]
+  const tail = path === 'role' ? offer : path === 'vague' ? rest : []
+  const onScreen = [...head, ...tail]
 
   async function generate() {
     if (!ready || loading || spiel.length) return
@@ -530,10 +565,11 @@ export default function SpielBuilder() {
     setSpiel([])
     setError('')
     setCopied(false)
+    setPath('')
   }
 
   function copy() {
-    navigator.clipboard?.writeText([...intro, ...spiel].join('\n\n'))
+    navigator.clipboard?.writeText(onScreen.join('\n\n'))
     setCopied(true)
     setTimeout(() => setCopied(false), 1600)
   }
@@ -601,7 +637,7 @@ export default function SpielBuilder() {
         </div>
 
         <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderTop: 'none', padding: '26px 26px 22px' }}>
-          {[...intro, ...spiel].map((p, i) => (
+          {head.map((p, i) => (
             <p
               key={i}
               style={{
@@ -615,6 +651,67 @@ export default function SpielBuilder() {
               <ScriptLine text={p} size={18} />
             </p>
           ))}
+
+          {/* The read stops on the roles question and waits for a human answer. Both
+              branches are already written, so whichever the rep taps is instant. */}
+          {spiel.length > 0 && (
+            <div style={{ marginTop: 26, borderTop: `1px solid ${LINE}`, paddingTop: 18 }}>
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: '0.14em',
+                  color: '#8b94a5',
+                  marginBottom: 10,
+                }}
+              >
+                WHAT DID THEY SAY?
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                {([
+                  ['role', 'They named a role'],
+                  ['vague', 'Vague, or no role'],
+                ] as Array<['role' | 'vague', string]>).map(([key, label]) => (
+                  <button
+                    key={key}
+                    onClick={() => setPath(p => (p === key ? '' : key))}
+                    style={{
+                      background: path === key ? MAGENTA : '#fff',
+                      color: path === key ? '#fff' : NAVY,
+                      border: `1px solid ${path === key ? MAGENTA : LINE}`,
+                      borderRadius: 4,
+                      padding: '9px 16px',
+                      fontFamily: MONO,
+                      fontSize: 11,
+                      letterSpacing: '0.06em',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {tail.length > 0 && (
+                <div style={{ marginTop: 22 }}>
+                  {tail.map((p, i) => (
+                    <p
+                      key={i}
+                      style={{
+                        margin: i ? '20px 0 0' : 0,
+                        fontSize: 18,
+                        lineHeight: 1.65,
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
+                      <ScriptLine text={p} size={18} />
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {!spiel.length && (
             <p style={{ marginTop: 20, fontFamily: MONO, fontSize: 11, color: '#b6bdc9', letterSpacing: '0.06em' }}>
               THE REST LANDS HERE
