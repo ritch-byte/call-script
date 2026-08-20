@@ -3,7 +3,6 @@ import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, SAVINGS_CLAIM, S
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
-import SpielBuilder from './SpielBuilder'
 import { callAI, buildResearchPrompt } from '../lib/ai'
 import Scorecard from './Scorecard'
 import { newState, applyAnswer } from '../lib/score'
@@ -66,9 +65,6 @@ export default function CallScreen({ onReset }: Props) {
   const [showResearch, setShowResearch] = useState(false)
   const [showGates, setShowGates] = useState(false)
   const [emailPageOpen, setEmailPageOpen] = useState(false)
-  const [spielPageOpen, setSpielPageOpen] = useState(false)
-  /** Role and slot carried over from the Spiel Builder's post-booking qualifier. */
-  const [qualContext, setQualContext] = useState<{ role: string; when: string } | null>(null)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
@@ -145,10 +141,10 @@ export default function CallScreen({ onReset }: Props) {
 
   // Reserve space for the fixed scorecard so it never overlaps the cards.
   useEffect(() => {
-    const on = showScore && !emailPageOpen && !spielPageOpen
+    const on = showScore && !emailPageOpen
     document.body.classList.toggle('scorecard-open', on)
     return () => document.body.classList.remove('scorecard-open')
-  }, [showScore, emailPageOpen, spielPageOpen])
+  }, [showScore, emailPageOpen])
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
@@ -187,45 +183,6 @@ export default function CallScreen({ onReset }: Props) {
 
   const sp1Prefill = mkPrefill(sharedDate, sharedTime, sharedLink)
   const sp2Prefill = mkPrefill(sharedDate2 || sharedDate, sharedTime2 || sharedTime, sharedLink2)
-
-  // ── Spiel Builder full-page view ────────────────────────────────────────
-  if (spielPageOpen) {
-    return (
-      <div className="call-screen">
-        <div className="email-page-header">
-          <button className="email-page-back" onClick={() => setSpielPageOpen(false)}>
-            ← Back to Call
-          </button>
-          <span className="email-page-title">Spiel Builder</span>
-        </div>
-
-        <div className="email-page-body">
-          <SpielBuilder
-            leadName={leadName}
-            yourName={yourName}
-            onUseInCall={research => {
-              setGeminiResearch(research)
-              setShowResearch(false)
-              setSpielPageOpen(false)
-            }}
-            onQualify={({ role, when, banks, refuses }) => {
-              // Credit what the buyer already confirmed so the live scorecard reflects
-              // the call, then drop the rep at Role Fit to carry on in the real flow.
-              setScoreStack(prev => [
-                ...prev,
-                applyAnswer(prev[prev.length - 1], { banks, refuses }),
-              ])
-              setQualContext({ role, when })
-              if (role) setContext(prev => ({ ...prev, roleWanted: role }))
-              const idx = steps.findIndex(s => s.nodeId === 'qualify_role')
-              if (idx !== -1) setActiveIdx(idx)
-              setSpielPageOpen(false)
-            }}
-          />
-        </div>
-      </div>
-    )
-  }
 
   if (emailPageOpen) {
     return (
@@ -293,12 +250,6 @@ export default function CallScreen({ onReset }: Props) {
             onClick={() => setShowScore(v => !v)}
           >
             Scorecard
-          </button>
-          <button
-            className="btn-header-ghost"
-            onClick={() => setSpielPageOpen(true)}
-          >
-            Spiel Builder
           </button>
           <button
             className="btn-header-ghost"
@@ -386,7 +337,7 @@ export default function CallScreen({ onReset }: Props) {
             The analyzer credits what the <strong style={{ color: '#15213f' }}>buyer</strong> says out loud — not your summary. Get a spoken &ldquo;yes&rdquo; on all three.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-            {SPOKEN_GATE_ORDER.map(id => ({ g: GATE_TITLES[id], ask: `“${gateAsk(id, qualContext?.role || '')}”`, say: GATE_COPY[id].say, not: GATE_COPY[id].not })).map(c => (
+            {SPOKEN_GATE_ORDER.map(id => ({ g: GATE_TITLES[id], ask: `“${gateAsk(id, '')}”`, say: GATE_COPY[id].say, not: GATE_COPY[id].not })).map(c => (
               <div key={c.g} style={{ background: '#fff', border: '1px solid #e5e8f1', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '.02em', color: '#d6006e', marginBottom: 6 }}>{c.g}</div>
                 <div style={{ fontSize: 12.5, color: '#5b6379', fontStyle: 'italic', marginBottom: 10 }}>{c.ask}</div>
@@ -408,23 +359,6 @@ export default function CallScreen({ onReset }: Props) {
           <div style={{ marginTop: 12, background: '#f2f4fa', borderRadius: 10, padding: '10px 14px', fontSize: 12.5, color: '#3f4a5f' }}>
             <strong style={{ color: '#15213f' }}>Recap &amp; lock:</strong> end on a question, wait for an audible &ldquo;yes.&rdquo; A nod isn&rsquo;t proof. &ldquo;Maybe / possibly / probably&rdquo; reads as <strong style={{ color: '#c0364a' }}>unclear</strong> and flags — convert it to an explicit yes before you book.
           </div>
-        </div>
-      )}
-
-      {/* ── Carried over from the Spiel Builder's qualifier ── */}
-      {qualContext && (
-        <div className="qual-banner">
-          <span className="qual-banner-key">Qualifying for</span>
-          <strong>{qualContext.role || 'no role named'}</strong>
-          {qualContext.when && (
-            <>
-              <span className="qual-banner-key">· slot</span>
-              <strong>{qualContext.when}</strong>
-            </>
-          )}
-          <button className="qual-banner-x" onClick={() => setQualContext(null)} title="Dismiss">
-            ×
-          </button>
         </div>
       )}
 

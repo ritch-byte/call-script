@@ -5,10 +5,6 @@ dc-dashboard-pages
 call-script-v2/node_modules/
 call-script-v2/dist/
 
-# The development API key probes spend, so test runs never land on the same line of
-# the usage page as the floor's real builds. Never commit it.
-call-script-v2/.env.probe
-
 # This repo is the home directory and it pushes to a public GitHub remote, so anything
 # left untracked here is one `git add -A` away from being published. .claude holds an
 # auth credential, conversation transcripts that quote whatever was typed into them
