@@ -351,7 +351,7 @@ export function buildPrompt({
 }): string {
   const plural = pluralTitle(title)
   const { offer, fallback } = offerWindow()
-  return `Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for offshore staffing firms.
+  return `Write a cold call opener for an SDR at Outsource Accelerator, the leading marketplace for global talent networks.
 
   LEAD: ${title}, ${company}${industry ? `, ${industry}` : ''}${url ? `, ${url}` : ''}
   No research and no web access: you know nothing checkable about this company. The website address is there for the kind of firm it signals, nothing more. Do not claim anything you would have had to read on it.${
@@ -370,7 +370,7 @@ export function buildPrompt({
 
   ONE STORY, NOT SIX CLAIMS. The company name is context for you only. Do not say it anywhere in the spiel: the rep refers to "your company". After the thumbnail, THEY are the subject and we do not appear again until beat 5. Each beat picks up what the last one put down: 2 names their day, 3 says what changed about that day, 4 prices it, and only then do we turn up as the answer to something already on the table. Never restart on a new topic. Concrete nouns from their world, never adjectives.
 
-  1. 18 WORDS MAX. "So yeah quick thumbnail on us..." + this word for word, ending on "for": "we're the leading marketplace for offshore staffing firms, built specifically for" + then name what THIS company actually is, in five or six words, the way someone there would describe the place. Not "businesses", not "companies like yours", not "founders like you": their industry, their kind of firm. No bridge phrases like "which basically means". The tail is a NOUN PHRASE naming what they ARE, and it ends there. "post-production studios" is right; "post-production studios scaling their teams" is wrong, because that is what we are ringing to propose.
+  1. 18 WORDS MAX. "So yeah quick thumbnail on us..." + this word for word, ending on "for": "we're the leading marketplace for global talent networks, built specifically for" + then name what THIS company actually is, in five or six words, the way someone there would describe the place. Not "businesses", not "companies like yours", not "founders like you": their industry, their kind of firm. No bridge phrases like "which basically means". The tail is a NOUN PHRASE naming what they ARE, and it ends there. "post-production studios" is right; "post-production studios scaling their teams" is wrong, because that is what we are ringing to propose.
 
   2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX. Word for word, saying "your company" and never the company's actual name: "I made some research about your company... so correct me if I'm off, but ${plural} like you are most likely" + the two activities. Say the title back exactly like that, plural and unchanged. Saying the title back is what makes it land. Then two concrete things that title does hour to hour, joined by "and then". Then word for word: "right?" Pick the two a team could take off their hands, the operational work. Their day is the WORK, never the staffing of it. Beat 3 owns hiring, so nothing about hiring, recruiting, headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore either. Shape only, never reuse the words or "across the X markets": Head of Partnerships: "carrier and partner deals across the SEA markets... getting them signed, and then getting them actually live."
 
