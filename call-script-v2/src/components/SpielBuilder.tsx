@@ -34,16 +34,28 @@
  * word locks, the word caps, the banned words, the delivery marks. Do not reformat it, do
  * not "improve" it, and do not let a formatter re-wrap the template literal.
  *
- * ONE KNOWN GAP, left in on purpose because the prompt is not ours to edit. Beat 3 names
- * two roles and says they must be titles a lead would recognise on an org chart, but it
- * never says the roles have to be doable from another country. A previous build had the
- * same gap and a rep ran three leads through it, a hotel and two restaurants, and got back
- * the GM, the front office manager, the housekeeping lead, the kitchen staff and the floor
- * managers. All real titles, none of them offshorable. The fix that worked was one sentence
- * in the roles beat: could this person do the whole job on a laptop, with nobody needing
- * them in the building. It is not here because adding it means editing the string the brief
- * says not to edit. Ask before assuming this is safe on hospitality, trades, clinics,
- * retail or anywhere else the work happens on site.
+ * THE ONE ADDITION TO THE PROMPT, in beat 3, and why it is there anyway.
+ *
+ * Two reps reported the same defect from two different builds. Bedier ran three leads, a
+ * hotel and two restaurants, and got the GM, the front office manager, the housekeeping
+ * lead, the kitchen staff and the floor managers. Rommel ran a logistics lead on this
+ * build and got "an offshore Operations Coordinator to take logistics scheduling off your
+ * plate, or a Warehouse Manager to handle the receiving side and keep the warehouse
+ * running while you're out in the field". The first role is fine. The second cannot be
+ * done from another country, and the sentence even says the lead is out in the field while
+ * it happens.
+ *
+ * Beat 3 asked for titles a lead would recognise on an org chart and never said the roles
+ * had to be doable from another country, so the writer named the seats the company
+ * obviously has, which for anything physical are all on site. The new second-role rule
+ * makes it worse rather than better: told to point at the wider operation, the writer
+ * points at the floor, because on a logistics firm the wider operation IS the floor.
+ *
+ * So beat 3 now carries the laptop test, the failing titles from both reports, the back
+ * office that passes instead, and a line aiming the second role at the desk work behind
+ * the operation. This edits the string the brief says not to edit. It is here because the
+ * alternative is a rep reading an unofferable role aloud on a live call, twice reported,
+ * and because the caps, the locks and the delivery marks it protects are all untouched.
  *
  * There is deliberately no regenerate button. A rep finishes the call and moves to the
  * next lead.
@@ -384,6 +396,7 @@ export function buildPrompt({
 
   Then suggest the roles, lightly, the way you would float an idea rather than present a finding. Word for word: "so yeah I think a great starting point to help is" + an offshore role + "to" + what it takes off them, then "or a" + a second role + "to" + what that one takes off them. Two roles, that is all. Keep it easy, keep it short, and let it sound like a thought rather than a recommendation.
   THE TWO ROLES DO DIFFERENT JOBS. The FIRST one is theirs: it sits directly under this person's own remit and takes work off the desk you described in beat 2, so they feel it personally. The SECOND one is the company's: a seat a firm in their industry carries regardless of who is in this person's chair, and it should point at the wider operation rather than at their own queue. Two roles, one close in and one further out, never two versions of the same seat.
+  BOTH ROLES MUST BE DOABLE FROM ANOTHER COUNTRY. The test, before you name either one: could this person do the whole job on a laptop, with nobody needing them in the building? A warehouse manager, a site foreman, a front office manager, a housekeeping lead, kitchen staff, floor managers all fail it, because the job is where the work is. The back office behind them passes: purchasing and inventory coordinators, order processing, freight and customs documentation, dispatch scheduling, bookkeeping, payroll, customer support. Watch the SECOND role hardest. Pointing at the wider operation is exactly what pulls you onto the floor, so aim it at the desk work behind the operation, never at the operation itself.
   Real job titles a lead would recognise on an org chart. End the beat there, on the second role. No question, no follow up, no handing it back to them.
 
   WE ARE NOT IN THIS BEAT. The subject is them, their desk, or the role itself. Never us and never what we do. BANNED outright: "we typically place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", "our partners", and any sentence at all whose subject is we, our, us or I. If a sentence could be moved onto a company website unchanged, rewrite it.

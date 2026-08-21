@@ -17,19 +17,19 @@
  * in the component. Deploy this, then point the component at the /exec URL, and
  * the model stops being something the browser can change.
  *
- * WATCH MAX_PROMPT_CHARS. Measured against the v2 prompt: 8309 characters for the
- * brief's own test lead, 8407 when the industry is blank because that adds a
- * paragraph, and 8603 for a deliberately long CRM row. All under 9000, so nothing
- * is broken today, but that is roughly 400 characters of headroom and the lead's
- * own title, company, industry and URL are what consume it. Past the line this
- * proxy answers "Bad request.", which reaches the rep as "That did not come back
- * clean. Run it again." Running it again cannot help, because the prompt is the
- * same length every time. Raising this to 12000 costs nothing.
+ * MAX_PROMPT_CHARS IS 12000, NOT THE 9000 IT SHIPPED WITH. The v2 prompt measured
+ * 8309 characters for the brief's own test lead before beat 3 gained the
+ * offshorability test, and that addition costs about 700 more. At 9000 a long CRM
+ * row would have crossed the line, and past the line this proxy answers "Bad
+ * request.", which reaches the rep as "That did not come back clean. Run it again."
+ * Running it again cannot help, because the prompt is the same length every time.
+ * The ceiling is here to stop a browser sending an arbitrary prompt on our key, and
+ * 12000 still does that with room for the prompt to grow.
  */
 
 var MODEL = 'claude-haiku-4-5-20251001'; // ~$0.0036 per spiel
 var MAX_TOKENS = 800;                    // four short beats need ~350
-var MAX_PROMPT_CHARS = 9000;             // refuse anything not our spec
+var MAX_PROMPT_CHARS = 12000;            // refuse anything not our spec
 
 function doPost(e) {
   try {
