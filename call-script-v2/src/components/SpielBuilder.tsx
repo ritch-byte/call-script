@@ -11,7 +11,7 @@
  *   - Two characters were repaired: the dash class in the response cleanup and the dot
  *     separator in the parsed-lead line had both been mangled to latin-1 in transit.
  *
- * THE PROMPT IN buildPrompt IS THE ORIGINAL, including its indentation, with THREE
+ * THE PROMPT IN buildPrompt IS THE ORIGINAL, including its indentation, with FOUR
  * additions recorded below. Every phrase in it was tuned against live calls: the word for word
  * locks, the word caps, the banned words, the delivery marks. Do not reformat it, do not
  * "improve" it, and do not let a formatter re-wrap the template literal.
@@ -38,6 +38,22 @@
  * picks the conversation up from a shrug instead of continuing a monologue. The writer is
  * told this, because a beat written as the middle of a monologue reads wrong as the thing
  * you say after silence.
+ *
+ * FOUR, beats 3, 4 and 5. Two scripts the floor already runs by hand carry three devices
+ * this prompt did not. Beat 3 can now be the two bad options - stuck choosing between
+ * paying premium locally or gambling on unverified freelancers - and that is the default,
+ * with the before-and-after number kept as the exception. It is the better default twice
+ * over: the lead recognises both horns without being quoted a figure, and the old rule
+ * MADE the writer invent a market statistic, which is the class of claim the SP change
+ * order just finished stripping out of the call script. Beat 4 can close on the cost of
+ * waiting instead of "without sacrificing quality". Beat 5 now carries the "Think..." list,
+ * three things and then "not just random remote workers", which meant beat 5 also had to
+ * come out of the no-lists rule at the bottom, or the two instructions contradict.
+ *
+ * NOT taken from those scripts: "trusted by over 3,000 businesses", "some of the biggest
+ * companies in [country]" and "more than 95% of businesses". Unverified numbers, and the
+ * same change order replaced 4,700 with more than 80 source partners. "enterprise-grade
+ * infrastructure" is out too, since "infrastructure" is already on the trip-word list.
  *
  * Nothing else in the string moved, and the checks confirm it.
  *
@@ -374,13 +390,16 @@ export function buildPrompt({
 
   2. THE HOMEWORK, the beat that buys the call. 32 WORDS MAX. Word for word, saying "your company" and never the company's actual name: "I made some research about your company... so correct me if I'm off, but ${plural} like you are most likely" + the two activities. Say the title back exactly like that, plural and unchanged. Saying the title back is what makes it land. Then two concrete things that title does hour to hour, joined by "and then". Then word for word: "right?" Pick the two a team could take off their hands, the operational work. Their day is the WORK, never the staffing of it. Beat 3 owns hiring, so nothing about hiring, recruiting, headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore either. Shape only, never reuse the words or "across the X markets": Head of Partnerships: "carrier and partner deals across the SEA markets... getting them signed, and then getting them actually live."
 
-  3. CHANGE IN THE WORLD, the beat that earns the call and the turn in the story. THREE SHORT SENTENCES, 40 WORDS MAX. "I see, and so what we are seeing from a high level... is that..." then the before and the after, told about THEIR operation: what filling this seat used to take, what it takes now, and the part nobody puts a number on. THE BEFORE AND AFTER MUST BE ACTUAL NUMBERS. "three weeks, now it's eight" works. "weeks, now months" does not, and neither does "harder".
+  3. THE TRAP, the beat that earns the call and the turn in the story. TWO OR THREE SHORT SENTENCES, 40 WORDS MAX. "I see, and so what we are seeing from a high level... is that..." then ONE of these two shapes, whichever this firm would actually recognise.
+  EITHER THE TWO BAD OPTIONS, and this is the shape to use by default. Firms like this one are stuck choosing between one thing and another, where both are real and both cost them something. "stuck choosing between paying premium for local talent or gambling on unverified freelancers" is the shape. Name the two the way THIS firm meets them, in their roles and their market. It works because the lead recognises both horns, not because we quoted a figure at them.
+  OR THE BEFORE AND THE AFTER, if a number here is genuinely obvious. What filling this seat used to take, what it takes now, and the part nobody puts a number on. IN ACTUAL NUMBERS: "three weeks, now it's eight" works, "weeks, now months" does not, and neither does "harder". Only use this shape if you would stand behind the number. An invented statistic about their market is worse than no statistic, so if you are reaching for one, use the two bad options instead.
 
   4. 22 WORDS MAX. "So the big question is" + can they secure world class talent, naming two or three roles this company would really hire offshore, at up to 70% less than local hiring cost, without sacrificing quality? The cost comparison IS this beat.
+  THE CLOSING CLAUSE IS ONE OF TWO, never both. Either "without sacrificing quality", or the cost of waiting, the way "before you get lost in a stack of generic proposals from unvetted vendors" does it. The second one is stronger when beat 3 used the two bad options, because it names what the wrong horn actually costs.
   THE ROLES MUST BE DOABLE FROM ANOTHER COUNTRY. Put every role through that test before you name it: could this person do the whole job on a laptop, with nobody needing them in the building? A hotel's GM, front office manager and housekeeping lead all fail it; its reservations agents, revenue analysts and accounts payable clerks pass. A restaurant's kitchen staff and floor managers fail; its bookkeeping, payroll admin, supplier ordering and social media pass. Where the work itself is physical, on site or hands on, the offshorable roles are the back office behind it and never the floor.
   NAME THREE, AND MAKE ONE OF THEM GENERAL. One or two tied to this person's own remit, and then one that any firm in this industry needs whatever seat you are talking to: the bookkeeping, the admin support, the payroll, the customer support sitting behind the operation. Say the general one last. It is the safety net, because if the specific roles are not the ones they happen to be short of, that one still lands.
 
-  5. 14 WORDS MAX. "So in response to this, our edge lies in our access to pre-vetted firms." + name in one word what they get back, then real systems, real data security, managed teams, not random freelancers.
+  5. TWO SENTENCES, 34 WORDS MAX. "So in response to this, our edge lies in our access to pre-vetted firms." Then word for word "Think..." + three things they get back, then word for word: "not just random remote workers." The three are real systems, real data security and managed teams, in words a rep can read at pace. Three, never two and never four, and put the one that matters most to THIS firm last.
 
   6. 16 WORDS MAX. "And we do it in a way where," + we shortlist and introduce the firms that already run teams like the one you need. End inside THEIR operation: the team feels like theirs, not a vendor.
 
@@ -399,7 +418,7 @@ export function buildPrompt({
 
   SAY IT ALOUD. A rep reads this at pace on a live call. Short, common, spoken words. Nothing anyone could trip over: not "operationalised", "shepherding", "consolidation", "methodologies", "infrastructure".
 
-  Beats 1, 4, 5 and 6 are ONE short sentence each. No subclauses, no lists.`
+  Beats 1, 4 and 6 are ONE short sentence each. No subclauses, no lists. Beat 5 is two: the sentence, then the Think list.`
 }
 
 /* Pauses and directions read as stage marks, not as words to say. */
