@@ -4,6 +4,7 @@ import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
 import { callAI, buildResearchPrompt } from '../lib/ai'
+import SpielBuilder from './SpielBuilder'
 import Scorecard from './Scorecard'
 import { newState, applyAnswer } from '../lib/score'
 import type { ScoreState } from '../lib/score'
@@ -65,6 +66,7 @@ export default function CallScreen({ onReset }: Props) {
   const [showResearch, setShowResearch] = useState(false)
   const [showGates, setShowGates] = useState(false)
   const [emailPageOpen, setEmailPageOpen] = useState(false)
+  const [spielPageOpen, setSpielPageOpen] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
@@ -141,10 +143,10 @@ export default function CallScreen({ onReset }: Props) {
 
   // Reserve space for the fixed scorecard so it never overlaps the cards.
   useEffect(() => {
-    const on = showScore && !emailPageOpen
+    const on = showScore && !emailPageOpen && !spielPageOpen
     document.body.classList.toggle('scorecard-open', on)
     return () => document.body.classList.remove('scorecard-open')
-  }, [showScore, emailPageOpen])
+  }, [showScore, emailPageOpen, spielPageOpen])
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
@@ -183,6 +185,23 @@ export default function CallScreen({ onReset }: Props) {
 
   const sp1Prefill = mkPrefill(sharedDate, sharedTime, sharedLink)
   const sp2Prefill = mkPrefill(sharedDate2 || sharedDate, sharedTime2 || sharedTime, sharedLink2)
+
+  // ── Spiel Builder full-page view ────────────────────────────────────────
+  if (spielPageOpen) {
+    return (
+      <div className="call-screen">
+        <div className="email-page-header">
+          <button className="email-page-back" onClick={() => setSpielPageOpen(false)}>
+            ← Back to Call
+          </button>
+          <span className="email-page-title">Spiel Builder</span>
+        </div>
+        <div className="email-page-body">
+          <SpielBuilder />
+        </div>
+      </div>
+    )
+  }
 
   if (emailPageOpen) {
     return (
@@ -250,6 +269,12 @@ export default function CallScreen({ onReset }: Props) {
             onClick={() => setShowScore(v => !v)}
           >
             Scorecard
+          </button>
+          <button
+            className="btn-header-ghost"
+            onClick={() => setSpielPageOpen(true)}
+          >
+            Spiel Builder
           </button>
           <button
             className="btn-header-ghost"
