@@ -34,7 +34,20 @@
  * word locks, the word caps, the banned words, the delivery marks. Do not reformat it, do
  * not "improve" it, and do not let a formatter re-wrap the template literal.
  *
- * THE ONE ADDITION TO THE PROMPT, in beat 3, and why it is there anyway.
+ * TWO ADDITIONS TO THE PROMPT, and why they are there anyway.
+ *
+ * TWO, beat 2. Reps reported the duties reading true but saying nothing: "managing day to
+ * day operations", "overseeing the team". The beat already had a specificity test - swap in
+ * a different job title and see if it still makes sense - but it was abstract, and the
+ * writer graded its own homework generously every time. Beat 3's brochure bans work because
+ * they name the actual phrases, so beat 2 now does the same: a ban list of twelve, a
+ * requirement that each activity carry a noun only this industry would use, and a second
+ * test asking whether the phrase could sit in a job ad for a firm in another industry. A
+ * second worked example was added, because one example calibrates the shape but not how
+ * specific to be. The parse was audited first and cleared: 16 realistic CRM rows all hand
+ * the prompt the exact title that was pasted, so the wrong duties were never a wrong title.
+ *
+ * ONE, beat 3, and why it is there anyway.
  *
  * Two reps reported the same defect from two different builds. Bedier ran three leads, a
  * hotel and two restaurants, and got the GM, the front office manager, the housekeeping
@@ -387,8 +400,11 @@ export function buildPrompt({
 
   THE COMPLIMENT, four to seven words. Something a firm like theirs is visibly doing right, said plainly. It has to be true of them without you having checked anything, so no awards, no numbers, no client names, no claims about growth. Nothing gushing, nothing that sounds read off a page: one warm line and move on.
 
-  THE TWO ACTIVITIES. Both must belong to THIS exact title, not to the industry in general and not to the person's boss. Test it: if you could swap in a different job title and the sentence still made sense, it is too generic and you rewrite it. Say the title back exactly as given, plural and unchanged, because that is what makes it land.
-  Pick the two a team could take off their hands, the operational work. Their day is the WORK, never the staffing of it. Nothing about hiring, recruiting, headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore either. Shape only, never reuse the words or "across the X markets": Head of Partnerships: "carrier and partner deals across the SEA markets... getting them signed, and then getting them actually live."
+  THE TWO ACTIVITIES. Both must belong to THIS exact title, not to the industry in general and not to the person's boss. Say the title back exactly as given, plural and unchanged, because that is what makes it land.
+  EACH ACTIVITY NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing they are actually handling: carrier contracts, shop drawings, reservation inventory, specimen batches, freight invoices, case files, retainer scopes. That noun is what puts the sentence in one industry and nowhere else, and it is the whole job of this beat.
+  THE TEST, and run both on both activities. One: could this phrase sit word for word in a job ad for a firm in a completely different industry? Two: could you swap in a different job title at this same firm and have it still make sense? Either one yes and you rewrite it. True is not the bar. A lead who hears their own job described in words that would fit anyone learns nothing about whether this call is worth taking.
+  BANNED, because every one of them is true and says nothing: "managing day to day operations", "overseeing the team", "running the business", "handling the workload", "keeping things on track", "managing multiple priorities", "coordinating across teams", "ensuring smooth operations", "managing stakeholders", "overseeing projects", "handling the admin", "driving results".
+  Pick the two a team could take off their hands, the operational work. Their day is the WORK, never the staffing of it. Nothing about hiring, recruiting, headcount or filling seats, and nothing about offshore, outsourced, BPO or nearshore either. Shape only, never reuse the words or "across the X markets": Head of Partnerships: "carrier and partner deals across the SEA markets... getting them signed, and then getting them actually live." Head of Supply Chain at a dealer group: "parts ordering across the dealerships... getting the stock forecast right, and then chasing the back orders."
 
   3. THE ROLES. 55 WORDS MAX, two or three short sentences. This is the beat that has to sound like a person, not a proposal.
 
