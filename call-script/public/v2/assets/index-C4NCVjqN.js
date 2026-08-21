@@ -265,10 +265,11 @@ The industry was not given. Work it out from the company name and the website ad
 
   3. THE ROLES. 55 WORDS MAX, two or three short sentences. This is the beat that has to sound like a person, not a proposal.
 
-  Open on a PATTERN INTERRUPT: one short spoken line that breaks the rhythm of a pitch and makes them look up. Pick a different one every time, never the same opener twice: "And look, I'll be straight with you...", "Can I be honest?", "Here's the part most people don't expect...", "This might be completely off, but...", "And this is where it gets interesting...". Never open with "And honestly" on its own, never "So basically", never "That said", never "Given that".
+  Open word for word, always this exact line, never a variation of it: "Here's where it gets interesting..." It comes straight off beat 2's "right?", so it lands as a turn in the call, not as a new topic. Do not put anything in front of it and do not add a sentence between it and the roles.
 
   Then suggest the roles, lightly, the way you would float an idea rather than present a finding. Word for word: "so yeah I think a great starting point to help is" + an offshore role + "to" + what it takes off them, then "or a" + a second role + "to" + what that one takes off them. Two roles, that is all. Keep it easy, keep it short, and let it sound like a thought rather than a recommendation.
-  Real job titles a lead would recognise on an org chart. The work each one takes has to be work you already described in beat 2, not new work you invented. ONE of them is the seat THIS person would personally feel lighter without. End the beat there, on the second role. No question, no follow up, no handing it back to them.
+  THE TWO ROLES DO DIFFERENT JOBS. The FIRST one is theirs: it sits directly under this person's own remit and takes work off the desk you described in beat 2, so they feel it personally. The SECOND one is the company's: a seat a firm in their industry carries regardless of who is in this person's chair, and it should point at the wider operation rather than at their own queue. Two roles, one close in and one further out, never two versions of the same seat.
+  Real job titles a lead would recognise on an org chart. End the beat there, on the second role. No question, no follow up, no handing it back to them.
 
   WE ARE NOT IN THIS BEAT. The subject is them, their desk, or the role itself. Never us and never what we do. BANNED outright: "we typically place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", "our partners", and any sentence at all whose subject is we, our, us or I. If a sentence could be moved onto a company website unchanged, rewrite it.
 
@@ -279,11 +280,11 @@ The industry was not given. Work it out from the company name and the website ad
   The ONLY words you write are the hesitation, and it is 10 WORDS MAX, one short clause, no full stop inside it. It is the one thing that would really make THIS person pause before saying yes: what they are protecting, what they got burned on, what they think this is going to be. Their words, not ours. Never a generic objection like being busy or not having budget.
   Change nothing else in that beat. No filler words, no stage directions or pauses inside it, no pitching, no recap, no thanks, no extra sentence after it.
 
-  VOICE: spoken, short clauses, contractions, and at least one pattern interrupt so it never settles into pitch rhythm, ellipses as pacing marks but at most ONE per beat. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service.
+  VOICE: spoken, short clauses, contractions, ellipses as pacing marks but at most ONE per beat. No em dashes, corporate filler, feature lists or pricing. Curiosity, not authority. Sell the meeting, not the service.
 
   DELIVERY MARKS. Write it the way a screenplay is written, so the rep can see the pacing on the page.
   Put [PAUSE] on its own after the thumbnail and again before the ask in beat 4, where the rep should stop and let it land. Two, no more.
-  Put a direction in round brackets before the phrase it governs, one word: (slow), (deliberate), (softer). At most one across the whole spiel, and never inside beat 2 or beat 4, which have to run clean.
+  Put a direction in round brackets before the phrase it governs, one word: (slow), (deliberate), (softer). At most one across the whole spiel, and never anywhere inside beat 2, beat 3 or beat 4. Those three run clean, with no direction in front of them and none in the middle of them. A direction dropped between "or a" and a job title breaks the line the rep is saying.
   Drop in a spoken filler where a person actually would, like y'know or uh. At most one per beat, and never in beat 1 or beat 4.
   The marks, the directions and the fillers are stage directions and breath. They do NOT count toward the word caps. Count only the words the rep says as content.
 
