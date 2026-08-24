@@ -1,9 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE } from '../data/flow'
+import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, SAVINGS_CLAIM, SAVINGS_PCT, MEETING_LENGTH } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
 import { callAI, buildResearchPrompt } from '../lib/ai'
+import SpielBuilder from './SpielBuilder'
+import Scorecard from './Scorecard'
+import { newState, applyAnswer } from '../lib/score'
+import type { ScoreState } from '../lib/score'
+import { GATE_COPY, GATE_TITLES, SPOKEN_GATE_ORDER, gateAsk } from '../data/gates'
 
 interface Props {
   callData: CallData
@@ -20,8 +25,6 @@ type StepEntry = {
 const MAIN_FLOW = [
   'opening',
   'pitch_q1',
-  'discovery_q2',
-  'discovery_priority',
   'qualify_role',
   'value_offer',
   'qualify_fulltime',
@@ -29,8 +32,10 @@ const MAIN_FLOW = [
   'qualify_offshore',
   'qualify_timeline',
   'qualify_dm',
+  'qualify_budget',
   'two_meeting',
   'close_recap',
+  'close_authority',
   'end_booked',
 ]
 
@@ -40,6 +45,13 @@ function interpolate(text: string, leadName: string, yourName: string, geminiRes
     .replace(/{yourName}/g, yourName || '[BDR Name]')
     .replace(/{geminiResearch}/g, geminiResearch)
     .replace(/{hiringSetup}/g, ctx.hiringSetup ?? 'team')
+    .replace(/{SAVINGS_CLAIM}/g, SAVINGS_CLAIM)
+    .replace(/{SAVINGS_PCT}/g, SAVINGS_PCT)
+    .replace(/{MEETING_LENGTH}/g, MEETING_LENGTH)
+    // Both fall back to what the rep would have said anyway, so a skipped capture
+    // reads as a slightly vaguer sentence rather than a placeholder on the prompter.
+    .replace(/{role}/g, ctx.roleWanted?.trim() || 'that role')
+    .replace(/{statedTimelineVerbatim}/g, ctx.statedTimelineVerbatim?.trim() || 'that timeframe you mentioned')
     .trimEnd()
 }
 
@@ -54,6 +66,7 @@ export default function CallScreen({ onReset }: Props) {
   const [showResearch, setShowResearch] = useState(false)
   const [showGates, setShowGates] = useState(false)
   const [emailPageOpen, setEmailPageOpen] = useState(false)
+  const [spielPageOpen, setSpielPageOpen] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
@@ -70,6 +83,8 @@ export default function CallScreen({ onReset }: Props) {
   const [sharedTime2, setSharedTime2] = useState('')
   const [sharedLink2, setSharedLink2] = useState('')
   const activeRef = useRef<HTMLDivElement>(null)
+  const [scoreStack, setScoreStack] = useState<ScoreState[]>(() => [newState()])
+  const [showScore, setShowScore] = useState(true)
 
   const generateSpiel = async () => {
     setIsGenerating(true)
@@ -89,6 +104,8 @@ export default function CallScreen({ onReset }: Props) {
   }
 
   const goTo = (option: FlowOption) => {
+    const answeredNode = flow[steps[activeIdx]?.nodeId]
+    setScoreStack(prev => [...prev, applyAnswer(prev[prev.length - 1], option, answeredNode?.topic, answeredNode?.isObjection)])
     if (option.capture) setContext(prev => ({ ...prev, ...option.capture }))
     const nextId = option.next
     const updatedSteps = [...steps]
@@ -109,6 +126,7 @@ export default function CallScreen({ onReset }: Props) {
 
   const goBack = () => {
     if (activeIdx <= 0) return
+    setScoreStack(prev => (prev.length > 1 ? prev.slice(0, -1) : prev))
     const updatedSteps = [...steps]
     const isInjected = !MAIN_FLOW.includes(updatedSteps[activeIdx].nodeId)
     if (isInjected) updatedSteps.splice(activeIdx, 1)
@@ -122,6 +140,13 @@ export default function CallScreen({ onReset }: Props) {
   useEffect(() => {
     activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [activeIdx])
+
+  // Reserve space for the fixed scorecard so it never overlaps the cards.
+  useEffect(() => {
+    const on = showScore && !emailPageOpen && !spielPageOpen
+    document.body.classList.toggle('scorecard-open', on)
+    return () => document.body.classList.remove('scorecard-open')
+  }, [showScore, emailPageOpen, spielPageOpen])
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
@@ -160,6 +185,23 @@ export default function CallScreen({ onReset }: Props) {
 
   const sp1Prefill = mkPrefill(sharedDate, sharedTime, sharedLink)
   const sp2Prefill = mkPrefill(sharedDate2 || sharedDate, sharedTime2 || sharedTime, sharedLink2)
+
+  // ── Spiel Builder full-page view ────────────────────────────────────────
+  if (spielPageOpen) {
+    return (
+      <div className="call-screen">
+        <div className="email-page-header">
+          <button className="email-page-back" onClick={() => setSpielPageOpen(false)}>
+            ← Back to Call
+          </button>
+          <span className="email-page-title">Spiel Builder</span>
+        </div>
+        <div className="email-page-body">
+          <SpielBuilder />
+        </div>
+      </div>
+    )
+  }
 
   if (emailPageOpen) {
     return (
@@ -221,6 +263,18 @@ export default function CallScreen({ onReset }: Props) {
             onClick={() => { setShowGates(v => !v); setShowRates(false); setShowResearch(false) }}
           >
             Gates
+          </button>
+          <button
+            className={`btn-header-ghost${showScore ? ' btn-header-active' : ''}`}
+            onClick={() => setShowScore(v => !v)}
+          >
+            Scorecard
+          </button>
+          <button
+            className="btn-header-ghost"
+            onClick={() => setSpielPageOpen(true)}
+          >
+            Spiel Builder
           </button>
           <button
             className="btn-header-ghost"
@@ -308,11 +362,7 @@ export default function CallScreen({ onReset }: Props) {
             The analyzer credits what the <strong style={{ color: '#15213f' }}>buyer</strong> says out loud — not your summary. Get a spoken &ldquo;yes&rdquo; on all three.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-            {[
-              { g: 'Gate 1 · Near-term need', ask: '“When would you want someone starting?”', say: ['“one to two months”', '“thirty to sixty days”'], not: ['“2–3 months”', '“90 days”', '“next year”'] },
-              { g: 'Gate 2 · Open to offshore', ask: '“Offshore, on your hours — open to that?”', say: ['“yes, open to that”', '“the Philippines is fine”', '“we already use offshore”'], not: ['“must be local”', '“on-site only”'] },
-              { g: 'Gate 3 · Full-time dedicated', ask: '“Full-time dedicated, or part-time?”', say: ['“full-time”', '“dedicated, just for us”', '“forty hours”'], not: ['“part-time”', '“project / shared”', '“ad hoc”'] },
-            ].map(c => (
+            {SPOKEN_GATE_ORDER.map(id => ({ g: GATE_TITLES[id], ask: `“${gateAsk(id, '')}”`, say: GATE_COPY[id].say, not: GATE_COPY[id].not })).map(c => (
               <div key={c.g} style={{ background: '#fff', border: '1px solid #e5e8f1', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '.02em', color: '#d6006e', marginBottom: 6 }}>{c.g}</div>
                 <div style={{ fontSize: 12.5, color: '#5b6379', fontStyle: 'italic', marginBottom: 10 }}>{c.ask}</div>
@@ -384,6 +434,23 @@ export default function CallScreen({ onReset }: Props) {
                   line ? <p key={i}>{line}</p> : <br key={i} />
                 )}
               </div>
+
+              {node.recordField && (
+                <div className="inline-research-form">
+                  <div className="inline-research-label">{node.recordField.label}</div>
+                  <textarea
+                    className="gen-paste-input"
+                    placeholder={node.recordField.placeholder}
+                    value={context[node.recordField.key] ?? ''}
+                    onChange={e => {
+                      const key = node.recordField!.key
+                      const val = e.target.value
+                      setContext(prev => ({ ...prev, [key]: val }))
+                    }}
+                    rows={2}
+                  />
+                </div>
+              )}
 
               {(['value_prop', 'obj_no_role'].includes(step.nodeId)) && (
                 <div className="inline-research-form">
@@ -511,6 +578,11 @@ export default function CallScreen({ onReset }: Props) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Live QC Scorecard ── */}
+      {showScore && (
+        <Scorecard state={scoreStack[scoreStack.length - 1]} onClose={() => setShowScore(false)} />
       )}
     </div>
   )

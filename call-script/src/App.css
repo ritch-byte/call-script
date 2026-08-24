@@ -42,6 +42,15 @@ body {
 
 .app { min-height: 100vh; }
 
+/* Reserve room on the right for the live scorecard so it never overlaps the cards.
+   Belt-and-suspenders: pad the parent AND cap the column width directly. */
+body.scorecard-open .app { padding-right: 330px; transition: padding-right .18s ease; }
+body.scorecard-open .call-screen { max-width: calc(100vw - 340px); }
+@media (max-width: 720px) {
+  body.scorecard-open .app { padding-right: 0; }
+  body.scorecard-open .call-screen { max-width: 760px; }
+}
+
 /* ─────────────────────────────────────────
    CALL SCREEN
 ───────────────────────────────────────── */
@@ -1670,3 +1679,50 @@ body {
   color: #b91c1c;
   font-family: 'DM Sans', sans-serif;
 }
+/* ─────────────────────────────────────────
+   SPIEL BUILDER — full page view
+───────────────────────────────────────── */
+
+.spiel { max-width: 720px; }
+
+/* Objections */
+
+/* ── Carried-over context banner (call screen) ── */
+
+.qual-banner {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 0 auto 10px;
+  max-width: 720px;
+  background: var(--blue-soft);
+  border: 1.5px solid var(--blue-muted);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  color: var(--text);
+}
+.qual-banner strong { color: var(--blue-dark); }
+.qual-banner-key {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.qual-banner-x {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.qual-banner-x:hover { color: var(--blue); }
+
+/* ── Qualification trigger, sits under the spiel ── */
+
