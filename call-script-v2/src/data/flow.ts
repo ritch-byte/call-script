@@ -60,7 +60,7 @@ export const SALARY_TABLE: SalaryRow[] = [
  * It is said out loud on nearly every call, so it should be edited once rather than
  * hunted through the script. Interpolated into {SAVINGS_CLAIM} by CallScreen.
  */
-export const SAVINGS_PCT = 'around 80%'
+export const SAVINGS_PCT = '50 to 70%'
 export const SAVINGS_CLAIM = `${SAVINGS_PCT} less than local hiring`
 
 /**
@@ -271,7 +271,7 @@ export const flow: Record<string, FlowNode> = {
     title: "No Role — Value Pitch + Research",
     isObjection: true,
     script: "No worries at all! I actually did a bit of homework on you before I called...\n\n{geminiResearch}",
-    tip: "Gap Selling: even without a named role, lead with the cost problem — 'salary costs by up to 80%' creates instant curiosity. The research insert lets you surface a role for them. A general direction is enough to keep going into the value and offer.",
+    tip: "Gap Selling: even without a named role, lead with the cost problem — 'salary costs by {SAVINGS_PCT}' creates instant curiosity. The research insert lets you surface a role for them. A general direction is enough to keep going into the value and offer.",
     options: [
       { label: 'Lead is engaged / curious', next: 'value_offer', type: 'positive' },
       { label: 'Already outsourcing / need to think', next: 'obj_already_outsourcing', type: 'objection' },
@@ -530,7 +530,7 @@ export const flow: Record<string, FlowNode> = {
     title: 'Objection: Budget / Cost / Rates',
     script: "I hear you, and honestly that's the whole reason I'm calling, we're not adding to your costs, we're cutting them.\n\nHonest answer, I'm not going to quote you a rate, because the partners price against your actual spec and I'd rather you got a real number than a wrong one from me. What I can tell you is they typically come in {SAVINGS_CLAIM}. Getting the exact figure for your role is the main thing that call is for. Fair enough?",
     isObjection: true,
-    tip: "The $3-$9/hr range is a verbatim approved line (Vince / Paul, 465 Office) — use it, convert for UK/EU (£2.25–£7.65). Never fully deflect pricing. Then quantify the gap in dollars, not percentages: '$100K a year back' beats '80% savings.'",
+    tip: "The $3-$9/hr range is a verbatim approved line (Vince / Paul, 465 Office) — use it, convert for UK/EU (£2.25–£7.65). Never fully deflect pricing. Then quantify the gap in dollars, not percentages: '$100K a year back' beats '{SAVINGS_PCT} savings.'",
     options: [
       { label: "They're open to hearing the numbers", next: 'two_meeting', type: 'positive' },
       { label: 'Still not interested', next: 'end_not_interested', type: 'end' },
@@ -564,9 +564,9 @@ export const flow: Record<string, FlowNode> = {
   obj_no_external: {
     id: 'obj_no_external',
     title: "Objection: Don't Hire Externally",
-    script: "Totally makes sense — a lot of leaders feel the same way initially.\n\nLet me ask it differently: if the quality was identical or better, and the cost was 70 to 80 percent lower than what you're paying now — would that change the conversation at all?\n\nBecause that's the actual scenario for most of the roles we place. What kind of role would you consider if the savings were significant enough to make it worth looking at?",
+    script: "Totally makes sense — a lot of leaders feel the same way initially.\n\nLet me ask it differently: if the quality was identical or better, and the cost was {SAVINGS_PCT} lower than what you're paying now — would that change the conversation at all?\n\nBecause that's the actual scenario for most of the roles we place. What kind of role would you consider if the savings were significant enough to make it worth looking at?",
     isObjection: true,
-    tip: "Gap Selling: 'we don't hire externally' is a current state, not a final answer. The hypothetical — 'if quality was the same at 80% less' — is a Need-Payoff question that opens the door. Get them to name a role they'd consider. That's the gap.",
+    tip: "Gap Selling: 'we don't hire externally' is a current state, not a final answer. The hypothetical — 'if quality was the same at {SAVINGS_PCT} less' — is a Need-Payoff question that opens the door. Get them to name a role they'd consider. That's the gap.",
     options: [
       { label: 'They mention a role to consider', next: 'value_prop', type: 'positive' },
       { label: 'Not open to it', next: 'end_not_interested', type: 'end' },

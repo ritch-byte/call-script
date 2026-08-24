@@ -486,7 +486,7 @@ export default function CallScreen({ onReset }: Props) {
               {node.tip && (
                 <div className="coach-tip">
                   <div className="coach-tip-label">Coach Tip</div>
-                  {node.tip}
+                  {interpolate(node.tip, leadName, yourName, geminiResearch, context)}
                 </div>
               )}
 
