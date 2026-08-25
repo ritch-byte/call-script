@@ -79,7 +79,7 @@ export const flow: Record<string, FlowNode> = {
   opening: {
     id: 'opening',
     title: 'Opening',
-    script: "Hey {leadName}? (Pause)\n\nOh hey uhh, {leadName}, it's {yourName} here over at Outsource Accelerator. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not (pause)\n\nAppreciate that, yeah remind me uhh, have you heard of Outsource Accelerator just by the off chance?",
+    script: "Hey {leadName}? (Pause)\n\nOh hey, {leadName}, it's {yourName} here over at Outsource Accelerator. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not (pause)\n\nAppreciate that, yeah remind me, have you heard of Outsource Accelerator just by the off chance?",
     tip: "Fanatical Prospecting: the first 7 seconds determine the call. Stay upbeat and confident — not apologetic. 'I know I called you out of the blue' disarms the reflex rejection before it fires. Pause briefly after 'relevant or not' — let them say yes.",
     options: [
       { label: "No — haven't heard of OA", next: 'pitch_q1', type: 'positive' },

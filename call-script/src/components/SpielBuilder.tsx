@@ -353,8 +353,8 @@ export function buildIntro(contact: string): string[] {
   const lead = (contact || '').split(/\s+/)[0] || '[Lead Name]'
   return [
     `Hey ${lead}? (Pause)`,
-    `Oh hey uhh, ${lead}, it's [Your Name] here over at Outsource Accelerator. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not (pause)`,
-    `Appreciate that, yeah remind me uhh, have you heard of Outsource Accelerator just by the off chance?`,
+    `Oh hey, ${lead}, it's [Your Name] here over at Outsource Accelerator. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not (pause)`,
+    `Appreciate that, yeah remind me, have you heard of Outsource Accelerator just by the off chance?`,
     `No? Oh okay, feel free to cut me off if it's not in your wheelhouse.`,
   ]
 }
