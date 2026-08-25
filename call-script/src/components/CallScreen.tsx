@@ -295,6 +295,13 @@ export default function CallScreen({ onReset }: Props) {
             <span className="reference-bar-title">US Salary vs Offshore (Philippines)</span>
             <button className="btn-ref-close" onClick={() => setShowRates(false)}>Close</button>
           </div>
+          {/* Per-role savings run higher than the figure we quote. Both are true, but the
+              rep is the one who has to reconcile them live, so say which number is ours. */}
+          <div className="salary-note">
+            Your reference, not a line to read. The figure we say on calls is <strong>{SAVINGS_CLAIM}</strong>.
+            These are the underlying cost gap per role and several run higher than that, so quote the
+            range and let the partner price the actual spec.
+          </div>
           <div className="salary-table-wrap">
             <table className="salary-table">
               <thead>

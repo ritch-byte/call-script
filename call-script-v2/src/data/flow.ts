@@ -284,9 +284,9 @@ export const flow: Record<string, FlowNode> = {
   value_offer: {
     id: 'value_offer',
     title: 'Value & Offer + CTA',
-    script: "Perfect, that's exactly the kind of role they fill all the time, so I'll skip the sales pitch and get straight to it.\n\nHere's how it works. I connect you with the right sourcing partners, we've got more than 80 source partners in our network, and based on what you've shared I'll pick the two that fit your industry and this role.\n\nOn the call they'll go through what this role actually costs offshore, how the team gets managed day to day, and who owns performance and retention. That's the part you can't get over email.\n\nIf it's not a fit, that's completely fine, no obligation either way.\n\nThe call takes about 15 to 30 minutes. If I can be honest, can we do this on Wed or Thursday if you're busy on Mondays and Tuesdays?",
+    script: "Perfect, that's exactly the kind of role they fill all the time, so I'll skip the sales pitch and get straight to it.\n\nHere's how it works. I connect you with the right sourcing partners, we've got more than 80 source partners in our network, and based on what you've shared I'll pick the two that fit your industry and this role.\n\nOn the call they'll go through what this role actually costs offshore, how the team gets managed day to day, and who owns performance and retention. That's the part you can't get over email.\n\nIf it's not a fit, that's completely fine, no obligation either way.\n\nThe call takes about {MEETING_LENGTH}. If I can be honest, can we do this on Wed or Thursday if you're busy on Mondays and Tuesdays?",
     waitForAnswer: true,
-    tip: "The value + offer CTA, fired right after they name the role. Skip the pitch — frame the mechanics: you pick two of 80+ source partners for their industry and role, and the call covers what the role costs offshore, how the team is managed day to day, and who owns performance and retention, the things email cannot answer. Zero obligation, 15 to 30 minutes. Then go for a specific day (offer Wed/Thu). Note any date they float and proceed into the must-knows — you'll firm up attendance at the recap. ANALYZER: capture 'yes, open to offshore' in their own voice at the offshore gate or the recap for Gate 2 to count.",
+    tip: "The value + offer CTA, fired right after they name the role. Skip the pitch — frame the mechanics: you pick two of 80+ source partners for their industry and role, and the call covers what the role costs offshore, how the team is managed day to day, and who owns performance and retention, the things email cannot answer. Zero obligation, {MEETING_LENGTH}. Then go for a specific day (offer Wed/Thu). Note any date they float and proceed into the must-knows — you'll firm up attendance at the recap. ANALYZER: capture 'yes, open to offshore' in their own voice at the offshore gate or the recap for Gate 2 to count.",
     options: [
       { label: 'Engages / floats a day', next: 'qualify_fulltime', type: 'positive', banks: ['offshorable'], buyingSignal: true },
       { label: 'Open / has questions', next: 'qualify_fulltime', type: 'positive', banks: ['offshorable'], buyingSignal: true },
@@ -552,7 +552,7 @@ export const flow: Record<string, FlowNode> = {
   obj_no_challenges: {
     id: 'obj_no_challenges',
     title: 'Objection: No Hiring Challenges',
-    script: "That's genuinely impressive, sounds like you've built a really solid team and setup.\n\nI'd still love to show you what we do, even just as a benchmarking thing. Whether or not you ever change anything, seeing a real cost comparison for your roles takes about 30 minutes and you walk away with useful data either way.\n\nZero commitment. Worth a quick look?",
+    script: "That's genuinely impressive, sounds like you've built a really solid team and setup.\n\nI'd still love to show you what we do, even just as a benchmarking thing. Whether or not you ever change anything, seeing a real cost comparison for your roles takes {MEETING_LENGTH} and you walk away with useful data either way.\n\nZero commitment. Worth a quick look?",
     isObjection: true,
     tip: "Reciprocity: frame the consultation as giving them something useful regardless of outcome — real salary benchmarking data. Lower the stakes: 'even if you don't change anything, you'll know your number.'",
     options: [
@@ -576,7 +576,7 @@ export const flow: Record<string, FlowNode> = {
   obj_already_outsourcing: {
     id: 'obj_already_outsourcing',
     title: 'Objection: Already Outsourcing / Need to Think',
-    script: "Oh nice, so you already know the model works, that's half the battle. Can I ask though, are you actually happy with both the quality AND the cost right now, or is there a bit of room on either one?\n\nHonestly most people who come to us were already outsourcing, they just found our partners had better talent for less. It's a quick benchmarking call, no strings, and in 30 minutes you'll know if there's an upgrade worth having. Is there a role that's been tougher to fill or pricier than you'd like?",
+    script: "Oh nice, so you already know the model works, that's half the battle. Can I ask though, are you actually happy with both the quality AND the cost right now, or is there a bit of room on either one?\n\nHonestly most people who come to us were already outsourcing, they just found our partners had better talent for less. It's a quick benchmarking call, no strings, and in {MEETING_LENGTH} you'll know if there's an upgrade worth having. Is there a role that's been tougher to fill or pricier than you'd like?",
     isObjection: true,
     tip: "Smart Calling: they're already sold on the concept — the hard part's done. Make them curious whether their setup is optimal. 'Happy with both quality AND cost?' is a double-gate — most people are happy with one but not both. This is a warm prospect, not a dead one.",
     options: [
@@ -600,7 +600,7 @@ export const flow: Record<string, FlowNode> = {
   obj_think_about_it: {
     id: 'obj_think_about_it',
     title: 'Objection: Need to Think About It',
-    script: "Of course, totally respect that. Can I ask what specifically you'd want to chew on? Is it the timing, whether it's the right fit, or something else?\n\nReason I ask is the partners actually answer most of that on the call itself, they'll put real CVs and real pricing for your roles right in front of you. It's 30 minutes of straight info, not a pitch, and you walk away with something useful whether you go ahead or not.\n\nWould [Tuesday] or [Thursday] this week work just to get that in front of you?",
+    script: "Of course, totally respect that. Can I ask what specifically you'd want to chew on? Is it the timing, whether it's the right fit, or something else?\n\nReason I ask is the partners actually answer most of that on the call itself, what the role really costs offshore, how the team gets managed, who owns performance. It's {MEETING_LENGTH} of straight info, not a pitch, and you walk away with something useful whether you go ahead or not.\n\nWould [Tuesday] or [Thursday] this week work just to get that in front of you?",
     isObjection: true,
     tip: "Schiffman + SPIN: diagnose what they're thinking about before re-pitching. Then reframe the consultation as information-gathering, not a sales meeting — 'it answers the questions you're thinking through.' Offer two specific days. Then capture the 4 criteria at the close. ANALYZER: 'I'll do my best / I'll try' is a show-up flag — pin a specific day and time and get a clean 'yes, I'll be on.'",
     options: [
@@ -651,7 +651,7 @@ export const flow: Record<string, FlowNode> = {
   obj_tried_before: {
     id: 'obj_tried_before',
     title: 'Objection: Tried Outsourcing Before',
-    script: "I'm actually really glad you told me that, it genuinely changes how I'd go about this with you.\n\nCan I ask what went sideways? Was it the talent itself, the communication with the agency, the management overhead, or something else?\n\n[Listen, then:] Yeah, what you're describing is nearly always a sourcing problem, unvetted agencies just handing you whoever's free instead of whoever's right. We vet every partner up front and you compare two of them side by side before you commit to anything. Would it be worth 30 minutes to see how we'd handle your situation differently, and you take it from there?",
+    script: "I'm actually really glad you told me that, it genuinely changes how I'd go about this with you.\n\nCan I ask what went sideways? Was it the talent itself, the communication with the agency, the management overhead, or something else?\n\n[Listen, then:] Yeah, what you're describing is nearly always a sourcing problem, unvetted agencies just handing you whoever's free instead of whoever's right. We vet every partner up front and you compare two of them side by side before you commit to anything. Would it be worth {MEETING_LENGTH} to see how we'd handle your situation differently, and you take it from there?",
     isObjection: true,
     tip: "'Tried before' is your best lead — they've validated the concept, they just had a bad experience. Diagnose what broke, then differentiate OA's vetting model as the specific fix. Listen more than you talk in this one.",
     options: [
