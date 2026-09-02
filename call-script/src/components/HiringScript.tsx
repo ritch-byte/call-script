@@ -109,6 +109,26 @@
  * now opens on a locked line carrying the local figure, and the seat staying on site is a
  * subordinate clause in the middle rather than the headline.
  *
+ * THE CLOSE IS THE FLOOR'S OWN, restored. It reads "I know [HESITATION], but would you be
+ * opposed to carving out 15 minutes for a coffee break style chat, just to see if this could
+ * work or not, I'm thinking..." That is the wording from the standalone builder, tuned on
+ * live calls, and the hesitation now completes "I know ___" rather than trailing a fixed
+ * "I know people hiring right now", which was doing nothing except forcing a relative clause.
+ * The two day names stay: without them the beat asks permission but never asks for the
+ * meeting, and the floor's version has always carried them.
+ *
+ * The fifteen minutes is derived from MEETING_LENGTH by stripping "each", not typed. One
+ * number, two grammars: "15 minutes each" is right where two partners are on the table and
+ * wrong in "carving out 15 minutes each for a chat".
+ *
+ * WHAT-THE-CALL-IS IS GONE, by request, and the script is four beats now. It had become
+ * half redundant the moment beat 3 started quoting figures: "what those seats actually cost
+ * offshore" repeats the number the rep has just said. What went with it is not redundant
+ * though, and is worth knowing was lost: how the team gets managed day to day, and who owns
+ * performance and retention. That is Stefanie's reframe of what the meeting is and the thing
+ * PJ built the change order around, and this generator no longer says it anywhere. If it
+ * should come back it belongs as one clause inside the ask, not as its own beat.
+ *
  * WHAT WAS NOT TAKEN from that framework: proof. Weinberg wants customer names, outcomes and
  * numbers in the story. The only number here we can stand behind is the partner count, and it
  * already lives in the call script's own offer beat. Inventing social proof is precisely the
@@ -251,6 +271,9 @@ function splitFreeform(text: string) {
 
 export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: HiringLead): string {
   const { offer, fallback } = offerWindow()
+  /* "15 minutes each" was written for the two-partner line and is wrong in the ask. Strip the "each" rather than
+     typing 15 a second time, so changing MEETING_LENGTH still moves both. */
+  const perPartner = MEETING_LENGTH.replace(/\s+each$/i, '')
   return `Write a cold call script for an SDR at Outsource Accelerator, an outsourcing marketplace, calling someone who is currently hiring.
 
   WHO IS BEING CALLED: ${jobTitle}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
@@ -260,11 +283,11 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   ONE EXCEPTION, and only this one. Beat 3 gives an approximate market salary for that KIND of seat, said as an approximation. That is a general market figure. You still do not know, and must never imply you know, what THIS company pays, what the advertisement offered, or what their budget is.
   The website address is there for the kind of firm it signals, nothing more. Never say the company's name: the rep says "your company".
 
-  5 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble. Keep every phrase marked word for word exactly as written, and fill the rest with this person's world. One or two short sentences per beat, never three.
+  4 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble. Keep every phrase marked word for word exactly as written, and fill the rest with this person's world. One or two short sentences per beat, never three.
 
   The rep has ALREADY opened the call: they greeted the lead by name, gave their own name, said they are from Outsource Accelerator, asked for half a minute and got it. Do not greet, do not introduce yourself, do not name Outsource Accelerator again, do not ask for permission or for time. Start cold on the reason for the call.
 
-  It is one continuous read. Beats 1 to 4 carry no ask and no meeting request. The ask lives in beat 5 and nowhere else.
+  It is one continuous read. Beats 1 to 3 carry no ask and no meeting request. The ask lives in beat 4 and nowhere else.
 
   1. THE REASON FOR THE CALL. 30 WORDS MAX. Word for word: "So the reason for my call is I saw you're hiring for a ${hiringPosition}..." then ONE short clause naming what that seat actually handles at a firm like this one. Say the advertised seat exactly as written above.
   THE CLAUSE NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing that seat is actually handling: shop drawings, variation claims, site diaries, subcontractor packages, carrier contracts, reservation inventory, specimen batches, freight documentation, case files, retainer scopes. That noun is what makes the line land, and it is the whole job of this beat.
@@ -296,19 +319,17 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   WE ARE NOT IN THIS BEAT. The subject is them, their desk, the seat, or the money. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us. "That seat stays on site" is how you say it from their side, in five words.
   No promises about quality, no pitching us, and no third number.
 
-  4. WHAT THE CALL IS. 34 WORDS MAX. Word for word: "So what I'd suggest is a quick chat with two of them, ${MEETING_LENGTH}," then what the partners cover: what those seats actually cost offshore, how the team gets managed day to day, and who owns performance and retention. Say "those seats", never "the role", because in route B the advertised role is not the one going offshore. Then word for word: "That's the part you can't get over email." No CVs, no candidates, no profiles, no shortlist, no rates, no percentages beyond the one already used, and no promises about what the partner will bring.
-
-  5. THE ASK. Word for word, and the only thing you write is the hesitation:
-  "I know people hiring right now [HESITATION]. But would you be opposed to a quick chat just to see if this could work or not, I'm thinking ${offer}? If not maybe ${fallback}?"
-  The hesitation is 10 WORDS MAX, one short clause, no full stop inside it. It is the one thing that would make THIS person pause before saying yes, given the seat they are filling and the industry they are in: what they are protecting, what they think this is going to be, what they got burned on last time. Their words, not ours, and specific to this hire. Never a generic objection like being busy, not having budget, or wanting someone who stays.
+  4. THE ASK. Word for word, and the only thing you write is the hesitation:
+  "I know [HESITATION], but would you be opposed to carving out ${perPartner} for a coffee break style chat, just to see if this could work or not, I'm thinking ${offer}? If not maybe ${fallback}?"
+  THE HESITATION COMPLETES "I know ___", so it has to read straight on from those two words with no joining word in front of it and no full stop after it. 10 WORDS MAX, one short clause. It is the one thing that would make THIS person pause before saying yes, given the seat they are filling and the industry they are in: what they are protecting, what they think this call is going to be, what went wrong last time. Their words, not ours, and specific to this hire. Never a generic objection like being busy, not having budget, or wanting someone who stays.
   Change nothing else in that beat. No filler, no stage directions inside it, no recap, no thanks, nothing after it.
 
   VOICE: spoken, short clauses, contractions, ellipses as pacing marks but at most ONE per beat. No em dashes, no corporate filler, no feature lists. Curiosity, not authority. Sell the meeting, not the service.
 
   DELIVERY MARKS. Write it the way a screenplay is written, so the rep can see the pacing.
-  Put [PAUSE] on its own after beat 1 and again before the ask in beat 5. Two, no more.
-  Put one direction in round brackets before the phrase it governs, one word: (slow), (deliberate), (softer). At most one across the whole script, and never inside beat 5.
-  Drop in a spoken filler where a person actually would, like y'know or uh. At most one per beat, and never in beat 5.
+  Put [PAUSE] on its own after beat 1 and again before the ask in beat 4. Two, no more.
+  Put one direction in round brackets before the phrase it governs, one word: (slow), (deliberate), (softer). At most one across the whole script, and never inside beat 4.
+  Drop in a spoken filler where a person actually would, like y'know or uh. At most one per beat, and never in beat 4.
   Marks, directions and fillers are breath, not content. They do NOT count toward the word caps.
 
   SAY IT ALOUD. A rep reads this at pace on a live call. Short, common, spoken words. Nothing anyone could trip over: not "operationalised", "consolidation", "methodologies", "infrastructure", "bandwidth", "streamline", "leverage".`
