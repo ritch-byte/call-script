@@ -84,6 +84,31 @@
  * fewer words, which is lighter to say and does less work. It is still intact in the call
  * script's own pitch beat in data/flow, so the two now differ on purpose rather than by drift.
  *
+ * BEAT 3 NOW QUOTES TWO SALARY FIGURES, and that is a decision taken with the conflict on the
+ * table rather than around it. PJ's change order retired the local-to-offshore conversion by
+ * name - "60K locally is typically 12 to 18K offshore" is on the retired list - on the
+ * grounds that quoting price does the partner's discovery for them with numbers we cannot
+ * stand behind. These figures are the same shape. They will show up in the weekly phrase
+ * count, and PJ should hear it from us rather than from the query.
+ *
+ * Three things make the version here as defensible as it can be:
+ *   The offshore figure is not a second guess. It is the local figure less the approved
+ *   savings percentage, so the two numbers cannot imply a saving the script does not claim,
+ *   and they move together if that percentage ever changes.
+ *   The currency comes from the website's country code, because quoting US dollars at an
+ *   Australian construction firm is worse than quoting nothing.
+ *   Both are said as approximations and as market figures for that KIND of seat. The
+ *   invention guard above keeps its teeth on the part that matters: the writer still may not
+ *   imply it knows what THIS company pays or what the advertisement offered.
+ *
+ * ROUTE B NEEDED A WORD-FOR-WORD LOCK, not a better rule. The previous attempt told it to put
+ * the back office seats first and the on-site clause last, and named the bad sentence, and it
+ * came back anyway with "A Senior Project Manager isn't a seat our partners fill offshore" -
+ * negative first, us as the subject. Ordering instructions and ban lists get graded
+ * generously. Every rule that has actually held in this tool is a locked phrase, so route B
+ * now opens on a locked line carrying the local figure, and the seat staying on site is a
+ * subordinate clause in the middle rather than the headline.
+ *
  * WHAT WAS NOT TAKEN from that framework: proof. Weinberg wants customer names, outcomes and
  * numbers in the story. The only number here we can stand behind is the partner count, and it
  * already lives in the call script's own offer beat. Inventing social proof is precisely the
@@ -231,7 +256,8 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   WHO IS BEING CALLED: ${jobTitle}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
   THE SEAT THEY HAVE ADVERTISED: ${hiringPosition}
 
-  WHAT YOU KNOW, AND IT IS ONLY THIS. The role above is open, because they advertised it. Nothing else. You have no research and no web access. Do not write where the ad was posted, what it pays, how long it has been open, how many they want, how senior it is, whether they are struggling to fill it, or anything at all about this company's size, clients, funding or offices. If it is not in the two lines above, you do not know it, and a lead who hears a detail we could not possibly have will end the call.
+  WHAT YOU KNOW, AND IT IS ONLY THIS. The role above is open, because they advertised it. Nothing else. You have no research and no web access. Do not write where the ad was posted, how long it has been open, how many they want, how senior it is, whether they are struggling to fill it, or anything at all about this company's size, clients, funding or offices. If it is not in the two lines above, you do not know it, and a lead who hears a detail we could not possibly have will end the call.
+  ONE EXCEPTION, and only this one. Beat 3 gives an approximate market salary for that KIND of seat, said as an approximation. That is a general market figure. You still do not know, and must never imply you know, what THIS company pays, what the advertisement offered, or what their budget is.
   The website address is there for the kind of firm it signals, nothing more. Never say the company's name: the rep says "your company".
 
   5 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble. Keep every phrase marked word for word exactly as written, and fill the rest with this person's world. One or two short sentences per beat, never three.
@@ -252,13 +278,23 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   WHY THIS ORDER, because it is the difference between a story and a monologue. Opening on what we are asks the lead to care about our business model before they have heard a single problem of their own. The problem is what earns the sentence that follows it, and a cold call that opens on the caller is the one that gets ended.
   BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 
-  3. THE TURN. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the marketplace line so it lands as a turn in the conversation, not as a correction to something they said.
+  3. THE TURN, AND THE TWO NUMBERS. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the marketplace line so it lands as a turn in the conversation, not as a correction to something they said.
   Then sort the advertised seat and write ONE of the two routes below. Never mention the other, never explain that you chose, never use the words route, option or scenario.
   THE TEST: could the person in that seat do the whole job on a laptop, with nobody needing them in the building?
-  ROUTE A, the seat passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruitment coordinator. 32 WORDS MAX. Name that seat back, then "to" and what it takes off the person you are calling, in the words of beat 1. Then that the same person comes in at ${SAVINGS_CLAIM}, full-time and dedicated, on their hours.
-  ROUTE B, the seat fails because the work is physical, on site or hands on. Site engineers and project managers, foremen, warehouse and floor managers, drivers, technicians, nurses, kitchen and housekeeping staff, front office, retail floor. 42 WORDS MAX, in this order and not the other way round. FIRST name TWO back office seats a firm like theirs carries behind that hire, each with "to" and what it takes off this person's desk, then that those come in at ${SAVINGS_CLAIM}. LAST, one short clause and only one, saying that seat itself stays where the work is. Opening on what cannot be done reads as a correction to someone who has just told you they are hiring, and you lose them before the useful half.
-  WE ARE NOT IN THIS BEAT. The subject is them, their desk, or the seat itself. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us. "A Senior Project Manager isn't a seat our partners fill offshore" is exactly the wrong shape twice over: it opens on a no, and it makes us the subject. "That seat stays on site" says the same thing from their side, in five words.
-  No costs beyond the one figure above, no promises about quality, no pitching us.
+
+  ROUTE A, the seat passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruitment coordinator. 40 WORDS MAX. After the opener, word for word: "a ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then that the same person through one of these firms is "more like" + THE OFFSHORE FIGURE, full-time and dedicated, on their hours.
+
+  ROUTE B, the seat fails because the work is physical, on site or hands on. Site engineers and project managers, foremen, warehouse and floor managers, drivers, technicians, nurses, kitchen and housekeeping staff, front office, retail floor. 52 WORDS MAX. After the opener, word for word: "a ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then word for word: "that one stays on site, that's where the work is, but" + TWO back office seats a firm like theirs carries behind that hire, each with "to" and what it takes off this person's desk, then "those are more like" + THE OFFSHORE FIGURE.
+  START ON THE LOCAL FIGURE, NOT ON WHAT CANNOT BE DONE. "A ${hiringPosition} isn't a seat our partners fill offshore" is the wrong sentence twice over: it opens on a no, to someone who has just told you they are hiring, and its subject is us. The seat staying on site is a subordinate clause in the middle of the beat, never the headline.
+
+  THE TWO NUMBERS, and they are approximate market figures, not quotes.
+  SAY THEM AS APPROXIMATE, always: "somewhere around", "roughly", "more like". Never a precise number, never a rate per hour, never a price from a partner, never a total saving.
+  THE LOCAL FIGURE is what that KIND of seat typically pays in this lead's market, as a round annual number.
+  CURRENCY comes from the website address: .com.au is Australian dollars, .co.nz or .nz New Zealand dollars, .co.uk or .uk pounds, .ie euros, .ca Canadian dollars, .sg Singapore dollars, .ph pesos. Anything else, or no website, US dollars. Say the currency once, on the first figure only, and never name the country.
+  THE OFFSHORE FIGURE IS NOT A SECOND GUESS. It is the local figure less ${SAVINGS_CLAIM}, worked out and rounded, given as a range from low to high. A figure implying any other saving than that is wrong even if it sounds right.
+
+  WE ARE NOT IN THIS BEAT. The subject is them, their desk, the seat, or the money. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us. "That seat stays on site" is how you say it from their side, in five words.
+  No promises about quality, no pitching us, and no third number.
 
   4. WHAT THE CALL IS. 34 WORDS MAX. Word for word: "So what I'd suggest is a quick chat with two of them, ${MEETING_LENGTH}," then what the partners cover: what those seats actually cost offshore, how the team gets managed day to day, and who owns performance and retention. Say "those seats", never "the role", because in route B the advertised role is not the one going offshore. Then word for word: "That's the part you can't get over email." No CVs, no candidates, no profiles, no shortlist, no rates, no percentages beyond the one already used, and no promises about what the partner will bring.
 
