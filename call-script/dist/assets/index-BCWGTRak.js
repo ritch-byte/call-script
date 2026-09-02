@@ -320,7 +320,7 @@ The industry was not given. Work it out from the company name and the website ad
 
   2. THE PROBLEM FIRST, THEN US. 42 WORDS MAX, and the order is the whole point of the beat.
   FIRST, one short sentence on what a firm like theirs actually runs into filling this seat. Their side of it, never ours: what it costs them, how long it sits open, or the two bad options they are stuck choosing between, paying a premium locally or taking whoever is available. Concrete and in their world. Do not describe anything we do, do not name a benefit, and do not use the word offshore yet.
-  THEN, word for word and unchanged: "...and that's where we come in. We're an outsourcing marketplace, we don't supply the staff ourselves, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
+  THEN, word for word: "...and that's where we come in. We're an outsourcing marketplace, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
   WHY THIS ORDER, because it is the difference between a story and a monologue. Opening on what we are asks the lead to care about our business model before they have heard a single problem of their own. The problem is what earns the sentence that follows it, and a cold call that opens on the caller is the one that gets ended.
   BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 

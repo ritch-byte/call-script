@@ -75,6 +75,15 @@
  * banned from being we, our, us or I, and the test is the same one Weinberg gives: if the
  * first sentence could sit on our website unchanged, it is the monologue.
  *
+ * "WE DON'T SUPPLY THE STAFF OURSELVES" WAS TAKEN OUT of the marketplace line here, by
+ * request. Worth knowing what it was doing, because it is not decoration. It is the clause
+ * that answers "so you're a recruitment agency?" before the lead asks it, and Stefanie has a
+ * recording of a lead cutting in mid-sentence to ask exactly that. PJ's change order replaced
+ * "global talent network" with the marketplace framing "in full", and this clause was part of
+ * that framing. The line now leans on "we match you to" to carry the same distinction in
+ * fewer words, which is lighter to say and does less work. It is still intact in the call
+ * script's own pitch beat in data/flow, so the two now differ on purpose rather than by drift.
+ *
  * WHAT WAS NOT TAKEN from that framework: proof. Weinberg wants customer names, outcomes and
  * numbers in the story. The only number here we can stand behind is the partner count, and it
  * already lives in the call script's own offer beat. Inventing social proof is precisely the
@@ -239,7 +248,7 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
 
   2. THE PROBLEM FIRST, THEN US. 42 WORDS MAX, and the order is the whole point of the beat.
   FIRST, one short sentence on what a firm like theirs actually runs into filling this seat. Their side of it, never ours: what it costs them, how long it sits open, or the two bad options they are stuck choosing between, paying a premium locally or taking whoever is available. Concrete and in their world. Do not describe anything we do, do not name a benefit, and do not use the word offshore yet.
-  THEN, word for word and unchanged: "...and that's where we come in. We're an outsourcing marketplace, we don't supply the staff ourselves, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
+  THEN, word for word: "...and that's where we come in. We're an outsourcing marketplace, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
   WHY THIS ORDER, because it is the difference between a story and a monologue. Opening on what we are asks the lead to care about our business model before they have heard a single problem of their own. The problem is what earns the sentence that follows it, and a cold call that opens on the caller is the one that gets ended.
   BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 
