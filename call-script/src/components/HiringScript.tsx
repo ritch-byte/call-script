@@ -274,7 +274,7 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   /* "15 minutes each" was written for the two-partner line and is wrong in the ask. Strip the "each" rather than
      typing 15 a second time, so changing MEETING_LENGTH still moves both. */
   const perPartner = MEETING_LENGTH.replace(/\s+each$/i, '')
-  return `Write a cold call script for an SDR at Outsource Accelerator, an outsourcing marketplace, calling someone who is currently hiring.
+  return `Write a cold call script for an SDR at Outsource Accelerator, the world's leading outsourcing marketplace, calling someone who is currently hiring.
 
   WHO IS BEING CALLED: ${jobTitle}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
   THE SEAT THEY HAVE ADVERTISED: ${hiringPosition}
@@ -297,7 +297,7 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
 
   2. THE PROBLEM FIRST, THEN US. 42 WORDS MAX, and the order is the whole point of the beat.
   FIRST, one short sentence on what a firm like theirs actually runs into filling this seat. Their side of it, never ours: what it costs them, how long it sits open, or the two bad options they are stuck choosing between, paying a premium locally or taking whoever is available. Concrete and in their world. Do not describe anything we do, do not name a benefit, and do not use the word offshore yet.
-  THEN, word for word: "...and that's where we come in. We're an outsourcing marketplace, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
+  THEN, word for word: "...and that's where we come in. We're the world's leading outsourcing marketplace, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
   WHY THIS ORDER, because it is the difference between a story and a monologue. Opening on what we are asks the lead to care about our business model before they have heard a single problem of their own. The problem is what earns the sentence that follows it, and a cold call that opens on the caller is the one that gets ended.
   BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 
