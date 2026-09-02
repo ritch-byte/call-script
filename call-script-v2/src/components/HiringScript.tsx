@@ -8,6 +8,10 @@
  *
  * The rep pastes four things, in this order:
  *   Job Title, Industry, Hiring Position, Website URL
+ * Commas optional. Reps paste straight off the job ad, so a bare line reads too: the seat is
+ * taken off the back, where a capitalised run ends as soon as lower case begins, and the
+ * title off the front. "Executive Chairman civil engineering SENIOR PROJECT MANAGER" splits
+ * on exactly that.
  * Job Title is the person being called. Hiring Position is the seat they have advertised. The
  * company name is deliberately not an input, because the script says "your company" and never
  * names it. The URL is only there for the kind of firm it signals and to read the line back.
@@ -49,6 +53,9 @@ const SANS = '"Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans
 const URL_RE =
   /^(https?:\/\/|www\.)|\.(com|net|org|io|co|ai|ph|au|uk|us|ca|nz|sg|de|fr|es|it|nl|se|dk|in|jp|biz|info|dev|app|xyz|group|build)\b/i
 
+const TITLE_WORD =
+  /^(chief|head|vp|svp|evp|president|vice|director|manager|managing|officer|founder|co-?founder|owner|proprietor|principal|partner|lead|supervisor|coordinator|specialist|executive|chairman|chairwoman|chair|superintendent|estimator|controller|comptroller|treasurer|counsel|attorney|foreman|buyer|planner|scheduler|dispatcher|recruiter|analyst|engineer|architect|surveyor|producer|editor|admin|c[eftmoi]o|cmo|cro|cpo|chro|cco|gm|md)$/i
+
 export interface HiringLead {
   jobTitle: string
   industry: string
@@ -85,7 +92,20 @@ export function parseHiringLead(line: string): HiringLead {
   const strip = (s: string) =>
     s.replace(/^(job\s*title|title|role|position|industry|sector|hiring(\s*(for|position|role))?|they'?re hiring)\s*[:=-]\s*/i, '').trim()
 
-  const [a = '', b = '', c = ''] = rest.map(strip)
+  const fields = rest.map(strip).filter(Boolean)
+
+  /* Pasted straight off a job ad, with no commas anywhere. Work it out from the words. */
+  if (fields.length === 1 && /\s/.test(fields[0])) {
+    const ff = splitFreeform(fields[0])
+    if (ff.jobTitle && ff.hiringPosition) {
+      out.jobTitle = ff.jobTitle
+      out.industry = ff.industry
+      out.hiringPosition = ff.hiringPosition
+      return out
+    }
+  }
+
+  const [a = '', b = '', c = ''] = fields
   out.jobTitle = a
   out.industry = b
   out.hiringPosition = c
@@ -95,6 +115,56 @@ export function parseHiringLead(line: string): HiringLead {
     out.industry = ''
   }
   return out
+}
+
+/*
+ * One line, no commas: "Executive Chairman civil engineering SENIOR PROJECT MANAGER".
+ *
+ * Two things make this readable without punctuation. The lead's own title comes first and
+ * contains a title word, and the advertised seat comes last and is capitalised, because it
+ * was copied out of a job ad. So take the title off the front, take the capitalised run off
+ * the back, and whatever is left in the middle is the industry. Lower case is the signal
+ * that the industry has started: "civil engineering" stops the backward scan dead.
+ */
+function splitFreeform(text: string) {
+  const toks = text.split(/\s+/).filter(Boolean)
+  const isCapped = (t: string) => /^[A-Z0-9&]/.test(t)
+  const empty = { jobTitle: '', industry: '', hiringPosition: '' }
+  if (toks.length < 2) return empty
+
+  /*
+   * Take the seat off the back FIRST. Doing the title first breaks on "Executive Chairman",
+   * where the second word is itself a title word and the forward scan has no way to know
+   * whether it belongs to the title or starts the advertised seat. From the back there is no
+   * such question: the run ends where lower case begins.
+   */
+  let seatAt = toks.length
+  while (seatAt > 1 && isCapped(toks[seatAt - 1]) && toks.length - seatAt < 4) seatAt--
+  if (seatAt === toks.length) return empty
+  const head = toks.slice(0, seatAt)
+
+  /* then the title off the front of what is left */
+  let first = -1
+  for (let i = 0; i < head.length; i++) {
+    if (TITLE_WORD.test(head[i])) {
+      first = i
+      break
+    }
+  }
+  if (first === -1) return empty
+  let start = first
+  while (start > 0 && isCapped(head[start - 1])) start--
+  let end = first
+  while (end + 1 < head.length && isCapped(head[end + 1])) end++
+  /* "Head of Partnerships" keeps its joiner */
+  while (end + 2 < head.length && /^(of|for|at)$/i.test(head[end + 1]) && isCapped(head[end + 2]))
+    end += 2
+
+  return {
+    jobTitle: head.slice(start, end + 1).join(' '),
+    industry: head.slice(end + 1).join(' '),
+    hiringPosition: toks.slice(seatAt).join(' '),
+  }
 }
 
 /* ------------------------------- the prompt ------------------------------- */
@@ -253,7 +323,7 @@ export default function HiringScript() {
               if (e.key === 'Enter') generate()
               if (e.key === 'Escape') reset()
             }}
-            placeholder="Job title, industry, hiring position, website"
+            placeholder="Job title, industry, hiring position, website. Commas optional."
           />
           <div
             style={{
@@ -279,7 +349,7 @@ export default function HiringScript() {
             >
               {ready
                 ? readBack.join('  ·  ')
-                : 'Need at least their job title and the position they are hiring for. Put commas between them.'}
+                : 'Could not tell which is their job title and which is the seat they are hiring for. Try commas between them.'}
             </div>
           )}
           <div
