@@ -109,6 +109,22 @@
  * now opens on a locked line carrying the local figure, and the seat staying on site is a
  * subordinate clause in the middle rather than the headline.
  *
+ * BEAT 1 IS ASSUMPTIVE NOW, not descriptive. It was coming back as "handling the
+ * reconciliation and GL entries that keep the books accurate", which explains the lead's own
+ * job back to them. They wrote the advertisement. The beat now states the tension they are
+ * already holding - someone genuinely good in that chair while the number stays where it has
+ * to - as a given rather than a question, which is the thing the rest of the call answers.
+ * The industry-noun rule went with the old shape, because the beat no longer describes duties;
+ * what replaced it is a requirement that one concrete thing from their world be in the
+ * tension, so it is this seat and not any seat, plus a ban list of the nine phrases that are
+ * true of every hire ever advertised.
+ *
+ * "A ACCOUNTING SPECIALIST" is why article() exists. Three locked lines hardcoded "a" in
+ * front of an interpolated job title. Vowel letters are the easy half; the other half is
+ * acronyms, where what matters is how the letter is said, so HR takes "an" and GL takes "a".
+ * A rep reading at pace trips on both, and SAY IT ALOUD is the one rule this whole prompt
+ * exists to serve.
+ *
  * THE CLOSE IS THE FLOOR'S OWN, restored. It reads "I know [HESITATION], but would you be
  * opposed to carving out 15 minutes for a coffee break style chat, just to see if this could
  * work or not, I'm thinking..." That is the wording from the standalone builder, tuned on
@@ -267,6 +283,24 @@ function splitFreeform(text: string) {
   }
 }
 
+/*
+ * "a" or "an" for a job title. Vowel letters are the easy half. The other half is acronyms,
+ * where what matters is how the letter is SAID: HR is "aitch", so it takes "an", while GL is
+ * "jee" and takes "a". Without this the locked lines produce "a Accounting Specialist" and
+ * "a HR Officer", and a rep reading at pace trips on both.
+ *
+ * The acronym branch is capped at three letters. Reps paste straight off the advertisement,
+ * which is often in capitals, and an unbounded rule reads SENIOR as an acronym and returns
+ * "an SENIOR PROJECT MANAGER". No acronym anyone puts in a job title is longer than three.
+ */
+const SOUNDS_VOWEL = /^[AEFHILMNORSX]+$/
+export function article(title: string): string {
+  const first = (title || '').trim().split(/\s+/)[0] || ''
+  /* Two or three letters, because job ads arrive in caps and SENIOR is not an acronym. */
+  if (/^[A-Z]{2,3}$/.test(first)) return SOUNDS_VOWEL.test(first[0]) ? 'an' : 'a'
+  return /^[aeiou]/i.test(first) ? 'an' : 'a'
+}
+
 /* ------------------------------- the prompt ------------------------------- */
 
 export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: HiringLead): string {
@@ -274,6 +308,7 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   /* "15 minutes each" was written for the two-partner line and is wrong in the ask. Strip the "each" rather than
      typing 15 a second time, so changing MEETING_LENGTH still moves both. */
   const perPartner = MEETING_LENGTH.replace(/\s+each$/i, '')
+  const a = article(hiringPosition)
   return `Write a cold call script for an SDR at Outsource Accelerator, the world's leading outsourcing marketplace, calling someone who is currently hiring.
 
   WHO IS BEING CALLED: ${jobTitle}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
@@ -289,11 +324,12 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
 
   It is one continuous read. Beats 1 to 3 carry no ask and no meeting request. The ask lives in beat 4 and nowhere else.
 
-  1. THE REASON FOR THE CALL. 30 WORDS MAX. Word for word: "So the reason for my call is I saw you're hiring for a ${hiringPosition}..." then ONE short clause naming what that seat actually handles at a firm like this one. Say the advertised seat exactly as written above.
-  THE CLAUSE NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing that seat is actually handling: shop drawings, variation claims, site diaries, subcontractor packages, carrier contracts, reservation inventory, specimen batches, freight documentation, case files, retainer scopes. That noun is what makes the line land, and it is the whole job of this beat.
-  THE TEST, and run both. One: could this clause sit word for word in an ad for the same seat at a firm in a completely different industry? Two: could you swap in a different job title and have it still make sense? Either one yes and you rewrite it. True is not the bar. A lead who hears their own job described in words that would fit anyone learns nothing about why you called.
-  BANNED, because every one of them is true and says nothing: "managing schedules, budgets and timelines", "managing day to day operations", "overseeing the team", "keeping projects on track", "coordinating across teams", "managing multiple priorities", "handling the workload", "making sure things run smoothly", "driving delivery".
-  Not why they should outsource it, not a problem, not a compliment, no adjectives.
+  1. THE REASON FOR THE CALL, AND IT IS ASSUMPTIVE. 34 WORDS MAX.
+  Word for word: "So the reason for my call is I saw your company is looking for ${a} ${hiringPosition}..." then word for word: "and I know how important it is to" + the thing this person is already weighing over that hire.
+  THE TENSION, NOT THE DUTIES. They wrote the advertisement, so telling them what the seat does teaches them nothing and reads as filler. Say instead the thing they are already holding in their head: getting someone genuinely good in that chair while the number stays where it has to sit. State it as something you assume is true of them, never as a question, and they are agreeing with you before they have decided to.
+  MAKE IT THIS SEAT, NOT ANY SEAT. One concrete thing from their world has to be in it, the thing that makes this particular hire hard: the scale of what they are running, the standard the work has to meet, or what goes wrong if the person turns out not to be right.
+  BANNED, because every one of them is true of every hire and says nothing: "finding the right person", "getting the right fit", "hiring the right talent", "keeping costs down", "managing the budget", "balancing cost and quality", "in today's market", "it's a competitive market", "attracting top talent".
+  Say the advertised seat exactly as written above. Not why they should outsource it, no compliment about the company, and no adjectives about them.
 
   2. THE PROBLEM FIRST, THEN US. 42 WORDS MAX, and the order is the whole point of the beat.
   FIRST, one short sentence on what a firm like theirs actually runs into filling this seat. Their side of it, never ours: what it costs them, how long it sits open, or the two bad options they are stuck choosing between, paying a premium locally or taking whoever is available. Concrete and in their world. Do not describe anything we do, do not name a benefit, and do not use the word offshore yet.
@@ -305,10 +341,10 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   Then sort the advertised seat and write ONE of the two routes below. Never mention the other, never explain that you chose, never use the words route, option or scenario.
   THE TEST: could the person in that seat do the whole job on a laptop, with nobody needing them in the building?
 
-  ROUTE A, the seat passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruitment coordinator. 40 WORDS MAX. After the opener, word for word: "a ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then that the same person through one of these firms is "more like" + THE OFFSHORE FIGURE, full-time and dedicated, on their hours.
+  ROUTE A, the seat passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruitment coordinator. 40 WORDS MAX. After the opener, word for word: "${a} ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then that the same person through one of these firms is "more like" + THE OFFSHORE FIGURE, full-time and dedicated, on their hours.
 
-  ROUTE B, the seat fails because the work is physical, on site or hands on. Site engineers and project managers, foremen, warehouse and floor managers, drivers, technicians, nurses, kitchen and housekeeping staff, front office, retail floor. 52 WORDS MAX. After the opener, word for word: "a ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then word for word: "that one stays on site, that's where the work is, but" + TWO back office seats a firm like theirs carries behind that hire, each with "to" and what it takes off this person's desk, then "those are more like" + THE OFFSHORE FIGURE.
-  START ON THE LOCAL FIGURE, NOT ON WHAT CANNOT BE DONE. "A ${hiringPosition} isn't a seat our partners fill offshore" is the wrong sentence twice over: it opens on a no, to someone who has just told you they are hiring, and its subject is us. The seat staying on site is a subordinate clause in the middle of the beat, never the headline.
+  ROUTE B, the seat fails because the work is physical, on site or hands on. Site engineers and project managers, foremen, warehouse and floor managers, drivers, technicians, nurses, kitchen and housekeeping staff, front office, retail floor. 52 WORDS MAX. After the opener, word for word: "${a} ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then word for word: "that one stays on site, that's where the work is, but" + TWO back office seats a firm like theirs carries behind that hire, each with "to" and what it takes off this person's desk, then "those are more like" + THE OFFSHORE FIGURE.
+  START ON THE LOCAL FIGURE, NOT ON WHAT CANNOT BE DONE. "${a[0].toUpperCase() + a.slice(1)} ${hiringPosition} isn't a seat our partners fill offshore" is the wrong sentence twice over: it opens on a no, to someone who has just told you they are hiring, and its subject is us. The seat staying on site is a subordinate clause in the middle of the beat, never the headline.
 
   THE TWO NUMBERS, and they are approximate market figures, not quotes.
   SAY THEM AS APPROXIMATE, always: "somewhere around", "roughly", "more like". Never a precise number, never a rate per hour, never a price from a partner, never a total saving.
