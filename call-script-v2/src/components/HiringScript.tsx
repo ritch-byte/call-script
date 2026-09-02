@@ -33,6 +33,30 @@
  * the advertised role is an input rather than a guess, and plenty of advertised roles are on
  * site. So the prompt has to sort the role first and take one of two routes, and it is told to
  * say so plainly rather than pretend a floor job can be done from Manila.
+ *
+ * FOUR RULES CAME ACROSS FROM THE SPIEL BUILDER after the first live run, a civil engineering
+ * firm hiring a site-based project manager. Each had already been learned there, and the
+ * output failed all four.
+ *
+ *   Beat 1 said the seat was "managing schedules, budgets, and site coordination". True of
+ *   every project manager anywhere, which is the exact failure reps reported on the Spiel
+ *   Builder's homework beat. Beat 1 now carries the same fix: a noun only this industry would
+ *   use, the job-ad test and the swap test, and a ban list of the phrases that pass for true
+ *   and say nothing.
+ *
+ *   Beat 3 opened "A Senior Project Manager isn't a seat our partners fill offshore." Two
+ *   faults in one line. It opens on a no, to someone who has just told you they are hiring,
+ *   and its subject is our partners. The Spiel Builder bans that whole shape with WE ARE NOT
+ *   IN THIS BEAT, so that rule is here now, with this sentence quoted as the thing not to do.
+ *
+ *   Route B was ordered backwards. It said what cannot be done, then what can. Reversed: the
+ *   two back office seats come first and "that seat stays on site" is one clause at the end.
+ *
+ *   The beat had no opener, so the turn read as a correction. It now opens on the Spiel
+ *   Builder's fixed line, "And here's where it gets interesting..."
+ *
+ * Beat 4 also stopped saying "the role". On route B the advertised role is not the one going
+ * offshore, so "what the role actually costs offshore" pointed at the wrong seat.
  */
 
 import { useState, useMemo } from 'react'
@@ -185,21 +209,27 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
 
   It is one continuous read. Beats 1 to 4 carry no ask and no meeting request. The ask lives in beat 5 and nowhere else.
 
-  1. THE REASON FOR THE CALL. 26 WORDS MAX. Word for word: "So the reason for my call is I saw you're hiring for a ${hiringPosition}..." then ONE short clause naming what that seat actually carries day to day at a firm like this one. Concrete nouns from their world. Not why they should outsource it, not a problem, not a compliment, and no adjectives. Say the advertised role exactly as it is written above, do not reword it or promote it.
+  1. THE REASON FOR THE CALL. 30 WORDS MAX. Word for word: "So the reason for my call is I saw you're hiring for a ${hiringPosition}..." then ONE short clause naming what that seat actually handles at a firm like this one. Say the advertised seat exactly as written above.
+  THE CLAUSE NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing that seat is actually handling: shop drawings, variation claims, site diaries, subcontractor packages, carrier contracts, reservation inventory, specimen batches, freight documentation, case files, retainer scopes. That noun is what makes the line land, and it is the whole job of this beat.
+  THE TEST, and run both. One: could this clause sit word for word in an ad for the same seat at a firm in a completely different industry? Two: could you swap in a different job title and have it still make sense? Either one yes and you rewrite it. True is not the bar. A lead who hears their own job described in words that would fit anyone learns nothing about why you called.
+  BANNED, because every one of them is true and says nothing: "managing schedules, budgets and timelines", "managing day to day operations", "overseeing the team", "keeping projects on track", "coordinating across teams", "managing multiple priorities", "handling the workload", "making sure things run smoothly", "driving delivery".
+  Not why they should outsource it, not a problem, not a compliment, no adjectives.
 
   2. THE THUMBNAIL. 24 WORDS MAX. Word for word: "and the reason that's relevant is we're an outsourcing marketplace, we don't supply the staff ourselves, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
 
-  3. THE ROUTE. This is the beat that decides whether this call is honest, so sort the advertised role before you write anything.
+  3. THE TURN. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the thumbnail so it lands as a turn in the conversation, not as a correction to something they said.
+  Then sort the advertised seat and write ONE of the two routes below. Never mention the other, never explain that you chose, never use the words route, option or scenario.
   THE TEST: could the person in that seat do the whole job on a laptop, with nobody needing them in the building?
-  ROUTE A, the seat itself passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruiter coordinator. 30 WORDS MAX. Say plainly that this is a seat their partners fill constantly, and that the same person costs ${SAVINGS_CLAIM}. One sentence on what "the same person" means: full-time, dedicated, on their hours.
-  ROUTE B, the seat fails because the work is physical, on site or hands on. Warehouse and floor managers, site foremen, drivers, technicians, nurses, kitchen and housekeeping staff, front office, retail floor. 34 WORDS MAX. Do NOT pretend it can be done offshore. Say so, in one short clause, and turn to the desk work sitting behind that hire: name two back office seats a firm like theirs carries anyway, and say those come in at ${SAVINGS_CLAIM}. Two roles, both obviously off the floor, both real titles.
-  Write one route only. Never mention the other, never explain that you chose, and never use the words route, option or scenario.
+  ROUTE A, the seat passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruitment coordinator. 32 WORDS MAX. Name that seat back, then "to" and what it takes off the person you are calling, in the words of beat 1. Then that the same person comes in at ${SAVINGS_CLAIM}, full-time and dedicated, on their hours.
+  ROUTE B, the seat fails because the work is physical, on site or hands on. Site engineers and project managers, foremen, warehouse and floor managers, drivers, technicians, nurses, kitchen and housekeeping staff, front office, retail floor. 42 WORDS MAX, in this order and not the other way round. FIRST name TWO back office seats a firm like theirs carries behind that hire, each with "to" and what it takes off this person's desk, then that those come in at ${SAVINGS_CLAIM}. LAST, one short clause and only one, saying that seat itself stays where the work is. Opening on what cannot be done reads as a correction to someone who has just told you they are hiring, and you lose them before the useful half.
+  WE ARE NOT IN THIS BEAT. The subject is them, their desk, or the seat itself. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us. "A Senior Project Manager isn't a seat our partners fill offshore" is exactly the wrong shape twice over: it opens on a no, and it makes us the subject. "That seat stays on site" says the same thing from their side, in five words.
+  No costs beyond the one figure above, no promises about quality, no pitching us.
 
-  4. WHAT THE CALL IS. 34 WORDS MAX. Word for word: "So what I'd suggest is a quick chat with two of them, ${MEETING_LENGTH}," then what the partners cover: what the seat actually costs offshore, how the team gets managed day to day, and who owns performance and retention. Then word for word: "That's the part you can't get over email." No CVs, no candidates, no profiles, no shortlist, no rates, no percentages beyond the one already used, and no promises about what the partner will bring.
+  4. WHAT THE CALL IS. 34 WORDS MAX. Word for word: "So what I'd suggest is a quick chat with two of them, ${MEETING_LENGTH}," then what the partners cover: what those seats actually cost offshore, how the team gets managed day to day, and who owns performance and retention. Say "those seats", never "the role", because in route B the advertised role is not the one going offshore. Then word for word: "That's the part you can't get over email." No CVs, no candidates, no profiles, no shortlist, no rates, no percentages beyond the one already used, and no promises about what the partner will bring.
 
   5. THE ASK. Word for word, and the only thing you write is the hesitation:
   "I know people hiring right now [HESITATION]. But would you be opposed to a quick chat just to see if this could work or not, I'm thinking ${offer}? If not maybe ${fallback}?"
-  The hesitation is 10 WORDS MAX, one short clause, no full stop inside it. It is the one thing that would make THIS person pause before saying yes, given the seat they are filling: what they are protecting, what they think this is going to be, what they got burned on. Their words, not ours. Never a generic objection like being busy or not having budget.
+  The hesitation is 10 WORDS MAX, one short clause, no full stop inside it. It is the one thing that would make THIS person pause before saying yes, given the seat they are filling and the industry they are in: what they are protecting, what they think this is going to be, what they got burned on last time. Their words, not ours, and specific to this hire. Never a generic objection like being busy, not having budget, or wanting someone who stays.
   Change nothing else in that beat. No filler, no stage directions inside it, no recap, no thanks, nothing after it.
 
   VOICE: spoken, short clauses, contractions, ellipses as pacing marks but at most ONE per beat. No em dashes, no corporate filler, no feature lists. Curiosity, not authority. Sell the meeting, not the service.
