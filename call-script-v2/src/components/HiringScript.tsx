@@ -57,6 +57,28 @@
  *
  * Beat 4 also stopped saying "the role". On route B the advertised role is not the one going
  * offshore, so "what the role actually costs offshore" pointed at the wrong seat.
+ *
+ * BEAT 2 WAS A MONOLOGUE, and two separate sources said so. It read "And the reason that's
+ * relevant is we're an outsourcing marketplace, we don't supply the staff ourselves, we match
+ * you to the vetted BPO partners that already do this work." Every clause is about us, and
+ * the lead has not yet heard a problem of their own. Weinberg's New Sales Simplified calls
+ * that the blunt weapon, a company-features monologue, and its rule is to lead with the
+ * customer's problem rather than the product. Stefanie's script review reached the same place
+ * from a recording: cold calls die in monologues, and her proposed hook was a problem line,
+ * "companies come to us when hiring locally is getting too slow, too expensive, or the quality
+ * isn't there".
+ *
+ * So the beat is inverted rather than reworded. One short sentence on what a firm like theirs
+ * runs into filling this seat, in their words and from their side, and only then the
+ * marketplace line, which is kept word for word because PJ signed that framing off in full and
+ * it is what stops a lead asking whether we are a recruitment agency. The opening words are
+ * banned from being we, our, us or I, and the test is the same one Weinberg gives: if the
+ * first sentence could sit on our website unchanged, it is the monologue.
+ *
+ * WHAT WAS NOT TAKEN from that framework: proof. Weinberg wants customer names, outcomes and
+ * numbers in the story. The only number here we can stand behind is the partner count, and it
+ * already lives in the call script's own offer beat. Inventing social proof is precisely the
+ * class of claim the SP change order spent a week removing, so this beat carries none.
  */
 
 import { useState, useMemo } from 'react'
@@ -215,9 +237,13 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   BANNED, because every one of them is true and says nothing: "managing schedules, budgets and timelines", "managing day to day operations", "overseeing the team", "keeping projects on track", "coordinating across teams", "managing multiple priorities", "handling the workload", "making sure things run smoothly", "driving delivery".
   Not why they should outsource it, not a problem, not a compliment, no adjectives.
 
-  2. THE THUMBNAIL. 24 WORDS MAX. Word for word: "and the reason that's relevant is we're an outsourcing marketplace, we don't supply the staff ourselves, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
+  2. THE PROBLEM FIRST, THEN US. 42 WORDS MAX, and the order is the whole point of the beat.
+  FIRST, one short sentence on what a firm like theirs actually runs into filling this seat. Their side of it, never ours: what it costs them, how long it sits open, or the two bad options they are stuck choosing between, paying a premium locally or taking whoever is available. Concrete and in their world. Do not describe anything we do, do not name a benefit, and do not use the word offshore yet.
+  THEN, word for word and unchanged: "...and that's where we come in. We're an outsourcing marketplace, we don't supply the staff ourselves, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
+  WHY THIS ORDER, because it is the difference between a story and a monologue. Opening on what we are asks the lead to care about our business model before they have heard a single problem of their own. The problem is what earns the sentence that follows it, and a cold call that opens on the caller is the one that gets ended.
+  BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 
-  3. THE TURN. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the thumbnail so it lands as a turn in the conversation, not as a correction to something they said.
+  3. THE TURN. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the marketplace line so it lands as a turn in the conversation, not as a correction to something they said.
   Then sort the advertised seat and write ONE of the two routes below. Never mention the other, never explain that you chose, never use the words route, option or scenario.
   THE TEST: could the person in that seat do the whole job on a laptop, with nobody needing them in the building?
   ROUTE A, the seat passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruitment coordinator. 32 WORDS MAX. Name that seat back, then "to" and what it takes off the person you are calling, in the words of beat 1. Then that the same person comes in at ${SAVINGS_CLAIM}, full-time and dedicated, on their hours.
