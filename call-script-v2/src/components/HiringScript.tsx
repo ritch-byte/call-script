@@ -1,0 +1,382 @@
+/*
+ * Hiring Script generator.
+ *
+ * A different call from the one the Spiel Builder writes. There, the rep is cold and has to
+ * discover whether a role exists at all. Here the role is already open and advertised, so the
+ * rep leads with it and the whole discovery half of the call is already done. That is why this
+ * is its own generator rather than a mode on the other one: nearly every beat is different.
+ *
+ * The rep pastes four things, in this order:
+ *   Job Title, Industry, Hiring Position, Website URL
+ * Job Title is the person being called. Hiring Position is the seat they have advertised. The
+ * company name is deliberately not an input, because the script says "your company" and never
+ * names it. The URL is only there for the kind of firm it signals and to read the line back.
+ *
+ * THE NUMBERS ARE NOT WRITTEN HERE. The savings figure and the meeting length are imported
+ * from data/flow, the same constants the live call script reads. A second generator quoting
+ * its own numbers is exactly how the script ended up saying two different savings figures in
+ * the first place, so this one cannot: change SAVINGS_PCT once and this moves with it.
+ *
+ * THE ONE THING THIS PROMPT GUARDS HARDEST. The rep knows the role is open because it was
+ * advertised, and that is the entire extent of what is known. Everything else about that ad
+ * is invented if the model writes it: the pay, the seniority, how long it has been open, where
+ * it was posted, how many they want, whether they are struggling to fill it. A lead who hears
+ * a detail we could not possibly have hangs up, and worse, tells the partner about it later.
+ *
+ * THE SECOND GUARD is offshorability, learned the expensive way on the other generator. Two
+ * reps ran leads through it and got back roles that cannot be done from another country: a
+ * warehouse manager, a hotel's front office lead, kitchen staff. Here it matters more, because
+ * the advertised role is an input rather than a guess, and plenty of advertised roles are on
+ * site. So the prompt has to sort the role first and take one of two routes, and it is told to
+ * say so plainly rather than pretend a floor job can be done from Manila.
+ */
+
+import { useState, useMemo } from 'react'
+import { callAI } from '../lib/ai'
+import { SAVINGS_CLAIM, MEETING_LENGTH } from '../data/flow'
+import { ScriptLine, buildIntro, offerWindow } from './SpielBuilder'
+
+/** Same model and the same one-call-per-click shape as the Spiel Builder. */
+const MODEL = 'claude-haiku-4-5-20251001'
+
+const NAVY = '#0f1729'
+const MAGENTA = '#d6006e'
+const PAPER = '#f7f8fb'
+const LINE = '#dfe3ec'
+const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
+const SANS = '"Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans-serif'
+
+const URL_RE =
+  /^(https?:\/\/|www\.)|\.(com|net|org|io|co|ai|ph|au|uk|us|ca|nz|sg|de|fr|es|it|nl|se|dk|in|jp|biz|info|dev|app|xyz|group|build)\b/i
+
+export interface HiringLead {
+  jobTitle: string
+  industry: string
+  hiringPosition: string
+  url: string
+}
+
+/*
+ * The four fields arrive in a fixed order, so this is positional rather than the fuzzy
+ * classifier the Spiel Builder needs. Two tolerances, because reps paste from anywhere:
+ * a URL is recognised wherever it lands and pulled out first, and "Hiring: Bookkeeper"
+ * style labels are stripped. Everything left keeps its order.
+ */
+export function parseHiringLead(line: string): HiringLead {
+  const out: HiringLead = { jobTitle: '', industry: '', hiringPosition: '', url: '' }
+  const parts = line
+    .split(/[,\t|;\n]+/)
+    .map(s => s.trim())
+    .filter(Boolean)
+
+  const rest: string[] = []
+  for (const part of parts) {
+    const tokens = part.split(/\s+/)
+    const at = tokens.findIndex(t => !/\s/.test(t) && URL_RE.test(t))
+    if (at !== -1 && !out.url) {
+      out.url = tokens.splice(at, 1)[0]
+      const left = tokens.join(' ').trim()
+      if (left) rest.push(left)
+      continue
+    }
+    rest.push(part)
+  }
+
+  const strip = (s: string) =>
+    s.replace(/^(job\s*title|title|role|position|industry|sector|hiring(\s*(for|position|role))?|they'?re hiring)\s*[:=-]\s*/i, '').trim()
+
+  const [a = '', b = '', c = ''] = rest.map(strip)
+  out.jobTitle = a
+  out.industry = b
+  out.hiringPosition = c
+  /* Three fields with no industry given: treat the third as the seat, not the sector. */
+  if (!c && b) {
+    out.hiringPosition = b
+    out.industry = ''
+  }
+  return out
+}
+
+/* ------------------------------- the prompt ------------------------------- */
+
+export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: HiringLead): string {
+  const { offer, fallback } = offerWindow()
+  return `Write a cold call script for an SDR at Outsource Accelerator, an outsourcing marketplace, calling someone who is currently hiring.
+
+  WHO IS BEING CALLED: ${jobTitle}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
+  THE SEAT THEY HAVE ADVERTISED: ${hiringPosition}
+
+  WHAT YOU KNOW, AND IT IS ONLY THIS. The role above is open, because they advertised it. Nothing else. You have no research and no web access. Do not write where the ad was posted, what it pays, how long it has been open, how many they want, how senior it is, whether they are struggling to fill it, or anything at all about this company's size, clients, funding or offices. If it is not in the two lines above, you do not know it, and a lead who hears a detail we could not possibly have will end the call.
+  The website address is there for the kind of firm it signals, nothing more. Never say the company's name: the rep says "your company".
+
+  5 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble. Keep every phrase marked word for word exactly as written, and fill the rest with this person's world. One or two short sentences per beat, never three.
+
+  The rep has ALREADY opened the call: they greeted the lead by name, gave their own name, said they are from Outsource Accelerator, asked for half a minute and got it. Do not greet, do not introduce yourself, do not name Outsource Accelerator again, do not ask for permission or for time. Start cold on the reason for the call.
+
+  It is one continuous read. Beats 1 to 4 carry no ask and no meeting request. The ask lives in beat 5 and nowhere else.
+
+  1. THE REASON FOR THE CALL. 26 WORDS MAX. Word for word: "So the reason for my call is I saw you're hiring for a ${hiringPosition}..." then ONE short clause naming what that seat actually carries day to day at a firm like this one. Concrete nouns from their world. Not why they should outsource it, not a problem, not a compliment, and no adjectives. Say the advertised role exactly as it is written above, do not reword it or promote it.
+
+  2. THE THUMBNAIL. 24 WORDS MAX. Word for word: "and the reason that's relevant is we're an outsourcing marketplace, we don't supply the staff ourselves, we match you to the vetted BPO partners that already do this work." Then stop. Nothing after it.
+
+  3. THE ROUTE. This is the beat that decides whether this call is honest, so sort the advertised role before you write anything.
+  THE TEST: could the person in that seat do the whole job on a laptop, with nobody needing them in the building?
+  ROUTE A, the seat itself passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruiter coordinator. 30 WORDS MAX. Say plainly that this is a seat their partners fill constantly, and that the same person costs ${SAVINGS_CLAIM}. One sentence on what "the same person" means: full-time, dedicated, on their hours.
+  ROUTE B, the seat fails because the work is physical, on site or hands on. Warehouse and floor managers, site foremen, drivers, technicians, nurses, kitchen and housekeeping staff, front office, retail floor. 34 WORDS MAX. Do NOT pretend it can be done offshore. Say so, in one short clause, and turn to the desk work sitting behind that hire: name two back office seats a firm like theirs carries anyway, and say those come in at ${SAVINGS_CLAIM}. Two roles, both obviously off the floor, both real titles.
+  Write one route only. Never mention the other, never explain that you chose, and never use the words route, option or scenario.
+
+  4. WHAT THE CALL IS. 34 WORDS MAX. Word for word: "So what I'd suggest is a quick chat with two of them, ${MEETING_LENGTH}," then what the partners cover: what the seat actually costs offshore, how the team gets managed day to day, and who owns performance and retention. Then word for word: "That's the part you can't get over email." No CVs, no candidates, no profiles, no shortlist, no rates, no percentages beyond the one already used, and no promises about what the partner will bring.
+
+  5. THE ASK. Word for word, and the only thing you write is the hesitation:
+  "I know people hiring right now [HESITATION]. But would you be opposed to a quick chat just to see if this could work or not, I'm thinking ${offer}? If not maybe ${fallback}?"
+  The hesitation is 10 WORDS MAX, one short clause, no full stop inside it. It is the one thing that would make THIS person pause before saying yes, given the seat they are filling: what they are protecting, what they think this is going to be, what they got burned on. Their words, not ours. Never a generic objection like being busy or not having budget.
+  Change nothing else in that beat. No filler, no stage directions inside it, no recap, no thanks, nothing after it.
+
+  VOICE: spoken, short clauses, contractions, ellipses as pacing marks but at most ONE per beat. No em dashes, no corporate filler, no feature lists. Curiosity, not authority. Sell the meeting, not the service.
+
+  DELIVERY MARKS. Write it the way a screenplay is written, so the rep can see the pacing.
+  Put [PAUSE] on its own after beat 1 and again before the ask in beat 5. Two, no more.
+  Put one direction in round brackets before the phrase it governs, one word: (slow), (deliberate), (softer). At most one across the whole script, and never inside beat 5.
+  Drop in a spoken filler where a person actually would, like y'know or uh. At most one per beat, and never in beat 5.
+  Marks, directions and fillers are breath, not content. They do NOT count toward the word caps.
+
+  SAY IT ALOUD. A rep reads this at pace on a live call. Short, common, spoken words. Nothing anyone could trip over: not "operationalised", "consolidation", "methodologies", "infrastructure", "bandwidth", "streamline", "leverage".`
+}
+
+/* --------------------------------- app --------------------------------- */
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '11px 12px',
+  border: `1px solid ${LINE}`,
+  borderRadius: 4,
+  fontFamily: SANS,
+  fontSize: 15,
+  color: NAVY,
+  outline: 'none',
+  boxSizing: 'border-box',
+  background: '#fff',
+}
+
+const ghostBtn: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  fontFamily: MONO,
+  fontSize: 11,
+  letterSpacing: '0.04em',
+  color: '#6b7280',
+  cursor: 'pointer',
+  textDecoration: 'underline',
+  textUnderlineOffset: 3,
+}
+
+export default function HiringScript() {
+  const [leadLine, setLeadLine] = useState('')
+  const [script, setScript] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const lead = useMemo(() => parseHiringLead(leadLine), [leadLine])
+  const ready = Boolean(lead.jobTitle.trim() && lead.hiringPosition.trim())
+  const intro = useMemo(() => buildIntro(''), [])
+  const onScreen = script.length ? [...intro, ...script] : intro
+
+  async function generate() {
+    if (!ready || loading || script.length) return
+    setLoading(true)
+    setError('')
+    try {
+      const text = await callAI({
+        prompt: buildHiringPrompt(lead),
+        model: MODEL,
+        maxTokens: 800,
+      })
+      const parts = text
+        .split(/\n\s*\n/)
+        .map(p =>
+          p
+            .replace(/^\s*\d+[.)]\s*/, '')
+            .replace(/^\s*[A-E][.)]\s+/, '')
+            .replace(/\s*[—–]\s*/g, ', ')
+            .replace(/\s+/g, ' ')
+            .trim(),
+        )
+        .filter(Boolean)
+      if (!parts.length) throw new Error('empty')
+      setScript(parts)
+    } catch {
+      setError('That did not come back clean. Run it again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function reset() {
+    setLeadLine('')
+    setScript([])
+    setError('')
+    setCopied(false)
+  }
+
+  function copy() {
+    navigator.clipboard?.writeText(onScreen.join('\n\n'))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1600)
+  }
+
+  const readBack = [
+    lead.jobTitle && `calling a ${lead.jobTitle}`,
+    lead.industry && lead.industry,
+    lead.hiringPosition && `hiring a ${lead.hiringPosition}`,
+    lead.url,
+  ].filter(Boolean)
+
+  return (
+    <div
+      style={{
+        fontFamily: SANS,
+        background: PAPER,
+        minHeight: '100%',
+        color: NAVY,
+        paddingBottom: 48,
+      }}
+    >
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '18px 24px 0' }}>
+        <div style={{ background: '#fff', border: `1px solid ${LINE}`, padding: 18 }}>
+          <input
+            style={inputStyle}
+            value={leadLine}
+            onChange={e => setLeadLine(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') generate()
+              if (e.key === 'Escape') reset()
+            }}
+            placeholder="Job title, industry, hiring position, website"
+          />
+          <div
+            style={{
+              marginTop: 7,
+              fontFamily: MONO,
+              fontSize: 10,
+              letterSpacing: '0.06em',
+              color: '#b6bdc9',
+            }}
+          >
+            THEIR JOB TITLE &nbsp;·&nbsp; INDUSTRY &nbsp;·&nbsp; THE SEAT THEY ARE HIRING FOR &nbsp;·&nbsp; WEBSITE
+          </div>
+          {leadLine.trim() && (
+            <div
+              style={{
+                marginTop: 9,
+                fontFamily: MONO,
+                fontSize: 11,
+                color: ready ? '#8b94a5' : MAGENTA,
+                letterSpacing: '0.02em',
+                lineHeight: 1.5,
+              }}
+            >
+              {ready
+                ? readBack.join('  ·  ')
+                : 'Need at least their job title and the position they are hiring for. Put commas between them.'}
+            </div>
+          )}
+          <div
+            style={{
+              display: 'flex',
+              gap: 14,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              marginTop: 14,
+            }}
+          >
+            <button
+              onClick={script.length ? reset : generate}
+              disabled={loading || (!ready && !script.length)}
+              style={{
+                background: ready || script.length ? MAGENTA : '#c9cfda',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 4,
+                padding: '10px 20px',
+                fontFamily: MONO,
+                fontSize: 12,
+                letterSpacing: '0.08em',
+                cursor: ready || script.length ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {loading ? 'WRITING' : script.length ? 'NEXT LEAD' : 'WRITE THE SCRIPT'}
+            </button>
+            {script.length > 0 && !loading && (
+              <button onClick={copy} style={ghostBtn}>
+                {copied ? 'Copied' : 'Copy the script'}
+              </button>
+            )}
+            {leadLine && !script.length && !loading && (
+              <button onClick={reset} style={ghostBtn}>
+                Clear
+              </button>
+            )}
+          </div>
+          {error && <div style={{ marginTop: 10, fontSize: 12, color: MAGENTA }}>{error}</div>}
+        </div>
+
+        <div
+          style={{
+            background: '#fff',
+            border: `1px solid ${LINE}`,
+            borderTop: 'none',
+            padding: '26px 26px 22px',
+          }}
+        >
+          {onScreen.map((p, i) => (
+            <p
+              key={i}
+              style={{
+                margin: i ? '20px 0 0' : 0,
+                fontSize: 18,
+                lineHeight: 1.65,
+                letterSpacing: '-0.01em',
+                opacity: i < intro.length && !script.length ? 0.75 : 1,
+              }}
+            >
+              <ScriptLine text={p} size={18} />
+            </p>
+          ))}
+
+          {!script.length && (
+            <p
+              style={{
+                marginTop: 20,
+                fontFamily: MONO,
+                fontSize: 11,
+                color: '#b6bdc9',
+                letterSpacing: '0.06em',
+              }}
+            >
+              THE REST LANDS HERE
+            </p>
+          )}
+
+          {script.length > 0 && (
+            <p
+              style={{
+                marginTop: 22,
+                paddingTop: 12,
+                borderTop: `1px solid ${LINE}`,
+                fontSize: 12,
+                lineHeight: 1.55,
+                color: '#8b94a5',
+              }}
+            >
+              Read it before you say it. If the seat they advertised has to be on site, this
+              should have turned to the back office behind it rather than offering to fill that
+              seat offshore. If it did not, do not read that line, and send it to your TL.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

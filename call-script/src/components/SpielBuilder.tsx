@@ -444,7 +444,7 @@ const MARK_RE =
   /(\[[^\]]{2,20}\]|\((?:slow|slower|slowly|deliberate|softer|soft|warm|warmer|faster|beat|smile|pause|lighter|drop)\))/gi
 const IS_PAUSE = /^(pause|beat|silence|long pause)$/i
 
-function ScriptLine({ text, size = 18, dim = NAVY }: { text: string; size?: number; dim?: string }) {
+export function ScriptLine({ text, size = 18, dim = NAVY }: { text: string; size?: number; dim?: string }) {
   return (
     <>
       {text.split(MARK_RE).map((part, i) => {
