@@ -27,12 +27,30 @@
  * it was posted, how many they want, whether they are struggling to fill it. A lead who hears
  * a detail we could not possibly have hangs up, and worse, tells the partner about it later.
  *
- * THE SECOND GUARD is offshorability, learned the expensive way on the other generator. Two
- * reps ran leads through it and got back roles that cannot be done from another country: a
- * warehouse manager, a hotel's front office lead, kitchen staff. Here it matters more, because
- * the advertised role is an input rather than a guess, and plenty of advertised roles are on
- * site. So the prompt has to sort the role first and take one of two routes, and it is told to
- * say so plainly rather than pretend a floor job can be done from Manila.
+ * THE COMPARISON IS ALWAYS THE SAME SEAT. What this role costs here, against what this role
+ * costs offshore. That is the whole of beat 3 and there is no second path.
+ *
+ * There used to be one, and it was my mistake rather than a requirement. The Spiel Builder had
+ * a real offshorability problem - two reps ran leads through it and got back a warehouse
+ * manager, a hotel's front office lead, kitchen staff - so I carried the same guard over here
+ * as a route that sorted the advertised seat and, when it judged the seat physical, swapped in
+ * the back office behind it instead. Two things were wrong with that.
+ *
+ * The guard does not transfer. On the Spiel Builder the model INVENTS the roles, so it needs
+ * telling which ones are impossible. Here the rep supplies the seat off a live advertisement.
+ * There is nothing to guard against, and a test with nothing to catch catches the wrong
+ * things: a Utilities Technical Sales Specialist, which is a desk job, came back routed as on
+ * site.
+ *
+ * And even when it routed correctly it answered a question nobody asked. The lead advertised
+ * one seat. Pricing a different one, and explaining that theirs has to stay on site, is a
+ * refusal dressed as a pitch. Beat 3 now says do not swap the job, do not offer the admin
+ * behind it, and do not raise whether the seat can be done offshore at all.
+ *
+ * Where the honest limit lives now: the note under the script, addressed to the rep rather
+ * than performed at the lead. If the advertised seat genuinely cannot be done from another
+ * country, a driver, a nurse, kitchen or floor staff, that is not a lead for this script.
+ * That is a decision the rep makes before dialling, not a beat the script argues on the call.
  *
  * FOUR RULES CAME ACROSS FROM THE SPIEL BUILDER after the first live run, a civil engineering
  * firm hiring a site-based project manager. Each had already been learned there, and the
@@ -294,10 +312,13 @@ function splitFreeform(text: string) {
  * "an SENIOR PROJECT MANAGER". No acronym anyone puts in a job title is longer than three.
  */
 const SOUNDS_VOWEL = /^[AEFHILMNORSX]+$/
+/* Written with a vowel, said with a "y": utilities, user, union, European. These take "a". */
+const SOUNDS_LIKE_YOU = /^(uni|use|usu|uti|utl|ubi|euro?|eu)/i
 export function article(title: string): string {
   const first = (title || '').trim().split(/\s+/)[0] || ''
   /* Two or three letters, because job ads arrive in caps and SENIOR is not an acronym. */
   if (/^[A-Z]{2,3}$/.test(first)) return SOUNDS_VOWEL.test(first[0]) ? 'an' : 'a'
+  if (SOUNDS_LIKE_YOU.test(first)) return 'a'
   return /^[aeiou]/i.test(first) ? 'an' : 'a'
 }
 
@@ -338,13 +359,9 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 
   3. THE TURN, AND THE TWO NUMBERS. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the marketplace line so it lands as a turn in the conversation, not as a correction to something they said.
-  Then sort the advertised seat and write ONE of the two routes below. Never mention the other, never explain that you chose, never use the words route, option or scenario.
-  THE TEST: could the person in that seat do the whole job on a laptop, with nobody needing them in the building?
+  38 WORDS MAX. Then word for word: "${a} ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then that the same seat, filled through one of these firms, is "more like" + THE OFFSHORE FIGURE. Then that it is full-time and dedicated, on their hours.
 
-  ROUTE A, the seat passes. Bookkeeper, accounts payable, customer support, admin, data, marketing, design, developer, analyst, scheduler, reservations, paralegal, recruitment coordinator. 40 WORDS MAX. After the opener, word for word: "${a} ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then that the same person through one of these firms is "more like" + THE OFFSHORE FIGURE, full-time and dedicated, on their hours.
-
-  ROUTE B, the seat fails because the work is physical, on site or hands on. Site engineers and project managers, foremen, warehouse and floor managers, drivers, technicians, nurses, kitchen and housekeeping staff, front office, retail floor. 52 WORDS MAX. After the opener, word for word: "${a} ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then word for word: "that one stays on site, that's where the work is, but" + TWO back office seats a firm like theirs carries behind that hire, each with "to" and what it takes off this person's desk, then "those are more like" + THE OFFSHORE FIGURE.
-  START ON THE LOCAL FIGURE, NOT ON WHAT CANNOT BE DONE. "${a[0].toUpperCase() + a.slice(1)} ${hiringPosition} isn't a seat our partners fill offshore" is the wrong sentence twice over: it opens on a no, to someone who has just told you they are hiring, and its subject is us. The seat staying on site is a subordinate clause in the middle of the beat, never the headline.
+  THE SAME SEAT IS ON BOTH SIDES OF THE COMPARISON, and this is the whole beat. What this role costs here, against what this role costs offshore. Do not swap in a different job. Do not offer the admin, the coordination or the back office behind it. Do not say the seat has to stay on site, and do not raise whether it can be done offshore at all. They advertised this role, so this role is the one being priced, and anything else answers a question they did not ask.
 
   THE TWO NUMBERS, and they are approximate market figures, not quotes.
   SAY THEM AS APPROXIMATE, always: "somewhere around", "roughly", "more like". Never a precise number, never a rate per hour, never a price from a partner, never a total saving.
@@ -352,7 +369,7 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   CURRENCY comes from the website address: .com.au is Australian dollars, .co.nz or .nz New Zealand dollars, .co.uk or .uk pounds, .ie euros, .ca Canadian dollars, .sg Singapore dollars, .ph pesos. Anything else, or no website, US dollars. Say the currency once, on the first figure only, and never name the country.
   THE OFFSHORE FIGURE IS NOT A SECOND GUESS. It is the local figure less ${SAVINGS_CLAIM}, worked out and rounded, given as a range from low to high. A figure implying any other saving than that is wrong even if it sounds right.
 
-  WE ARE NOT IN THIS BEAT. The subject is them, their desk, the seat, or the money. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us. "That seat stays on site" is how you say it from their side, in five words.
+  WE ARE NOT IN THIS BEAT. The subject is them, the seat, or the money. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us.
   No promises about quality, no pitching us, and no third number.
 
   4. THE ASK. Word for word, and the only thing you write is the hesitation:
@@ -598,9 +615,10 @@ export default function HiringScript() {
                 color: '#8b94a5',
               }}
             >
-              Read it before you say it. If the seat they advertised has to be on site, this
-              should have turned to the back office behind it rather than offering to fill that
-              seat offshore. If it did not, do not read that line, and send it to your TL.
+              Read it before you say it. Both figures are approximations for that kind of
+              seat, not quotes, and the partners price against the real spec on the call. If
+              the seat they advertised genuinely cannot be done from another country, a driver,
+              a nurse, kitchen or floor staff, this is not the lead for this script.
             </p>
           )}
         </div>
