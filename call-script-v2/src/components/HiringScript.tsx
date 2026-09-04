@@ -323,6 +323,34 @@ export function article(title: string): string {
 }
 
 /*
+ * Reading a line wrong is worse than refusing it. The four slots will accept anything, so a
+ * lead advertising three seats gets folded into them silently: job title, then a second role
+ * parked in the industry slot, then a third with the industry stuck on the end. Everything
+ * downstream then works perfectly on the wrong seat, and the only clue is a read-back line
+ * that looks plausible enough to press the button next to.
+ *
+ * So the two shapes that produce a confidently wrong script are named and refused.
+ */
+export function hiringLeadIssue(line: string, lead: HiringLead): string {
+  const looksLikeARole = (s: string) =>
+    Boolean(s) && (ROLE_NOUN.test(' ' + s) || TITLE_WORD.test(s.trim().split(/\s+/)[0] || ''))
+
+  if (looksLikeARole(lead.industry))
+    return `"${lead.industry}" is a job title, not an industry. If they are advertising more than one seat, run them one at a time: job title, industry, the one seat, website.`
+
+  const fields = line
+    .split(/[,\t|;\n]+/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    /* the same test the parser uses, so a bare domain does not read as a fourth field */
+    .filter(s => !s.split(/\s+/).some(t => URL_RE.test(t)))
+  if (fields.length > 3)
+    return `That is ${fields.length} fields before the website and this reads four: job title, industry, the one seat they are hiring for, website.`
+
+  return ''
+}
+
+/*
  * The opener asks who owns the function, so it needs the FUNCTION, not the job title.
  * "Customer Support Specialist" has to become "customer support": nobody is in charge of a
  * Customer Support Specialist. Strip the seniority off the front and the role noun off the
@@ -468,7 +496,8 @@ export default function HiringScript() {
   const [copied, setCopied] = useState(false)
 
   const lead = useMemo(() => parseHiringLead(leadLine), [leadLine])
-  const ready = Boolean(lead.jobTitle.trim() && lead.hiringPosition.trim())
+  const issue = useMemo(() => hiringLeadIssue(leadLine, lead), [leadLine, lead])
+  const ready = Boolean(lead.jobTitle.trim() && lead.hiringPosition.trim()) && !issue
   const intro = useMemo(() => buildHiringIntro(lead.hiringPosition), [lead.hiringPosition])
   const onScreen = script.length ? [...intro, ...script] : intro
 
@@ -568,7 +597,8 @@ export default function HiringScript() {
             >
               {ready
                 ? readBack.join('  ·  ')
-                : 'Could not tell which is their job title and which is the seat they are hiring for. Try commas between them.'}
+                : issue ||
+                  'Could not tell which is their job title and which is the seat they are hiring for. Try commas between them.'}
             </div>
           )}
           <div
