@@ -322,6 +322,51 @@ export function article(title: string): string {
   return /^[aeiou]/i.test(first) ? 'an' : 'a'
 }
 
+/* The words that make a phrase read as a job title rather than a company or a person. */
+const ROLE_NOUN = /\s+(specialist|manager|officer|coordinator|administrator|admin|assistant|clerk|analyst|executive|associate|lead|director|engineer|technician|agent|representative|rep|consultant|advisor|adviser|supervisor|controller|receptionist|accountant|bookkeeper|developer|designer|planner|scheduler|dispatcher|buyer|estimator)s?$/i
+
+/*
+ * Reading a line wrong is worse than refusing it. The four slots will accept anything, so a
+ * lead advertising three seats gets folded into them silently: job title, then a second role
+ * parked in the industry slot, then a third with the industry stuck on the end. Everything
+ * downstream then works perfectly on the wrong seat, and the only clue is a read-back line
+ * that looks plausible enough to press the button next to.
+ *
+ * So the two shapes that produce a confidently wrong script are named and refused.
+ */
+export function hiringLeadIssue(line: string, lead: HiringLead): string {
+  const looksLikeARole = (s: string) =>
+    Boolean(s) && (ROLE_NOUN.test(' ' + s) || TITLE_WORD.test(s.trim().split(/\s+/)[0] || ''))
+
+  if (looksLikeARole(lead.industry))
+    return `"${lead.industry}" is a job title, not an industry. If they are advertising more than one seat, run them one at a time: job title, industry, the one seat, website.`
+
+  /*
+   * A seat with no role word in it and several words long is not a seat. "Beacon AI Matt Cox"
+   * is a company and a contact name that landed in the slot, and it reads as fluently in the
+   * script as a real title would. Two words is left alone, because a short function like
+   * "customer success" is a plausible way to advertise; four words with nothing role-shaped in
+   * them is a paste that went in the wrong box.
+   */
+  const seat = lead.hiringPosition.trim()
+  const seatWords = seat ? seat.split(/\s+/) : []
+  const hasRoleWord =
+    ROLE_NOUN.test(' ' + seat) || seatWords.some(w => TITLE_WORD.test(w))
+  if (seat && seatWords.length >= 3 && !hasRoleWord)
+    return `"${seat}" does not read as a job title. Put the seat they advertised there, and leave the company and the contact out of it.`
+
+  const fields = line
+    .split(/[,\t|;\n]+/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    /* the same test the parser uses, so a bare domain does not read as a fourth field */
+    .filter(s => !s.split(/\s+/).some(t => URL_RE.test(t)))
+  if (fields.length > 3)
+    return `That is ${fields.length} fields before the website and this reads four: job title, industry, the one seat they are hiring for, website.`
+
+  return ''
+}
+
 /*
  * This generator has its own opener rather than the Spiel Builder's, for two reasons.
  *
@@ -381,13 +426,13 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
   BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 
   3. THE TURN, AND THE TWO NUMBERS. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the marketplace line so it lands as a turn in the conversation, not as a correction to something they said.
-  38 WORDS MAX. Then word for word: "${a} ${hiringPosition} here is going to run you somewhere around" + THE LOCAL FIGURE. Then that the same seat, filled through one of these firms, is "more like" + THE OFFSHORE FIGURE. Then that it is full-time and dedicated, on their hours.
+  38 WORDS MAX. Then word for word: "${a} ${hiringPosition} over there is going to run you somewhere around" + THE LOCAL FIGURE. Then that the same seat, filled through one of these firms, is "more like" + THE OFFSHORE FIGURE. Then that it is full-time and dedicated, on their hours.
 
   THE SAME SEAT IS ON BOTH SIDES OF THE COMPARISON, and this is the whole beat. What this role costs here, against what this role costs offshore. Do not swap in a different job. Do not offer the admin, the coordination or the back office behind it. Do not say the seat has to stay on site, and do not raise whether it can be done offshore at all. They advertised this role, so this role is the one being priced, and anything else answers a question they did not ask.
 
   THE TWO NUMBERS, and they are approximate market figures, not quotes.
   SAY THEM AS APPROXIMATE, always: "somewhere around", "roughly", "more like". Never a precise number, never a rate per hour, never a price from a partner, never a total saving.
-  THE LOCAL FIGURE is what that KIND of seat typically pays in this lead's market, as a round annual number.
+  THE LOCAL FIGURE is what that KIND of seat typically pays in this lead's own market, as a round annual number. It is their market, not ours, which is why the line says over there and not here.
   CURRENCY comes from the website address: .com.au is Australian dollars, .co.nz or .nz New Zealand dollars, .co.uk or .uk pounds, .ie euros, .ca Canadian dollars, .sg Singapore dollars, .ph pesos. Anything else, or no website, US dollars. Say the currency once, on the first figure only, and never name the country.
   THE OFFSHORE FIGURE IS NOT A SECOND GUESS. It is the local figure less ${SAVINGS_CLAIM}, worked out and rounded, given as a range from low to high. A figure implying any other saving than that is wrong even if it sounds right.
 
@@ -446,7 +491,8 @@ export default function HiringScript() {
   const [copied, setCopied] = useState(false)
 
   const lead = useMemo(() => parseHiringLead(leadLine), [leadLine])
-  const ready = Boolean(lead.jobTitle.trim() && lead.hiringPosition.trim())
+  const issue = useMemo(() => hiringLeadIssue(leadLine, lead), [leadLine, lead])
+  const ready = Boolean(lead.jobTitle.trim() && lead.hiringPosition.trim()) && !issue
   const intro = useMemo(() => buildHiringIntro(), [])
   const onScreen = script.length ? [...intro, ...script] : intro
 
@@ -546,7 +592,8 @@ export default function HiringScript() {
             >
               {ready
                 ? readBack.join('  ·  ')
-                : 'Could not tell which is their job title and which is the seat they are hiring for. Try commas between them.'}
+                : issue ||
+                  'Could not tell which is their job title and which is the seat they are hiring for. Try commas between them.'}
             </div>
           )}
           <div
