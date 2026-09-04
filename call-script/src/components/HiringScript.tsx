@@ -172,7 +172,7 @@
 import { useState, useMemo } from 'react'
 import { callAI } from '../lib/ai'
 import { SAVINGS_CLAIM, MEETING_LENGTH } from '../data/flow'
-import { ScriptLine, buildIntro, offerWindow } from './SpielBuilder'
+import { ScriptLine, offerWindow } from './SpielBuilder'
 
 /** Same model and the same one-call-per-click shape as the Spiel Builder. */
 const MODEL = 'claude-haiku-4-5-20251001'
@@ -322,6 +322,27 @@ export function article(title: string): string {
   return /^[aeiou]/i.test(first) ? 'an' : 'a'
 }
 
+/*
+ * This generator has its own opener rather than the Spiel Builder's, for two reasons.
+ *
+ * It is shorter. The heard-of-us question and the cut-me-off line are gone, so the rep gets
+ * to the reason for the call in two lines instead of four. On a lead who has advertised a
+ * seat there is less to earn: they have a hiring problem already and the call is about it.
+ *
+ * And it says OA rather than Outsource Accelerator. That is a wording change the Spiel
+ * Builder has not made, so sharing the function would drag it there too. The company name
+ * still appears in full in the prompt itself, because the writer needs to know who it is
+ * writing for; it is only what the rep SAYS that shortens.
+ *
+ * Fixed and local, never sent to the model, so it cannot be reworded.
+ */
+export function buildHiringIntro(): string[] {
+  return [
+    `Hey [Lead Name]? (Pause)`,
+    `Oh hey, [Lead Name], it's [Your Name] here over at OA. I know I called you out of the blue here, mind if I grab half a minute? Then you can let me know if it's relevant or not (pause)`,
+  ]
+}
+
 /* ------------------------------- the prompt ------------------------------- */
 
 export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: HiringLead): string {
@@ -341,7 +362,8 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
 
   4 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble. Keep every phrase marked word for word exactly as written, and fill the rest with this person's world. One or two short sentences per beat, never three.
 
-  The rep has ALREADY opened the call: they greeted the lead by name, gave their own name, said they are from Outsource Accelerator, asked for half a minute and got it. Do not greet, do not introduce yourself, do not name Outsource Accelerator again, do not ask for permission or for time. Start cold on the reason for the call.
+  The rep has ALREADY opened the call: they greeted the lead by name, gave their own name, said they are from OA, asked for half a minute and got it. Do not greet, do not introduce yourself, do not ask for permission or for time. Start cold on the reason for the call.
+  If the company is named again anywhere, it is OA, never Outsource Accelerator in full. The rep says OA on this call.
 
   It is one continuous read. Beats 1 to 3 carry no ask and no meeting request. The ask lives in beat 4 and nowhere else.
 
@@ -425,7 +447,7 @@ export default function HiringScript() {
 
   const lead = useMemo(() => parseHiringLead(leadLine), [leadLine])
   const ready = Boolean(lead.jobTitle.trim() && lead.hiringPosition.trim())
-  const intro = useMemo(() => buildIntro(''), [])
+  const intro = useMemo(() => buildHiringIntro(), [])
   const onScreen = script.length ? [...intro, ...script] : intro
 
   async function generate() {
