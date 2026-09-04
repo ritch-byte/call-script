@@ -172,7 +172,7 @@
 import { useState, useMemo } from 'react'
 import { callAI } from '../lib/ai'
 import { SAVINGS_CLAIM, MEETING_LENGTH } from '../data/flow'
-import { ScriptLine, buildIntro, offerWindow } from './SpielBuilder'
+import { ScriptLine, offerWindow } from './SpielBuilder'
 
 /** Same model and the same one-call-per-click shape as the Spiel Builder. */
 const MODEL = 'claude-haiku-4-5-20251001'
@@ -322,6 +322,49 @@ export function article(title: string): string {
   return /^[aeiou]/i.test(first) ? 'an' : 'a'
 }
 
+/*
+ * The opener asks who owns the function, so it needs the FUNCTION, not the job title.
+ * "Customer Support Specialist" has to become "customer support": nobody is in charge of a
+ * Customer Support Specialist. Strip the seniority off the front and the role noun off the
+ * back, and what is left is what that person runs.
+ *
+ * Three shapes come out of that, because one phrasing does not fit every title:
+ *   two or more words left  -> say it bare.            "customer support", "accounts payable"
+ *   one word left           -> "the X side".           "the payroll side", "the project side"
+ *   nothing stripped        -> name the hire instead.  "the Bookkeeper hire"
+ * The third is the honest fallback. A title that is one indivisible word gives us no function
+ * to ask about, and guessing one ("bookkeeping" from "Bookkeeper") is how you end up asking
+ * who runs a department that does not exist.
+ */
+const SENIORITY = /^(senior|snr|sr|junior|jnr|jr|lead|head of|chief|principal|assistant|associate|trainee|graduate|entry level|experienced)\s+/i
+const ROLE_NOUN = /\s+(specialist|manager|officer|coordinator|administrator|admin|assistant|clerk|analyst|executive|associate|lead|director|engineer|technician|agent|representative|rep|consultant|advisor|adviser|supervisor|controller|receptionist|accountant|bookkeeper|developer|designer|planner|scheduler|dispatcher|buyer|estimator)s?$/i
+
+export function hiringFunction(title: string): string {
+  const raw = (title || '').trim()
+  if (!raw) return 'that hire'
+  let t = raw
+  let stripped = false
+  const before = t
+  t = t.replace(SENIORITY, '')
+  if (t !== before) stripped = true
+  const beforeNoun = t
+  t = t.replace(ROLE_NOUN, '')
+  if (t !== beforeNoun) stripped = true
+  t = t.trim()
+  if (!stripped || !t) return `the ${raw} hire`
+  /* Said mid-sentence, not printed as a heading, so it is lower case either way. Job ads
+     arrive in capitals and a title-cased department reads as a proper noun it is not. */
+  const said = t.toLowerCase()
+  return said.includes(' ') ? said : `the ${said} side`
+}
+
+/** The opener is fixed and local. It is never sent to the model, so it cannot get reworded. */
+export function buildHiringIntro(hiringPosition: string): string[] {
+  return [
+    `Hi [Lead Name], it's [Your Name] here. (pause) Just curious, who's in charge of ${hiringFunction(hiringPosition)} over there?`,
+  ]
+}
+
 /* ------------------------------- the prompt ------------------------------- */
 
 export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: HiringLead): string {
@@ -341,7 +384,8 @@ export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: H
 
   4 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble. Keep every phrase marked word for word exactly as written, and fill the rest with this person's world. One or two short sentences per beat, never three.
 
-  The rep has ALREADY opened the call: they greeted the lead by name, gave their own name, said they are from Outsource Accelerator, asked for half a minute and got it. Do not greet, do not introduce yourself, do not name Outsource Accelerator again, do not ask for permission or for time. Start cold on the reason for the call.
+  THE REP HAS ALREADY SAID ONE LINE, and it is this: "Hi [name], it's [rep], just curious, who's in charge of ${hiringFunction(hiringPosition)} over there?" The lead has answered it. So do not greet, do not introduce yourself, do not ask who is in charge, and do not ask for permission or for time. Start cold on the reason for the call.
+  That opener does NOT name the company, so beat 2 is the first time the lead hears who we are. Write it as an introduction rather than a reminder.
 
   It is one continuous read. Beats 1 to 3 carry no ask and no meeting request. The ask lives in beat 4 and nowhere else.
 
@@ -425,7 +469,7 @@ export default function HiringScript() {
 
   const lead = useMemo(() => parseHiringLead(leadLine), [leadLine])
   const ready = Boolean(lead.jobTitle.trim() && lead.hiringPosition.trim())
-  const intro = useMemo(() => buildIntro(''), [])
+  const intro = useMemo(() => buildHiringIntro(lead.hiringPosition), [lead.hiringPosition])
   const onScreen = script.length ? [...intro, ...script] : intro
 
   async function generate() {
