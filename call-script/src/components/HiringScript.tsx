@@ -173,6 +173,13 @@ import { useState, useMemo } from 'react'
 import { callAI } from '../lib/ai'
 import { SAVINGS_CLAIM, MEETING_LENGTH } from '../data/flow'
 import { ScriptLine, offerWindow } from './SpielBuilder'
+import {
+  article,
+  hiringFunction,
+  hiringLeadIssue,
+  parseHiringLead,
+  type HiringLead,
+} from '../lib/hiringLead'
 
 /** Same model and the same one-call-per-click shape as the Spiel Builder. */
 const MODEL = 'claude-haiku-4-5-20251001'
@@ -183,189 +190,6 @@ const PAPER = '#f7f8fb'
 const LINE = '#dfe3ec'
 const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
 const SANS = '"Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans-serif'
-
-const URL_RE =
-  /^(https?:\/\/|www\.)|\.(com|net|org|io|co|ai|ph|au|uk|us|ca|nz|sg|de|fr|es|it|nl|se|dk|in|jp|biz|info|dev|app|xyz|group|build)\b/i
-
-const TITLE_WORD =
-  /^(chief|head|vp|svp|evp|president|vice|director|manager|managing|officer|founder|co-?founder|owner|proprietor|principal|partner|lead|supervisor|coordinator|specialist|executive|chairman|chairwoman|chair|superintendent|estimator|controller|comptroller|treasurer|counsel|attorney|foreman|buyer|planner|scheduler|dispatcher|recruiter|analyst|engineer|architect|surveyor|producer|editor|admin|c[eftmoi]o|cmo|cro|cpo|chro|cco|gm|md)$/i
-
-export interface HiringLead {
-  jobTitle: string
-  industry: string
-  hiringPosition: string
-  url: string
-}
-
-/*
- * The four fields arrive in a fixed order, so this is positional rather than the fuzzy
- * classifier the Spiel Builder needs. Two tolerances, because reps paste from anywhere:
- * a URL is recognised wherever it lands and pulled out first, and "Hiring: Bookkeeper"
- * style labels are stripped. Everything left keeps its order.
- */
-export function parseHiringLead(line: string): HiringLead {
-  const out: HiringLead = { jobTitle: '', industry: '', hiringPosition: '', url: '' }
-  const parts = line
-    .split(/[,\t|;\n]+/)
-    .map(s => s.trim())
-    .filter(Boolean)
-
-  const rest: string[] = []
-  for (const part of parts) {
-    const tokens = part.split(/\s+/)
-    const at = tokens.findIndex(t => !/\s/.test(t) && URL_RE.test(t))
-    if (at !== -1 && !out.url) {
-      out.url = tokens.splice(at, 1)[0]
-      const left = tokens.join(' ').trim()
-      if (left) rest.push(left)
-      continue
-    }
-    rest.push(part)
-  }
-
-  const strip = (s: string) =>
-    s.replace(/^(job\s*title|title|role|position|industry|sector|hiring(\s*(for|position|role))?|they'?re hiring)\s*[:=-]\s*/i, '').trim()
-
-  const fields = rest.map(strip).filter(Boolean)
-
-  /* Pasted straight off a job ad, with no commas anywhere. Work it out from the words. */
-  if (fields.length === 1 && /\s/.test(fields[0])) {
-    const ff = splitFreeform(fields[0])
-    if (ff.jobTitle && ff.hiringPosition) {
-      out.jobTitle = ff.jobTitle
-      out.industry = ff.industry
-      out.hiringPosition = ff.hiringPosition
-      return out
-    }
-  }
-
-  const [a = '', b = '', c = ''] = fields
-  out.jobTitle = a
-  out.industry = b
-  out.hiringPosition = c
-  /* Three fields with no industry given: treat the third as the seat, not the sector. */
-  if (!c && b) {
-    out.hiringPosition = b
-    out.industry = ''
-  }
-  return out
-}
-
-/*
- * One line, no commas: "Executive Chairman civil engineering SENIOR PROJECT MANAGER".
- *
- * Two things make this readable without punctuation. The lead's own title comes first and
- * contains a title word, and the advertised seat comes last and is capitalised, because it
- * was copied out of a job ad. So take the title off the front, take the capitalised run off
- * the back, and whatever is left in the middle is the industry. Lower case is the signal
- * that the industry has started: "civil engineering" stops the backward scan dead.
- */
-function splitFreeform(text: string) {
-  const toks = text.split(/\s+/).filter(Boolean)
-  const isCapped = (t: string) => /^[A-Z0-9&]/.test(t)
-  const empty = { jobTitle: '', industry: '', hiringPosition: '' }
-  if (toks.length < 2) return empty
-
-  /*
-   * Take the seat off the back FIRST. Doing the title first breaks on "Executive Chairman",
-   * where the second word is itself a title word and the forward scan has no way to know
-   * whether it belongs to the title or starts the advertised seat. From the back there is no
-   * such question: the run ends where lower case begins.
-   */
-  let seatAt = toks.length
-  while (seatAt > 1 && isCapped(toks[seatAt - 1]) && toks.length - seatAt < 4) seatAt--
-  if (seatAt === toks.length) return empty
-  const head = toks.slice(0, seatAt)
-
-  /* then the title off the front of what is left */
-  let first = -1
-  for (let i = 0; i < head.length; i++) {
-    if (TITLE_WORD.test(head[i])) {
-      first = i
-      break
-    }
-  }
-  if (first === -1) return empty
-  let start = first
-  while (start > 0 && isCapped(head[start - 1])) start--
-  let end = first
-  while (end + 1 < head.length && isCapped(head[end + 1])) end++
-  /* "Head of Partnerships" keeps its joiner */
-  while (end + 2 < head.length && /^(of|for|at)$/i.test(head[end + 1]) && isCapped(head[end + 2]))
-    end += 2
-
-  return {
-    jobTitle: head.slice(start, end + 1).join(' '),
-    industry: head.slice(end + 1).join(' '),
-    hiringPosition: toks.slice(seatAt).join(' '),
-  }
-}
-
-/*
- * "a" or "an" for a job title. Vowel letters are the easy half. The other half is acronyms,
- * where what matters is how the letter is SAID: HR is "aitch", so it takes "an", while GL is
- * "jee" and takes "a". Without this the locked lines produce "a Accounting Specialist" and
- * "a HR Officer", and a rep reading at pace trips on both.
- *
- * The acronym branch is capped at three letters. Reps paste straight off the advertisement,
- * which is often in capitals, and an unbounded rule reads SENIOR as an acronym and returns
- * "an SENIOR PROJECT MANAGER". No acronym anyone puts in a job title is longer than three.
- */
-const SOUNDS_VOWEL = /^[AEFHILMNORSX]+$/
-/* Written with a vowel, said with a "y": utilities, user, union, European. These take "a". */
-const SOUNDS_LIKE_YOU = /^(uni|use|usu|uti|utl|ubi|euro?|eu)/i
-export function article(title: string): string {
-  const first = (title || '').trim().split(/\s+/)[0] || ''
-  /* Two or three letters, because job ads arrive in caps and SENIOR is not an acronym. */
-  if (/^[A-Z]{2,3}$/.test(first)) return SOUNDS_VOWEL.test(first[0]) ? 'an' : 'a'
-  if (SOUNDS_LIKE_YOU.test(first)) return 'a'
-  return /^[aeiou]/i.test(first) ? 'an' : 'a'
-}
-
-/* The words that make a phrase read as a job title rather than a company or a person. */
-const ROLE_NOUN = /\s+(specialist|manager|officer|coordinator|administrator|admin|assistant|clerk|analyst|executive|associate|lead|director|engineer|technician|agent|representative|rep|consultant|advisor|adviser|supervisor|controller|receptionist|accountant|bookkeeper|developer|designer|planner|scheduler|dispatcher|buyer|estimator)s?$/i
-
-/*
- * Reading a line wrong is worse than refusing it. The four slots will accept anything, so a
- * lead advertising three seats gets folded into them silently: job title, then a second role
- * parked in the industry slot, then a third with the industry stuck on the end. Everything
- * downstream then works perfectly on the wrong seat, and the only clue is a read-back line
- * that looks plausible enough to press the button next to.
- *
- * So the two shapes that produce a confidently wrong script are named and refused.
- */
-export function hiringLeadIssue(line: string, lead: HiringLead): string {
-  const looksLikeARole = (s: string) =>
-    Boolean(s) && (ROLE_NOUN.test(' ' + s) || TITLE_WORD.test(s.trim().split(/\s+/)[0] || ''))
-
-  if (looksLikeARole(lead.industry))
-    return `"${lead.industry}" is a job title, not an industry. If they are advertising more than one seat, run them one at a time: job title, industry, the one seat, website.`
-
-  /*
-   * A seat with no role word in it and several words long is not a seat. "Beacon AI Matt Cox"
-   * is a company and a contact name that landed in the slot, and it reads as fluently in the
-   * script as a real title would. Two words is left alone, because a short function like
-   * "customer success" is a plausible way to advertise; four words with nothing role-shaped in
-   * them is a paste that went in the wrong box.
-   */
-  const seat = lead.hiringPosition.trim()
-  const seatWords = seat ? seat.split(/\s+/) : []
-  const hasRoleWord =
-    ROLE_NOUN.test(' ' + seat) || seatWords.some(w => TITLE_WORD.test(w))
-  if (seat && seatWords.length >= 3 && !hasRoleWord)
-    return `"${seat}" does not read as a job title. Put the seat they advertised there, and leave the company and the contact out of it.`
-
-  const fields = line
-    .split(/[,\t|;\n]+/)
-    .map(s => s.trim())
-    .filter(Boolean)
-    /* the same test the parser uses, so a bare domain does not read as a fourth field */
-    .filter(s => !s.split(/\s+/).some(t => URL_RE.test(t)))
-  if (fields.length > 3)
-    return `That is ${fields.length} fields before the website and this reads four: job title, industry, the one seat they are hiring for, website.`
-
-  return ''
-}
 
 /*
  * This generator has its own opener rather than the Spiel Builder's, for two reasons.
@@ -390,7 +214,10 @@ export function buildHiringIntro(): string[] {
 
 /* ------------------------------- the prompt ------------------------------- */
 
-export function buildHiringPrompt({ jobTitle, industry, hiringPosition, url }: HiringLead): string {
+export function buildHiringPrompt(
+  { jobTitle, industry, url }: HiringLead,
+  hiringPosition: string,
+): string {
   const { offer, fallback } = offerWindow()
   /* "15 minutes each" was written for the two-partner line and is wrong in the ask. Strip the "each" rather than
      typing 15 a second time, so changing MEETING_LENGTH still moves both. */
@@ -491,8 +318,16 @@ export default function HiringScript() {
   const [copied, setCopied] = useState(false)
 
   const lead = useMemo(() => parseHiringLead(leadLine), [leadLine])
-  const issue = useMemo(() => hiringLeadIssue(leadLine, lead), [leadLine, lead])
-  const ready = Boolean(lead.jobTitle.trim() && lead.hiringPosition.trim()) && !issue
+  /*
+   * A paste can advertise several seats. The rep picks which one the call is about, and the
+   * pick resets whenever the line changes, because seat 2 of the last lead is not seat 2 of
+   * this one. Defaulting to the first would be one keystroke cheaper and a wrong seat is the
+   * one mistake this tool cannot recover from, so it starts unpicked when there is a choice.
+   */
+  const [picked, setPicked] = useState('')
+  const seat = lead.seats.includes(picked) ? picked : lead.seats.length === 1 ? lead.seats[0] : ''
+  const issue = useMemo(() => hiringLeadIssue(lead, seat), [lead, seat])
+  const ready = Boolean(seat) && !issue
   const intro = useMemo(() => buildHiringIntro(), [])
   const onScreen = script.length ? [...intro, ...script] : intro
 
@@ -502,7 +337,7 @@ export default function HiringScript() {
     setError('')
     try {
       const text = await callAI({
-        prompt: buildHiringPrompt(lead),
+        prompt: buildHiringPrompt(lead, seat),
         model: MODEL,
         maxTokens: 800,
       })
@@ -528,6 +363,7 @@ export default function HiringScript() {
 
   function reset() {
     setLeadLine('')
+    setPicked('')
     setScript([])
     setError('')
     setCopied(false)
@@ -542,7 +378,7 @@ export default function HiringScript() {
   const readBack = [
     lead.jobTitle && `calling a ${lead.jobTitle}`,
     lead.industry && lead.industry,
-    lead.hiringPosition && `hiring a ${lead.hiringPosition}`,
+    seat && `hiring ${article(seat)} ${seat}`,
     lead.url,
   ].filter(Boolean)
 
@@ -566,7 +402,7 @@ export default function HiringScript() {
               if (e.key === 'Enter') generate()
               if (e.key === 'Escape') reset()
             }}
-            placeholder="Job title, industry, hiring position, website. Commas optional."
+            placeholder="Job title, industry, the seats they are hiring for, website"
           />
           <div
             style={{
@@ -577,7 +413,7 @@ export default function HiringScript() {
               color: '#b6bdc9',
             }}
           >
-            THEIR JOB TITLE &nbsp;·&nbsp; INDUSTRY &nbsp;·&nbsp; THE SEAT THEY ARE HIRING FOR &nbsp;·&nbsp; WEBSITE
+            THEIR JOB TITLE &nbsp;·&nbsp; INDUSTRY &nbsp;·&nbsp; THE SEATS THEY ARE HIRING FOR &nbsp;·&nbsp; WEBSITE
           </div>
           {leadLine.trim() && (
             <div
@@ -594,6 +430,42 @@ export default function HiringScript() {
                 ? readBack.join('  ·  ')
                 : issue ||
                   'Could not tell which is their job title and which is the seat they are hiring for. Try commas between them.'}
+            </div>
+          )}
+          {lead.seats.length > 1 && !script.length && (
+            <div style={{ marginTop: 13 }}>
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: '0.1em',
+                  color: '#6b7280',
+                  marginBottom: 7,
+                }}
+              >
+                {lead.seats.length} SEATS IN THAT PASTE &mdash; WHICH ONE IS THIS CALL ABOUT?
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {lead.seats.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setPicked(s)}
+                    style={{
+                      background: seat === s ? MAGENTA : '#fff',
+                      color: seat === s ? '#fff' : NAVY,
+                      border: `1px solid ${seat === s ? MAGENTA : LINE}`,
+                      borderRadius: 4,
+                      padding: '7px 13px',
+                      fontFamily: SANS,
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           <div

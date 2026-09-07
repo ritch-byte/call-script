@@ -14,8 +14,14 @@ DST="call-script/src"
 
 # Files v1 keeps its own copy of. One line each, with the reason and the date it split.
 DIVERGED=(
-  # 2026-09-05. The Hiring Script spiel is being reworked for v2 only. v1 holds the version
-  # that was live on this date. Delete this line to put the two back in step.
+  # 2026-09-05. The Hiring Script spiel is being reworked for v2 only. v1 holds its own
+  # opener and prompt. Delete this line to put the two back in step.
+  #
+  # Only the SPIEL is meant to diverge. Reading a lead is shared, in src/lib/hiringLead.ts,
+  # which is not on this list and so syncs normally. It was moved there after the parser had
+  # been duplicated into both copies and v1's was two fixes behind without anything saying so.
+  # If a change is about how a lead is read rather than what the rep says, it belongs in the
+  # lib, and then this list does not need touching at all.
   "components/HiringScript.tsx"
 )
 

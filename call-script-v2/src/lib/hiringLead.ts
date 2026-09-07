@@ -1,0 +1,233 @@
+/*
+ * Reading the line a rep pastes into the Hiring Script.
+ *
+ * This lives in lib rather than in the component because the two versions of the Hiring
+ * Script have deliberately different spiels but must read a lead identically. Held in the
+ * component it got duplicated, and the copy in v1 sat two fixes behind the copy in v2 without
+ * anything saying so. The divergence is meant to hold a spiel apart, not a parser.
+ *
+ * REPS PASTE WHOLE JOB-BOARD LISTINGS. That is the thing this went through three rounds to
+ * learn. A lead usually has several openings, and the four fixed slots quietly folded them
+ * into each other: a second role parked in the industry slot, a third with the industry stuck
+ * on the end. Refusing that was better than pricing the wrong seat, but refusing is the wrong
+ * answer to the common case, and a rep told to paste three times per lead stops using the
+ * tool.
+ *
+ * So a lead has a LIST of seats, and the rep picks the one they are calling about. Where the
+ * split is ambiguous the read-back shows it, which is the point: a visible wrong guess costs
+ * one re-paste, an invisible one costs a call.
+ */
+
+export const URL_RE =
+  /^(https?:\/\/|www\.)|\.(com|net|org|io|co|ai|ph|au|uk|us|ca|nz|sg|de|fr|es|it|nl|se|dk|in|jp|biz|info|dev|app|xyz|group|build)\b/i
+
+/** A word that makes a phrase read as somebody's job rather than a company or a sector. */
+export const TITLE_WORD =
+  /^(chief|head|vp|svp|evp|president|vice|director|manager|managing|officer|founder|co-?founder|owner|proprietor|principal|partner|lead|supervisor|coordinator|specialist|executive|chairman|chairwoman|chair|superintendent|estimator|controller|comptroller|treasurer|counsel|attorney|foreman|buyer|planner|scheduler|dispatcher|recruiter|analyst|engineer|architect|surveyor|producer|editor|admin|c[eftmoi]o|cmo|cro|cpo|chro|cco|gm|md)$/i
+
+export const ROLE_NOUN =
+  /\s+(specialist|manager|officer|coordinator|administrator|admin|assistant|clerk|analyst|executive|associate|lead|director|engineer|technician|agent|representative|rep|consultant|advisor|adviser|supervisor|controller|receptionist|accountant|bookkeeper|developer|designer|planner|scheduler|dispatcher|buyer|estimator|telephonist|nurse|driver|chef|cleaner|writer|paralegal|surveyor|architect|recruiter|auditor|underwriter|broker|teller|cashier)s?$/i
+
+const SENIORITY =
+  /^(senior|snr|sr|junior|jnr|jr|lead|head of|chief|principal|assistant|associate|trainee|graduate|entry level|experienced)\s+/i
+
+/** A phrase reads as a job if it ends in a role noun or opens on a title word. */
+export function looksLikeARole(s: string): boolean {
+  const t = (s || '').trim()
+  if (!t) return false
+  return ROLE_NOUN.test(' ' + t) || t.split(/\s+/).some(w => TITLE_WORD.test(w))
+}
+
+export interface HiringLead {
+  jobTitle: string
+  industry: string
+  /** Every seat the paste appears to advertise, in the order they appeared. */
+  seats: string[]
+  url: string
+}
+
+const LABEL =
+  /^(job\s*title|title|role|position|industry|sector|hiring(\s*(for|position|role))?|they'?re hiring|open roles?|vacancies)\s*[:=-]\s*/i
+
+export function parseHiringLead(line: string): HiringLead {
+  const out: HiringLead = { jobTitle: '', industry: '', seats: [], url: '' }
+
+  const rest: string[] = []
+  for (const part of (line || '').split(/[,\t|;\n]+/).map(s => s.trim()).filter(Boolean)) {
+    const tokens = part.split(/\s+/)
+    const at = tokens.findIndex(t => URL_RE.test(t))
+    if (at !== -1 && !out.url) {
+      out.url = tokens.splice(at, 1)[0]
+      const left = tokens.join(' ').trim()
+      if (left) rest.push(left)
+      continue
+    }
+    rest.push(part)
+  }
+
+  const fields = rest.map(s => s.replace(LABEL, '').trim()).filter(Boolean)
+  if (!fields.length) return out
+
+  /*
+   * The first field carries the lead's own title, and often the industry and the first seat
+   * along with it, because that is how a listing reads: "Practice Manager hospital & health
+   * care Business Support Officer". splitFreeform pulls the three apart on capitalisation.
+   */
+  const ff = splitFreeform(fields[0])
+  if (ff.jobTitle && ff.hiringPosition) {
+    out.jobTitle = ff.jobTitle
+    out.industry = ff.industry
+    out.seats.push(ff.hiringPosition)
+  } else {
+    out.jobTitle = fields[0]
+  }
+
+  for (const field of fields.slice(1)) {
+    if (looksLikeARole(field)) {
+      /* "Account Executive market research" is a seat with the sector stuck on the end. */
+      const split = splitTrailingSector(field)
+      if (split && !out.industry) {
+        out.seats.push(split.seat)
+        out.industry = split.sector
+      } else {
+        out.seats.push(field)
+      }
+    } else if (!out.industry) {
+      out.industry = field
+    } else {
+      out.seats.push(field)
+    }
+  }
+  return out
+}
+
+/**
+ * A capitalised head and a lower-case tail in one field: the head is the seat, the tail is
+ * the sector. Only useful while no industry has been found, which the caller checks.
+ */
+function splitTrailingSector(field: string): { seat: string; sector: string } | null {
+  const toks = field.split(/\s+/)
+  if (toks.length < 3) return null
+  let i = toks.length
+  while (i > 1 && !/^[A-Z0-9&]/.test(toks[i - 1])) i--
+  if (i === toks.length || i < 2) return null
+  const seat = toks.slice(0, i).join(' ')
+  const sector = toks.slice(i).join(' ')
+  return looksLikeARole(seat) ? { seat, sector } : null
+}
+
+/*
+ * One field, no commas: "Executive Chairman civil engineering SENIOR PROJECT MANAGER".
+ *
+ * The lead's own title comes first and contains a title word. The seat comes last and is
+ * capitalised, because it was copied out of an advertisement. So take the seat off the BACK
+ * first: doing the title first breaks on "Executive Chairman", where the second word is
+ * itself a title word and a forward scan cannot tell whether it belongs to the title or
+ * starts the seat. From the back that question never arises, because the run ends where lower
+ * case begins.
+ */
+const JOINER = /^(of|for|at|the|a|an|and|&|in|on|to|with|from|de|du)$/i
+
+function splitFreeform(text: string) {
+  const toks = (text || '').split(/\s+/).filter(Boolean)
+  const isCapped = (t: string) => /^[A-Z0-9&]/.test(t)
+  const empty = { jobTitle: '', industry: '', hiringPosition: '' }
+  if (toks.length < 3) return empty
+
+  let seatAt = toks.length
+  while (seatAt > 1 && isCapped(toks[seatAt - 1]) && toks.length - seatAt < 4) seatAt--
+  if (seatAt === toks.length) return empty
+  const head = toks.slice(0, seatAt)
+
+  let first = -1
+  for (let i = 0; i < head.length; i++) {
+    if (TITLE_WORD.test(head[i])) {
+      first = i
+      break
+    }
+  }
+  if (first === -1) return empty
+  let start = first
+  while (start > 0 && isCapped(head[start - 1])) start--
+  let end = first
+  while (end + 1 < head.length && isCapped(head[end + 1])) end++
+  /* "Head of Partnerships" keeps its joiner */
+  while (end + 2 < head.length && /^(of|for|at)$/i.test(head[end + 1]) && isCapped(head[end + 2]))
+    end += 2
+
+  /*
+   * Only trust this when lower case actually separated the two halves, and when what it
+   * separated is a real sector rather than a joining word. "Head of Operations" otherwise
+   * splits into a title of "Head", an industry of "of" and a seat of "Operations", which is
+   * three wrong answers from one plausible-looking rule. A sector has at least one word that
+   * is not a preposition.
+   */
+  const industry = head.slice(end + 1).join(' ')
+  if (!industry || !industry.split(/\s+/).some(w => !JOINER.test(w))) return empty
+
+  return { jobTitle: head.slice(start, end + 1).join(' '), industry, hiringPosition: toks.slice(seatAt).join(' ') }
+}
+
+/**
+ * Why a lead cannot be used, for the rep, in their words. Empty string means it is fine.
+ * Only the SEAT THEY PICKED is judged: the other chips can be noise without blocking.
+ */
+export function hiringLeadIssue(lead: HiringLead, seat: string): string {
+  if (!lead.jobTitle.trim())
+    return 'Could not find the job title of the person being called. It goes first.'
+  if (!lead.seats.length)
+    return 'Could not find a seat they are hiring for. Put it after the industry.'
+  const s = (seat || '').trim()
+  if (!s) return 'Pick which seat you are calling about.'
+  if (s.split(/\s+/).length >= 3 && !looksLikeARole(s))
+    return `"${s}" does not read as a job title. Leave the company and the contact out of the seat.`
+  return ''
+}
+
+/*
+ * "a" or "an" for a job title. Vowel letters are the easy half. The other half is acronyms,
+ * where what matters is how the letter is SAID: HR is "aitch" and takes "an", GL is "jee" and
+ * takes "a". The acronym branch is capped at three letters, because reps paste straight off
+ * the advertisement and an unbounded all-caps rule reads SENIOR as an acronym.
+ */
+const SOUNDS_VOWEL = /^[AEFHILMNORSX]+$/
+/* Written with a vowel, said with a "y": utilities, user, union, European. These take "a". */
+const SOUNDS_LIKE_YOU = /^(uni|use|usu|uti|utl|ubi|euro?|eu)/i
+
+export function article(title: string): string {
+  const first = (title || '').trim().split(/\s+/)[0] || ''
+  if (/^[A-Z]{2,3}$/.test(first)) return SOUNDS_VOWEL.test(first[0]) ? 'an' : 'a'
+  if (SOUNDS_LIKE_YOU.test(first)) return 'a'
+  return /^[aeiou]/i.test(first) ? 'an' : 'a'
+}
+
+/*
+ * The v2 opener asks who owns the function, so it needs the FUNCTION, not the job title.
+ * Nobody is in charge of a Customer Support Specialist. Strip the seniority off the front and
+ * the role noun off the back, and what is left is what that person runs. Three shapes come out
+ * of it, because one phrasing does not fit every title:
+ *   two or more words left -> say it bare        customer support, accounts payable
+ *   one word left          -> "the X side"       the payroll side, the project side
+ *   nothing stripped       -> name the hire      the Bookkeeper hire
+ * The third is the honest fallback. A title that is one indivisible word gives no function to
+ * ask about, and guessing one - bookkeeping from Bookkeeper - is how you end up asking who
+ * runs a department that does not exist.
+ */
+export function hiringFunction(title: string): string {
+  const raw = (title || '').trim()
+  if (!raw) return 'that hire'
+  let t = raw
+  let stripped = false
+  const before = t
+  t = t.replace(SENIORITY, '')
+  if (t !== before) stripped = true
+  const beforeNoun = t
+  t = t.replace(ROLE_NOUN, '')
+  if (t !== beforeNoun) stripped = true
+  /* A slashed compound title leaves a dangling separator: Receptionist/Telephonist/ */
+  t = t.replace(/[\s/\-&,]+$/, '').trim()
+  if (!stripped || !t) return `the ${raw} hire`
+  /* Said mid-sentence, not printed as a heading, so it is lower case either way. */
+  const said = t.toLowerCase()
+  return said.includes(' ') ? said : `the ${said} side`
+}
