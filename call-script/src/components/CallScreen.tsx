@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, DISPOSITIONS, SAVINGS_CLAIM, SAVINGS_PCT, MEETING_LENGTH } from '../data/flow'
+import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, DISPOSITIONS, SAVINGS_CLAIM, SAVINGS_PCT, MEETING_LENGTH, MEETING_ONE } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
@@ -49,6 +49,7 @@ function interpolate(text: string, leadName: string, yourName: string, geminiRes
     .replace(/{SAVINGS_CLAIM}/g, SAVINGS_CLAIM)
     .replace(/{SAVINGS_PCT}/g, SAVINGS_PCT)
     .replace(/{MEETING_LENGTH}/g, MEETING_LENGTH)
+    .replace(/{MEETING_ONE}/g, MEETING_ONE)
     // Both fall back to what the rep would have said anyway, so a skipped capture
     // reads as a slightly vaguer sentence rather than a placeholder on the prompter.
     .replace(/{role}/g, ctx.roleWanted?.trim() || 'that role')

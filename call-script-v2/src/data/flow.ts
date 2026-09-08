@@ -70,7 +70,17 @@ export const SAVINGS_CLAIM = `${SAVINGS_PCT} less than local hiring`
  * back-to-back half hours on a lead who had asked for fifteen. Saying the per-partner
  * length is the fix, so this carries "each" and the nodes do not have to remember to.
  */
-export const MEETING_LENGTH = '15 minutes each'
+export const MEETING_LENGTH = '30 minutes each'
+/*
+ * The same number, said two ways, because one grammar does not fit both sentences.
+ *
+ * MEETING_LENGTH belongs where the two partners are on the table: "two back-to-back
+ * sessions, 30 minutes each". MEETING_ONE belongs in every line about a single call, where
+ * "each" is not just clumsy but wrong: "worth a 30 minutes each look" is what one constant
+ * for both produced, and it was already broken at fifteen. Derived rather than typed, so the
+ * figure still changes in one place.
+ */
+export const MEETING_ONE = MEETING_LENGTH.replace(/\s+each$/i, '')
 
 export const flow: Record<string, FlowNode> = {
 
@@ -285,7 +295,7 @@ export const flow: Record<string, FlowNode> = {
   value_offer: {
     id: 'value_offer',
     title: 'Value & Offer + CTA',
-    script: "Perfect, that's exactly the kind of role they fill all the time, so I'll skip the sales pitch and get straight to it.\n\nHere's how it works. I connect you with the right BPO partners, we've got more than 80 BPO partners in our network, and based on what you've shared I'll pick the two that fit your industry and this role.\n\nOn the call they'll go through what this role actually costs offshore, how the team gets managed day to day, and who owns performance and retention. That's the part you can't get over email.\n\nIf it's not a fit, that's completely fine, no obligation either way.\n\nThe call takes about {MEETING_LENGTH}. If I can be honest, can we do this on Wed or Thursday if you're busy on Mondays and Tuesdays?",
+    script: "Perfect, that's exactly the kind of role they fill all the time, so I'll skip the sales pitch and get straight to it.\n\nHere's how it works. I connect you with the right BPO partners, we've got more than 80 BPO partners in our network, and based on what you've shared I'll pick the two that fit your industry and this role.\n\nOn the call they'll go through what this role actually costs offshore, how the team gets managed day to day, and who owns performance and retention. That's the part you can't get over email.\n\nIf it's not a fit, that's completely fine, no obligation either way.\n\nThe call takes about {MEETING_ONE}. If I can be honest, can we do this on Wed or Thursday if you're busy on Mondays and Tuesdays?",
     waitForAnswer: true,
     tip: "The value + offer CTA, fired right after they name the role. Skip the pitch — frame the mechanics: you pick two of 80+ BPO partners for their industry and role, and the call covers what the role costs offshore, how the team is managed day to day, and who owns performance and retention, the things email cannot answer. Zero obligation, {MEETING_LENGTH}. Then go for a specific day (offer Wed/Thu). Note any date they float and proceed into the must-knows — you'll firm up attendance at the recap. ANALYZER: capture 'yes, open to offshore' in their own voice at the offshore gate or the recap for Gate 2 to count.",
     options: [
@@ -377,7 +387,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_timeline_far',
     title: 'Timeline 3+ Months (AQPC)',
     isObjection: true,
-    script: "I completely understand, you've got your standards, and honestly I'm right there with you.\n\nCan I ask, is it the skills, the experience, the culture fit, or the pricing?\n\nWhatever it is, that's exactly what gets expounded and explained on the discovery call, and that's the whole reason we're setting up this free consultative meeting for you.\n\n(processing the invitation now...) So is that {MEETING_LENGTH} worth having, or is offshore not really on the table right now?",
+    script: "I completely understand, you've got your standards, and honestly I'm right there with you.\n\nCan I ask, is it the skills, the experience, the culture fit, or the pricing?\n\nWhatever it is, that's exactly what gets expounded and explained on the discovery call, and that's the whole reason we're setting up this free consultative meeting for you.\n\n(processing the invitation now...) So is that {MEETING_ONE} worth having, or is offshore not really on the table right now?",
     waitForAnswer: true,
     tip: "AQPC: Acknowledge their standards, Question to surface the real concern (skills, experience, culture fit, or pricing), Pivot to the discovery call as where it all gets answered, then close by giving them permission to say no, which is what makes the yes mean anything. A '3+ months' stall is usually a smokescreen for one of those four — surface it, then drive straight back to the meeting.",
     options: [
@@ -541,7 +551,7 @@ export const flow: Record<string, FlowNode> = {
   obj_doing_fine: {
     id: 'obj_doing_fine',
     title: "Objection: Team is Doing Fine",
-    script: "Good to hear, and I'm not calling to change anything you've got going. I'd honestly just like to be a resource for you on the salary-cost side, since most of our partners come in {SAVINGS_CLAIM}. It's all laid out on a free call, how the model actually works and what the real cost comparison looks like for your roles, so it's worth {MEETING_LENGTH} just to have that number on file.\n\nQuick one though, when a key role opens up, what's the bigger headache for you, the time it takes, the cost, or actually finding the right skill set?",
+    script: "Good to hear, and I'm not calling to change anything you've got going. I'd honestly just like to be a resource for you on the salary-cost side, since most of our partners come in {SAVINGS_CLAIM}. It's all laid out on a free call, how the model actually works and what the real cost comparison looks like for your roles, so it's worth {MEETING_ONE} just to have that number on file.\n\nQuick one though, when a key role opens up, what's the bigger headache for you, the time it takes, the cost, or actually finding the right skill set?",
     isObjection: true,
     tip: "Approved reframe (Carl / David, UBC Digital): 'strategic resource, not replacement' — the single most effective line in the approved set, use it verbatim. Challenge the status quo gently: 'doing fine' is not the same as 'doing it optimally.' Then get them to name their friction point.",
     options: [
@@ -553,7 +563,7 @@ export const flow: Record<string, FlowNode> = {
   obj_no_challenges: {
     id: 'obj_no_challenges',
     title: 'Objection: No Hiring Challenges',
-    script: "That's genuinely impressive, sounds like you've built a really solid team and setup.\n\nI'd still love to show you what we do, even just as a benchmarking thing. Whether or not you ever change anything, seeing a real cost comparison for your roles takes {MEETING_LENGTH} and you walk away with useful data either way.\n\nZero commitment. Worth a quick look?",
+    script: "That's genuinely impressive, sounds like you've built a really solid team and setup.\n\nI'd still love to show you what we do, even just as a benchmarking thing. Whether or not you ever change anything, seeing a real cost comparison for your roles takes {MEETING_ONE} and you walk away with useful data either way.\n\nZero commitment. Worth a quick look?",
     isObjection: true,
     tip: "Reciprocity: frame the consultation as giving them something useful regardless of outcome — real salary benchmarking data. Lower the stakes: 'even if you don't change anything, you'll know your number.'",
     options: [
@@ -577,7 +587,7 @@ export const flow: Record<string, FlowNode> = {
   obj_already_outsourcing: {
     id: 'obj_already_outsourcing',
     title: 'Objection: Already Outsourcing / Need to Think',
-    script: "Oh nice, so you already know the model works, that's half the battle. Can I ask though, are you actually happy with both the quality AND the cost right now, or is there a bit of room on either one?\n\nHonestly most people who come to us were already outsourcing, they just found our partners had better talent for less. It's a quick benchmarking call, no strings, and in {MEETING_LENGTH} you'll know if there's an upgrade worth having. Is there a role that's been tougher to fill or pricier than you'd like?",
+    script: "Oh nice, so you already know the model works, that's half the battle. Can I ask though, are you actually happy with both the quality AND the cost right now, or is there a bit of room on either one?\n\nHonestly most people who come to us were already outsourcing, they just found our partners had better talent for less. It's a quick benchmarking call, no strings, and in {MEETING_ONE} you'll know if there's an upgrade worth having. Is there a role that's been tougher to fill or pricier than you'd like?",
     isObjection: true,
     tip: "Smart Calling: they're already sold on the concept — the hard part's done. Make them curious whether their setup is optimal. 'Happy with both quality AND cost?' is a double-gate — most people are happy with one but not both. This is a warm prospect, not a dead one.",
     options: [
@@ -601,7 +611,7 @@ export const flow: Record<string, FlowNode> = {
   obj_think_about_it: {
     id: 'obj_think_about_it',
     title: 'Objection: Need to Think About It',
-    script: "Of course, totally respect that. Can I ask what specifically you'd want to chew on? Is it the timing, whether it's the right fit, or something else?\n\nReason I ask is the partners actually answer most of that on the call itself, what the role really costs offshore, how the team gets managed, who owns performance. It's {MEETING_LENGTH} of straight info, not a pitch, and you walk away with something useful whether you go ahead or not.\n\nWould [Tuesday] or [Thursday] this week work just to get that in front of you?",
+    script: "Of course, totally respect that. Can I ask what specifically you'd want to chew on? Is it the timing, whether it's the right fit, or something else?\n\nReason I ask is the partners actually answer most of that on the call itself, what the role really costs offshore, how the team gets managed, who owns performance. It's {MEETING_ONE} of straight info, not a pitch, and you walk away with something useful whether you go ahead or not.\n\nWould [Tuesday] or [Thursday] this week work just to get that in front of you?",
     isObjection: true,
     tip: "Schiffman + SPIN: diagnose what they're thinking about before re-pitching. Then reframe the consultation as information-gathering, not a sales meeting — 'it answers the questions you're thinking through.' Offer two specific days. Then capture the 4 criteria at the close. ANALYZER: 'I'll do my best / I'll try' is a show-up flag — pin a specific day and time and get a clean 'yes, I'll be on.'",
     options: [
@@ -652,7 +662,7 @@ export const flow: Record<string, FlowNode> = {
   obj_tried_before: {
     id: 'obj_tried_before',
     title: 'Objection: Tried Outsourcing Before',
-    script: "I'm actually really glad you told me that, it genuinely changes how I'd go about this with you.\n\nCan I ask what went sideways? Was it the talent itself, the communication with the agency, the management overhead, or something else?\n\n[Listen, then:] Yeah, what you're describing is nearly always a sourcing problem, unvetted agencies just handing you whoever's free instead of whoever's right. We vet every partner up front and you compare two of them side by side before you commit to anything. Would it be worth {MEETING_LENGTH} to see how we'd handle your situation differently, and you take it from there?",
+    script: "I'm actually really glad you told me that, it genuinely changes how I'd go about this with you.\n\nCan I ask what went sideways? Was it the talent itself, the communication with the agency, the management overhead, or something else?\n\n[Listen, then:] Yeah, what you're describing is nearly always a sourcing problem, unvetted agencies just handing you whoever's free instead of whoever's right. We vet every partner up front and you compare two of them side by side before you commit to anything. Would it be worth {MEETING_ONE} to see how we'd handle your situation differently, and you take it from there?",
     isObjection: true,
     tip: "'Tried before' is your best lead — they've validated the concept, they just had a bad experience. Diagnose what broke, then differentiate OA's vetting model as the specific fix. Listen more than you talk in this one.",
     options: [
@@ -735,7 +745,7 @@ export const flow: Record<string, FlowNode> = {
   obj_not_relevant: {
     id: 'obj_not_relevant',
     title: 'Objection: Not Relevant / Not a Fit',
-    script: "Fair, and I might be wrong.\n\nQuick check so I'm not wasting your time: who handles your admin or back-office today?\n\nOften people say it's not a fit, and then one role turns out to be the obvious one. Two free calls, and if it's genuinely not relevant you'll know in {MEETING_LENGTH}.",
+    script: "Fair, and I might be wrong.\n\nQuick check so I'm not wasting your time: who handles your admin or back-office today?\n\nOften people say it's not a fit, and then one role turns out to be the obvious one. Two free calls, and if it's genuinely not relevant you'll know in {MEETING_ONE}.",
     isObjection: true,
     tip: "A REASONED dismissal rather than a flat no, which makes it softer and far more workable. It is currently buried inside 'not interested' in the data. The whole move is one diagnostic question BEFORE you concede: you cannot know it is not a fit until you know what they do. Do not take a reasoned no at face value.",
     options: [
@@ -747,7 +757,7 @@ export const flow: Record<string, FlowNode> = {
   obj_anti_cold_call: {
     id: 'obj_anti_cold_call',
     title: "Objection: I Don't Take Cold Calls / What Are You Selling?",
-    script: "You're right, this is a cold call, and I'll respect that.\n\nI'm not selling anything on this call, I book two free intro calls with vetted teams.\n\nGive me one line and you decide if it's worth {MEETING_LENGTH}, sound fair?",
+    script: "You're right, this is a cold call, and I'll respect that.\n\nI'm not selling anything on this call, I book two free intro calls with vetted teams.\n\nGive me one line and you decide if it's worth {MEETING_ONE}, sound fair?",
     isObjection: true,
     tip: "An objection to the CHANNEL, not to the offer, which makes it completely different from 'not interested' and means it needs honesty rather than a rebuttal. Own that it is a cold call and promise brevity. Never pretend it is not outreach: they already know, and pretending proves the brush-off right.",
     options: [
@@ -771,7 +781,7 @@ export const flow: Record<string, FlowNode> = {
   obj_too_small: {
     id: 'obj_too_small',
     title: "Objection: We're Too Small",
-    script: "Actually it's often the opposite. Smaller teams get the most out of it, because one good offshore hire frees you from the admin eating your day.\n\nEven one part-time role counts, and there are no minimums to find out.\n\n{MEETING_LENGTH}, free, worth a look?",
+    script: "Actually it's often the opposite. Smaller teams get the most out of it, because one good offshore hire frees you from the admin eating your day.\n\nEven one part-time role counts, and there are no minimums to find out.\n\n{MEETING_ONE}, free, worth a look?",
     isObjection: true,
     tip: "Reframe small as ideal rather than as a disqualifier, and make it clear one part-time seat is enough. Never imply they need to be bigger. Real win: 'how many staff now?' — thirty — 'that's a fit, do you use external partners or all in-house?' — booked [Jezza Jaraula]. If they have literally no staff, that is the solo-operator handler and a different play.",
     options: [
@@ -784,7 +794,7 @@ export const flow: Record<string, FlowNode> = {
   obj_solo_operator: {
     id: 'obj_solo_operator',
     title: "Objection: I'm a One-Man Band / No Staff",
-    script: "Totally get it. Most solo owners aren't hiring a team, they get one part-time offshore admin to take the busywork off their plate for a few hundred a month.\n\nWorth a {MEETING_LENGTH} look, or genuinely not for you?",
+    script: "Totally get it. Most solo owners aren't hiring a team, they get one part-time offshore admin to take the busywork off their plate for a few hundred a month.\n\nWorth {MEETING_ONE} of your time, or genuinely not for you?",
     isObjection: true,
     tip: "A business of ONE is structurally different from a small team and from not-hiring: usually unqualifiable, but a part-time VA genuinely helps a solo owner. Make the single-assistant offer ONCE, and if the answer is still no, thank them and move on. Do not force a team pitch on a business of one, which is why the question gives them the exit.",
     options: [

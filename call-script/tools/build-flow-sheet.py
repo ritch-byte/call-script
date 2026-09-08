@@ -25,6 +25,8 @@ def fill(text):
         ("{SAVINGS_CLAIM}", C["SAVINGS_CLAIM"]),
         ("{SAVINGS_PCT}", C["SAVINGS_PCT"]),
         ("{MEETING_LENGTH}", C["MEETING_LENGTH"]),
+        # same number, singular grammar, for the lines about one call
+        ("{MEETING_ONE}", re.sub(r"\s+each$", "", C["MEETING_LENGTH"], flags=re.I)),
         ("{role}", "[that role]"),
         ("{statedTimelineVerbatim}", "[their timeframe, in their words]"),
         ("{hiringSetup}", "team"),
