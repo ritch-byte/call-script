@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, SAVINGS_CLAIM, SAVINGS_PCT, MEETING_LENGTH } from '../data/flow'
+import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, DISPOSITIONS, SAVINGS_CLAIM, SAVINGS_PCT, MEETING_LENGTH } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
@@ -64,6 +64,7 @@ export default function CallScreen({ onReset }: Props) {
   const [context, setContext] = useState<Context>({})
   const [showObjections, setShowObjections] = useState(false)
   const [showRates, setShowRates] = useState(false)
+  const [showDispositions, setShowDispositions] = useState(false)
   const [showResearch, setShowResearch] = useState(false)
   const [showGates, setShowGates] = useState(false)
   const [emailPageOpen, setEmailPageOpen] = useState(false)
@@ -266,6 +267,12 @@ export default function CallScreen({ onReset }: Props) {
         </div>
         <div className="header-actions">
           <button
+            className={`btn-header-ghost${showDispositions ? ' btn-header-active' : ''}`}
+            onClick={() => { setShowDispositions(v => !v); setShowRates(false); setShowResearch(false); setShowGates(false) }}
+          >
+            Not an Objection
+          </button>
+          <button
             className={`btn-header-ghost${showRates ? ' btn-header-active' : ''}`}
             onClick={() => { setShowRates(v => !v); setShowResearch(false); setShowGates(false) }}
           >
@@ -314,6 +321,44 @@ export default function CallScreen({ onReset }: Props) {
       </div>
 
       {/* ── Rates Panel ── */}
+      {/* Family B. Not objections, so they are not in the objection list and carry no
+          rebuttal: each one is an action on the record. Keeping them out of the objection
+          codes is what stops them being counted as objection-handling failures. */}
+      {showDispositions && (
+        <div className="reference-bar">
+          <div className="reference-bar-header">
+            <span className="reference-bar-title">Not an objection &mdash; do not rebut</span>
+            <button className="btn-ref-close" onClick={() => setShowDispositions(false)}>Close</button>
+          </div>
+          <div className="salary-note">
+            None of these is a sales objection. Take the action, end politely, and never pitch.
+            Rebutting a do-not-call creates real risk, and rebutting a wrong number wastes the
+            call. Roughly <strong>92%</strong> of what gets logged as &ldquo;other objection&rdquo;
+            is one of these, which is why it is the floor&rsquo;s biggest recorded
+            objection-handling failure and not actually a handling problem at all.
+          </div>
+          <div className="salary-table-wrap">
+            <table className="salary-table">
+              <thead>
+                <tr><th>When they say</th><th>Say this</th><th>Then do</th></tr>
+              </thead>
+              <tbody>
+                {DISPOSITIONS.map(d => (
+                  <tr key={d.trigger}>
+                    <td>
+                      {d.trigger}
+                      {d.share && <div className="disp-share">{d.share}</div>}
+                    </td>
+                    <td>{d.say}</td>
+                    <td>{d.action}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {showRates && (
         <div className="reference-bar">
           <div className="reference-bar-header">

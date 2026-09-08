@@ -107,11 +107,12 @@ export const flow: Record<string, FlowNode> = {
     id: 'pitch_q1',
     topic: 'current_setup',
     title: 'Value Hook + Discovery Q1',
-    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah, I'm reaching out because salaries for specialised local talent keep climbing. I work with a team that helps leaders handle growth without growing the payroll, we're an outsourcing marketplace, so we don't supply the staff ourselves, we match you to the vetted firms that already do this work. Most come in {SAVINGS_CLAIM}. Is that even on your radar at the moment?",
+    script: "No? Oh okay, feel free to cut me off if it's not in your wheelhouse.\n\nSo yeah, I'm reaching out because salaries for specialised local talent keep climbing. I work with a team that helps leaders handle growth without growing the payroll, we're an outsourcing marketplace, so we don't supply the staff ourselves, we match you to the vetted firms that already do this work. Most come in {SAVINGS_CLAIM}.\n\nJust curious, for any of your hiring, do you do it in-house or do you work with external partners for anything?",
     waitForAnswer: true,
-    tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'we don't supply the staff ourselves' is the line that does the work: it says what we are before they guess, and a marketplace is easier to say yes to than a vendor. Keep the discovery question binary; don't stack more on top of it.",
+    tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'we don't supply the staff ourselves' is the line that does the work: it says what we are before they guess, and a marketplace is easier to say yes to than a vendor. The closing question is deliberately NOT binary: 'in-house or external partners' cannot be answered with a flat no, and both answers route somewhere. In-house goes to the role question; already using partners goes to the benchmark play, which is the easier booking of the two. Ask it and stop talking.",
     options: [
-      { label: 'On the radar / they engage', next: 'qualify_role', type: 'positive', banks: ['company'], elaborated: true },
+      { label: 'All in-house', next: 'qualify_role', type: 'positive', banks: ['company'], elaborated: true },
+      { label: 'They already use external partners', next: 'obj_already_outsourcing', type: 'positive', banks: ['company'], elaborated: true },
       { label: 'Not interested', next: 'obj_pitch_recover', type: 'objection' },
       { label: 'Not hiring / budget concern', next: 'obj_not_hiring', type: 'objection' },
     ],
@@ -463,10 +464,10 @@ export const flow: Record<string, FlowNode> = {
 
   obj_timing: {
     id: 'obj_timing',
-    title: 'Objection: Timing / Who Are You',
-    script: "No worries at all, give me 30 seconds and if it's not relevant I'll happily let you go.\n\nSo I'm {yourName} over at Outsource Accelerator, we basically help businesses cut hiring costs by {SAVINGS_PCT} using really strong offshore talent. Is that even on your radar at the moment?",
+    title: 'Objection: Busy Right Now',
+    script: "No worries at all, give me 30 seconds and if it's not relevant I'll happily let you go.\n\nSo I'm {yourName} over at Outsource Accelerator, we basically help businesses cut hiring costs by {SAVINGS_PCT} using really strong offshore talent.\n\nJust curious, for any of your hiring, do you do it in-house or do you work with external partners for anything?",
     isObjection: true,
-    tip: "Smart Calling: answer the 'who are you' cleanly and fast — name, company, one-line value prop. Then re-qualify with a soft question. Don't re-pitch. If they give you 30 seconds, move straight to pitch_q1.",
+    tip: "7.5% of all objections and one of the few that CONVERTS WELL. Offer a binary: fifteen seconds now, or a specific slot. Then confirm the callback like a real appointment, because a vague 'call me sometime' is a dead lead. Do not keep pitching after 'gotta go'. Real win: 'I'll cut to it, just one question' then one sharp value question, booked [Gabriel]. For 'who are you' use the identity handler instead, it is a different move.",
     options: [
       { label: 'Yes, go ahead / give me a better time', next: 'pitch_q1', type: 'positive' },
       { label: 'Not interested', next: 'obj_not_interested_opening', type: 'objection' },
@@ -708,17 +709,192 @@ export const flow: Record<string, FlowNode> = {
       { label: 'Need legal review first — set follow-up', next: 'end_callback', type: 'positive' },
     ],
   },
+  /*
+   * The seven handlers below come from the corpus catalogue: 166,694 outbound calls, 115,526
+   * carrying a coded objection. Four are codes the classifier does not separate at all yet
+   * (not-relevant, anti-cold-call, solo-operator, replaced-by-AI); the rest were in the data
+   * with no handler on the floor. Frequency and the real win sit in each tip.
+   *
+   * They all end on the same ask, because that is what the catalogue found the winners do:
+   * acknowledge, reframe, then ask for the two free calls.
+   */
+
+  obj_who_are_you: {
+    id: 'obj_who_are_you',
+    title: 'Objection: Who Are You? / Why Are You Calling?',
+    script: "Fair question. I'm {yourName} at Outsource Accelerator, we're an outsourcing marketplace.\n\nReason I called: I line up two free calls with hand-picked offshore teams so you can compare what roles actually cost, usually {SAVINGS_PCT} less than local.\n\nCan I ask you one quick question?",
+    isObjection: true,
+    tip: "8.2% of all objections. Name, reason for calling, one question, all in one breath, then stop. Do NOT recite company history and do not get defensive about where the number came from. Real win: the lead asked 'in plain English, what do you do?' and the answer was 'world's leading marketplace for offshore staffing, think recruitment, but offshore' — booked [Marc Anos]. If they genuinely cannot follow you, that is the line or the accent and not an objection: slow down and re-introduce.",
+    options: [
+      { label: 'Satisfied / asks a question back', next: 'pitch_q1', type: 'positive' },
+      { label: "Couldn't understand me — slow down and re-introduce", next: 'pitch_q1', type: 'positive' },
+      { label: 'Not interested', next: 'obj_not_interested_opening', type: 'objection' },
+    ],
+  },
+
+  obj_not_relevant: {
+    id: 'obj_not_relevant',
+    title: 'Objection: Not Relevant / Not a Fit',
+    script: "Fair, and I might be wrong.\n\nQuick check so I'm not wasting your time: who handles your admin or back-office today?\n\nOften people say it's not a fit, and then one role turns out to be the obvious one. Two free calls, and if it's genuinely not relevant you'll know in {MEETING_LENGTH}.",
+    isObjection: true,
+    tip: "A REASONED dismissal rather than a flat no, which makes it softer and far more workable. It is currently buried inside 'not interested' in the data. The whole move is one diagnostic question BEFORE you concede: you cannot know it is not a fit until you know what they do. Do not take a reasoned no at face value.",
+    options: [
+      { label: 'They name who handles admin / back-office', next: 'qualify_role', type: 'positive', banks: ['company'], elaborated: true },
+      { label: 'Still not relevant after the question', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_anti_cold_call: {
+    id: 'obj_anti_cold_call',
+    title: "Objection: I Don't Take Cold Calls / What Are You Selling?",
+    script: "You're right, this is a cold call, and I'll respect that.\n\nI'm not selling anything on this call, I book two free intro calls with vetted teams.\n\nGive me one line and you decide if it's worth {MEETING_LENGTH}, sound fair?",
+    isObjection: true,
+    tip: "An objection to the CHANNEL, not to the offer, which makes it completely different from 'not interested' and means it needs honesty rather than a rebuttal. Own that it is a cold call and promise brevity. Never pretend it is not outreach: they already know, and pretending proves the brush-off right.",
+    options: [
+      { label: 'Go on then / one line', next: 'pitch_q1', type: 'positive' },
+      { label: 'Take me off your list', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_send_email: {
+    id: 'obj_send_email',
+    title: 'Objection: Just Send Me an Email',
+    script: "Happy to, and I'll keep it short so it's not another ignored email.\n\nSo I send the right thing: the roles owners like you outsource, or the cost savings?\n\nI'll send it today and hold a tentative slot for the two calls, one click to cancel.",
+    isObjection: true,
+    tip: "2.4% of objections and the easiest one to lose. Say YES to the email and attach a specific time in the same breath, because just saying 'sure' and hanging up is a dead lead. The question about what to send does double duty: it gets you one qualifying answer before you go. Real win: 'emails get lost, let me send it AND pair it with a ten-minute call so I can show the exact talent and pricing' — booked [Julius Sarmiento].",
+    options: [
+      { label: 'Gives an answer / accepts the held slot', next: 'qualify_role', type: 'positive' },
+      { label: 'Just send it, no slot', next: 'end_callback', type: 'positive' },
+    ],
+  },
+
+  obj_too_small: {
+    id: 'obj_too_small',
+    title: "Objection: We're Too Small",
+    script: "Actually it's often the opposite. Smaller teams get the most out of it, because one good offshore hire frees you from the admin eating your day.\n\nEven one part-time role counts, and there are no minimums to find out.\n\n{MEETING_LENGTH}, free, worth a look?",
+    isObjection: true,
+    tip: "Reframe small as ideal rather than as a disqualifier, and make it clear one part-time seat is enough. Never imply they need to be bigger. Real win: 'how many staff now?' — thirty — 'that's a fit, do you use external partners or all in-house?' — booked [Jezza Jaraula]. If they have literally no staff, that is the solo-operator handler and a different play.",
+    options: [
+      { label: 'Open to a look', next: 'qualify_role', type: 'positive' },
+      { label: 'Genuinely a business of one', next: 'obj_solo_operator', type: 'objection' },
+      { label: 'Still no', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_solo_operator: {
+    id: 'obj_solo_operator',
+    title: "Objection: I'm a One-Man Band / No Staff",
+    script: "Totally get it. Most solo owners aren't hiring a team, they get one part-time offshore admin to take the busywork off their plate for a few hundred a month.\n\nWorth a {MEETING_LENGTH} look, or genuinely not for you?",
+    isObjection: true,
+    tip: "A business of ONE is structurally different from a small team and from not-hiring: usually unqualifiable, but a part-time VA genuinely helps a solo owner. Make the single-assistant offer ONCE, and if the answer is still no, thank them and move on. Do not force a team pitch on a business of one, which is why the question gives them the exit.",
+    options: [
+      { label: 'Curious about the one-VA angle', next: 'qualify_role', type: 'positive' },
+      { label: 'Genuinely no need — exit politely', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  obj_replaced_ai: {
+    id: 'obj_replaced_ai',
+    title: 'Objection: We Use AI Now',
+    script: "Smart move, honestly.\n\nAnd most clients pairing AI still keep a human to check the edge cases and handle the relationships, at {SAVINGS_PCT} less.\n\nWorth seeing how others combine both?",
+    isObjection: true,
+    tip: "New and emerging: small volume today, but it goes straight at what we sell, so flag every one you hear. Yes-AND the AI, never argue against it. Position offshore talent as the human layer AI still needs, and note our people are skilled in AI tools. Real win: 'most of our clients use AI too, they still need a human layer for data verification and relationships; we provide talent skilled in AI tools' — booked [Marc Anos].",
+    options: [
+      { label: 'Curious about the human + AI mix', next: 'qualify_role', type: 'positive' },
+      { label: 'Not interested', next: 'end_not_interested', type: 'end' },
+    ],
+  },
 }
 
+/*
+ * Ordered by how often the corpus actually hears them, not for tidiness. The catalogue's
+ * headline is that FIVE objections are 62% of everything — not interested, not my decision,
+ * who are you, busy, send me an email — and those five plus the opener are where calls are
+ * won or lost. So they come first.
+ */
 export const QUICK_OBJECTIONS: FlowOption[] = [
   { label: 'Not interested', next: 'obj_not_interested_opening', type: 'objection' },
-  { label: 'Not a good time / who are you?', next: 'obj_timing', type: 'objection' },
+  { label: 'Not my decision / wrong person', next: 'obj_wrong_person', type: 'objection' },
+  { label: 'Who are you? / why are you calling?', next: 'obj_who_are_you', type: 'objection' },
+  { label: "I'm busy right now", next: 'obj_timing', type: 'objection' },
+  { label: 'Just send me an email', next: 'obj_send_email', type: 'objection' },
+  { label: 'Not relevant / not a fit', next: 'obj_not_relevant', type: 'objection' },
+  { label: "Don't take cold calls / what are you selling?", next: 'obj_anti_cold_call', type: 'objection' },
   { label: 'Budget / what are your rates?', next: 'obj_budget', type: 'objection' },
   { label: 'Already outsourcing', next: 'obj_already_outsourcing', type: 'objection' },
   { label: 'Not hiring right now', next: 'obj_not_hiring', type: 'objection' },
   { label: 'Team is doing fine', next: 'obj_doing_fine', type: 'objection' },
   { label: 'Why two meetings?', next: 'obj_two_meetings', type: 'objection' },
   { label: 'Tried outsourcing before', next: 'obj_tried_before', type: 'objection' },
+  { label: "We're too small", next: 'obj_too_small', type: 'objection' },
+  { label: 'One-man band / no staff', next: 'obj_solo_operator', type: 'objection' },
+  { label: 'We use AI now', next: 'obj_replaced_ai', type: 'objection' },
+]
+
+/*
+ * FAMILY B. These are not objections and must never be rebutted.
+ *
+ * This is the catalogue's highest-value finding, and it is a scoring problem before it is a
+ * script problem. OBJ_OTHER turns out to be ~92% NOT a sales objection: do-not-call is about
+ * half of it, wrong party another 15%, then legal threats, language, defunct businesses,
+ * duplicate calls and bad audio. Sitting inside the objection codes, they inflate the
+ * "objection-handling failure" rate, which is currently the floor's number one recorded
+ * failure cause. A rep cannot rebut a wrong number and must never rebut a DNC.
+ *
+ * Deliberately NOT flow nodes. A flow node is something you say next; each of these ends the
+ * call and triggers an action on the record instead.
+ */
+export interface Disposition {
+  trigger: string
+  say: string
+  action: string
+  /** Share of OBJ_OTHER, where the corpus could measure it. */
+  share?: string
+}
+
+export const DISPOSITIONS: Disposition[] = [
+  {
+    trigger: 'Take me off your list',
+    say: "Of course, I'll remove you right now. Apologies for the interruption.",
+    action: 'Suppress the record. No rebuttal, not even a short one.',
+    share: '~49% of OBJ_OTHER',
+  },
+  {
+    trigger: "This is illegal / I'm on the Do Not Call register",
+    say: "I'm sorry, I'll make sure you're removed permanently. Apologies again.",
+    action: 'Confirm immediate and permanent suppression, then log it for compliance. Never argue about where the number came from.',
+    share: '~8%',
+  },
+  {
+    trigger: "Wrong number / wrong person / they've left",
+    say: "Sorry to trouble you, I'll get that corrected on our side.",
+    action: 'List hygiene: correct or suppress the record. Ask once for the right contact, only if it feels natural.',
+    share: '~15%',
+  },
+  {
+    trigger: 'Business closed / owner retired',
+    say: 'Thanks for letting me know, I appreciate it.',
+    action: 'Suppress the record.',
+    share: '~4%',
+  },
+  {
+    trigger: "Can't speak English",
+    say: 'No problem at all, let me see if a colleague can call you.',
+    action: 'Route to a language-matched rep if there is one, otherwise skip. This is not a rejection.',
+    share: '~7%',
+  },
+  {
+    trigger: "You've called before / duplicate call",
+    say: "Sorry about that, I'll get the record fixed so it doesn't happen again.",
+    action: 'Dialer cadence or dedup fix. Repeat calls are what drive DNC requests and complaints in the first place.',
+    share: '~4%',
+  },
+  {
+    trigger: "Voicemail / can't hear you / bad line",
+    say: '(nothing to rebut)',
+    action: 'A disposition, not an objection: redial per cadence, or flag the line for quality. Most voicemails never reach the objection phase at all.',
+    share: '~6%',
+  },
 ]
 
 export const DEEP_OBJECTIONS: FlowOption[] = [
