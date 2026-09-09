@@ -35,7 +35,8 @@
 import { useMemo, useState } from 'react'
 import { callAI } from '../lib/ai'
 import { MEETING_ONE, SAVINGS_CLAIM } from '../data/flow'
-import { ScriptLine, URL_RE, offerWindow, pluralTitle } from './SpielBuilder'
+import { ScriptLine } from './ScriptLine'
+import { URL_RE, offerWindow, pluralTitle } from '../lib/leadText'
 
 /** Same model and the same one-call-per-click shape as the other two generators. */
 const MODEL = 'claude-haiku-4-5-20251001'

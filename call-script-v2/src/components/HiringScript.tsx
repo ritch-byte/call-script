@@ -172,7 +172,8 @@
 import { useState, useMemo } from 'react'
 import { callAI } from '../lib/ai'
 import { SAVINGS_CLAIM, MEETING_LENGTH } from '../data/flow'
-import { ScriptLine, offerWindow } from './SpielBuilder'
+import { ScriptLine } from './ScriptLine'
+import { offerWindow } from '../lib/leadText'
 import {
   article,
   hiringFunction,

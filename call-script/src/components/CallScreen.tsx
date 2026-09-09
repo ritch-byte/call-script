@@ -4,7 +4,6 @@ import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
 import { callAI, buildResearchPrompt } from '../lib/ai'
-import SpielBuilder from './SpielBuilder'
 import HiringScript from './HiringScript'
 import IndustryScript from './IndustryScript'
 import Scorecard from './Scorecard'
@@ -70,7 +69,6 @@ export default function CallScreen({ onReset }: Props) {
   const [showResearch, setShowResearch] = useState(false)
   const [showGates, setShowGates] = useState(false)
   const [emailPageOpen, setEmailPageOpen] = useState(false)
-  const [spielPageOpen, setSpielPageOpen] = useState(false)
   const [hiringPageOpen, setHiringPageOpen] = useState(false)
   const [industryPageOpen, setIndustryPageOpen] = useState(false)
   const [leadName, setLeadName] = useState('')
@@ -149,10 +147,10 @@ export default function CallScreen({ onReset }: Props) {
 
   // Reserve space for the fixed scorecard so it never overlaps the cards.
   useEffect(() => {
-    const on = showScore && !emailPageOpen && !spielPageOpen && !hiringPageOpen && !industryPageOpen
+    const on = showScore && !emailPageOpen && !hiringPageOpen && !industryPageOpen
     document.body.classList.toggle('scorecard-open', on)
     return () => document.body.classList.remove('scorecard-open')
-  }, [showScore, emailPageOpen, spielPageOpen, hiringPageOpen, industryPageOpen])
+  }, [showScore, emailPageOpen, hiringPageOpen, industryPageOpen])
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
@@ -223,23 +221,6 @@ export default function CallScreen({ onReset }: Props) {
         </div>
         <div className="email-page-body">
           <HiringScript />
-        </div>
-      </div>
-    )
-  }
-
-  // ── Spiel Builder full-page view ────────────────────────────────────────
-  if (spielPageOpen) {
-    return (
-      <div className="call-screen">
-        <div className="email-page-header">
-          <button className="email-page-back" onClick={() => setSpielPageOpen(false)}>
-            ← Back to Call
-          </button>
-          <span className="email-page-title">Spiel Builder</span>
-        </div>
-        <div className="email-page-body">
-          <SpielBuilder />
         </div>
       </div>
     )
@@ -323,12 +304,6 @@ export default function CallScreen({ onReset }: Props) {
             onClick={() => setIndustryPageOpen(true)}
           >
             Personalised Script
-          </button>
-          <button
-            className="btn-header-ghost"
-            onClick={() => setSpielPageOpen(true)}
-          >
-            Spiel Builder
           </button>
           <button
             className="btn-header-ghost"
