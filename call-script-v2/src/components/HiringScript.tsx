@@ -185,6 +185,7 @@ import {
   hiringLeadIssue,
   parseHiringLead,
   seatOwnership,
+  seatWarning,
   type HiringLead,
 } from '../lib/hiringLead'
 
@@ -368,6 +369,8 @@ export default function HiringScript() {
    * company posted. A warning costs nothing, and a rep who expects the correction handles it.
    */
   const owns = useMemo(() => seatOwnership(lead.jobTitle, seat), [lead.jobTitle, seat])
+  /* Non-blocking: says the seat looks odd without stopping the rep. See seatWarning. */
+  const warn = useMemo(() => seatWarning(seat), [seat])
   const intro = useMemo(() => buildHiringIntro(seat), [seat])
   const onScreen = script.length ? [...intro, ...script] : intro
 
@@ -506,6 +509,34 @@ export default function HiringScript() {
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+          {ready && warn && (
+            <div
+              style={{
+                marginTop: 10,
+                padding: '9px 12px',
+                borderLeft: `2px solid #c98a00`,
+                background: PAPER,
+                fontFamily: SANS,
+                fontSize: 12.5,
+                lineHeight: 1.5,
+                color: '#4b5563',
+              }}
+            >
+              <span
+                style={{
+                  display: 'block',
+                  marginBottom: 3,
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: '0.1em',
+                  color: '#6b7280',
+                }}
+              >
+                WORTH A SECOND LOOK
+              </span>
+              {warn}
             </div>
           )}
           {ready && owns.note && (

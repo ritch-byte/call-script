@@ -26,7 +26,7 @@ export const TITLE_WORD =
   /^(chief|head|vp|svp|evp|president|vice|director|manager|managing|officer|founder|co-?founder|owner|proprietor|principal|partner|lead|supervisor|coordinator|specialist|executive|chairman|chairwoman|chair|superintendent|estimator|controller|comptroller|treasurer|counsel|attorney|foreman|buyer|planner|scheduler|dispatcher|recruiter|analyst|engineer|architect|surveyor|producer|editor|admin|c[eftmoi]o|cmo|cro|cpo|chro|cco|gm|md)$/i
 
 export const ROLE_NOUN =
-  /\s+(specialist|manager|officer|coordinator|administrator|admin|assistant|clerk|analyst|executive|associate|lead|director|engineer|technician|agent|representative|rep|consultant|advisor|adviser|supervisor|controller|receptionist|accountant|bookkeeper|developer|designer|planner|scheduler|dispatcher|buyer|estimator|telephonist|nurse|driver|chef|cleaner|writer|paralegal|surveyor|architect|recruiter|auditor|underwriter|broker|teller|cashier)s?$/i
+  /\s+(specialist|manager|officer|coordinator|administrator|administrative|administration|admin|assistant|clerk|analyst|executive|associate|lead|director|engineer|technician|agent|representative|rep|consultant|advisor|adviser|supervisor|controller|receptionist|accountant|bookkeeper|developer|designer|planner|scheduler|dispatcher|buyer|estimator|telephonist|nurse|driver|chef|cleaner|writer|paralegal|surveyor|architect|recruiter|auditor|underwriter|broker|teller|cashier)s?$/i
 
 const SENIORITY =
   /^(senior|snr|sr|junior|jnr|jr|lead|head of|chief|principal|assistant|associate|trainee|graduate|entry level|experienced)\s+/i
@@ -171,6 +171,25 @@ function splitFreeform(text: string) {
 
   let seatAt = toks.length
   while (seatAt > 1 && isCapped(toks[seatAt - 1]) && toks.length - seatAt < 4) seatAt--
+  /*
+   * ONE MORE WORD IF IT IS A RANK, because the four-word cap cuts exactly those off.
+   *
+   * "Associate Partner accounting Apprentice For Credit Control Department" gave a seat of
+   * "For Credit Control Department" - four words, cap reached, and "Apprentice" left behind on
+   * the industry side. The seat then reads as a job that starts with "For", and the whole
+   * point of the seniority is gone.
+   *
+   * These words only ever sit in FRONT of a seat, never at the end of a sector, so crossing
+   * one costs nothing and there is no need to raise the cap generally.
+   */
+  if (
+    seatAt > 1 &&
+    isCapped(toks[seatAt - 1]) &&
+    /^(apprentice|trainee|graduate|intern|cadet|deputy|senior|snr|sr|junior|jnr|jr|lead|principal)$/i.test(
+      toks[seatAt - 1],
+    )
+  )
+    seatAt--
   if (seatAt === toks.length) return empty
   const head = toks.slice(0, seatAt)
 
@@ -242,8 +261,33 @@ export function hiringLeadIssue(lead: HiringLead, seat: string): string {
     return 'Could not find a seat they are hiring for. Put it after the industry.'
   const s = (seat || '').trim()
   if (!s) return 'Pick which seat you are calling about.'
+  return ''
+}
+
+/*
+ * "That does not read as a job title" USED TO BLOCK, and it has now refused two real seats:
+ * "Apprentice For Credit Control Department" and "Brand Partnerships Administrative", both
+ * straight off a live advertisement. It is a warning here instead, and the reasoning is the
+ * asymmetry between the two ways it can be wrong.
+ *
+ * A false refusal is a hard stop. The rep has a real lead in front of them, the button is
+ * dead, and nothing they can do to the paste is obviously right - so they either mangle the
+ * seat until the tool relents, which puts a made-up seat into the script, or they skip the
+ * lead. Both are worse than the thing the guard was protecting against.
+ *
+ * A false accept is now VISIBLE, which it was not when this check was written. The read-back
+ * prints the seat, and the ownership note prints beside it. A rep who sees "Northwich Cheshire
+ * United Kingdom" as the seat can see it in the line above the button before dialling.
+ *
+ * So the signal stays and the stop goes. That is the same rule the rest of this file follows:
+ * a visible wrong guess costs one re-paste, an invisible one costs a call - and a wrongly
+ * refused lead costs the call too.
+ */
+export function seatWarning(seat: string): string {
+  const s = (seat || '').trim()
+  if (!s) return ''
   if (s.split(/\s+/).length >= 3 && !looksLikeARole(s))
-    return `"${s}" does not read as a job title. Leave the company and the contact out of the seat.`
+    return `"${s}" does not read like a job title. Check the company or the contact name has not ended up in the seat — if it is right, carry on.`
   return ''
 }
 
