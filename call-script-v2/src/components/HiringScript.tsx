@@ -241,7 +241,7 @@ export function buildHiringPrompt(
   It is one continuous read. Beats 1 to 3 carry no ask and no meeting request. The ask lives in beat 4 and nowhere else.
 
   1. THE REASON FOR THE CALL, AND IT IS ASSUMPTIVE. 34 WORDS MAX.
-  Word for word: "So the reason for my call is I saw your company is looking for ${a} ${hiringPosition}..." then word for word: "and I know how important it is to" + the thing this person is already weighing over that hire.
+  Word for word: "so yeah I'm just reaching out because I saw your company is looking for ${a} ${hiringPosition}..." then word for word: "and I know how important it is to" + the thing this person is already weighing over that hire.
   THE TENSION, NOT THE DUTIES. They wrote the advertisement, so telling them what the seat does teaches them nothing and reads as filler. Say instead the thing they are already holding in their head: getting someone genuinely good in that chair while the number stays where it has to sit. State it as something you assume is true of them, never as a question, and they are agreeing with you before they have decided to.
   MAKE IT THIS SEAT, NOT ANY SEAT. One concrete thing from their world has to be in it, the thing that makes this particular hire hard: the scale of what they are running, the standard the work has to meet, or what goes wrong if the person turns out not to be right.
   BANNED, because every one of them is true of every hire and says nothing: "finding the right person", "getting the right fit", "hiring the right talent", "keeping costs down", "managing the budget", "balancing cost and quality", "in today's market", "it's a competitive market", "attracting top talent".
