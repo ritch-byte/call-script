@@ -176,7 +176,7 @@
 
 import { useState, useMemo } from 'react'
 import { callAI } from '../lib/ai'
-import { SAVINGS_CLAIM, MEETING_LENGTH } from '../data/flow'
+import { SAVINGS_CLAIM, SAVINGS_PCT, MEETING_LENGTH } from '../data/flow'
 import { ScriptLine } from './ScriptLine'
 import { offerWindow } from '../lib/leadText'
 import {
@@ -224,6 +224,33 @@ export function buildHiringPrompt(
      typing 15 a second time, so changing MEETING_LENGTH still moves both. */
   const perPartner = MEETING_LENGTH.replace(/\s+each$/i, '')
   const a = article(hiringPosition)
+  /*
+   * THE PRICED BAND, DERIVED FROM SAVINGS_PCT SO IT CANNOT DRIFT FROM THE HEADLINE CLAIM.
+   *
+   * The rule used to read "the local figure less 50 to 70%, worked out and rounded". On a
+   * local figure of 80,000 that is 24 to 40,000, and the model wrote "30 to 35,000" - a 56 to
+   * 62% saving. It was not doing the arithmetic, it was picking a band that sounded like the
+   * right shape. Same lesson as everywhere else on this tool: a word-for-word lock binds and
+   * a rule to be applied gets graded generously.
+   *
+   * So the prompt no longer asks for a subtraction. It gets multipliers and a worked example
+   * on this lead's own currency, both computed here.
+   *
+   * The band sits in the DEEP half of the claim: from the top figure down to the midpoint,
+   * so 60 to 70% off rather than 50 to 70% off. Two reasons. It is what the Rates panel
+   * already shows per role, 65 to 80%, so the shallow end of the claim was the outlier and
+   * not this. And a range quoted low-to-high is heard at its top: "24 to 40,000" lets the
+   * lead hear 40 and the comparison stops doing any work.
+   */
+  const bounds = (SAVINGS_PCT.match(/\d+/g) || ['50', '70']).map(Number)
+  const deepest = Math.max(...bounds)
+  const shallowest = Math.min(...bounds)
+  const midpoint = Math.round((deepest + shallowest) / 2)
+  /* What the lead PAYS, as a share of local: 100 minus the saving. */
+  const payLow = (100 - deepest) / 100
+  const payHigh = (100 - midpoint) / 100
+  const example = (local: number) =>
+    `${Math.round((local * payLow) / 1000)} to ${Math.round((local * payHigh) / 1000)},000`
   return `Write a cold call script for an SDR at Outsource Accelerator, the world's leading outsourcing marketplace, calling someone who is currently hiring.
 
   WHO IS BEING CALLED: ${jobTitle}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
@@ -262,7 +289,10 @@ export function buildHiringPrompt(
   SAY THEM AS APPROXIMATE, always: "somewhere around", "roughly", "more like". Never a precise number, never a rate per hour, never a price from a partner, never a total saving.
   THE LOCAL FIGURE is what that KIND of seat typically pays in this lead's own market, as a round annual number. It is their market, not ours, which is why the line says over there and not here.
   CURRENCY comes from the website address: .com.au is Australian dollars, .co.nz or .nz New Zealand dollars, .co.uk or .uk pounds, .ie euros, .ca Canadian dollars, .sg Singapore dollars, .ph pesos. Anything else, or no website, US dollars. Say the currency once, on the first figure only, and never name the country.
-  THE OFFSHORE FIGURE IS NOT A SECOND GUESS. It is the local figure less ${SAVINGS_CLAIM}, worked out and rounded, given as a range from low to high. A figure implying any other saving than that is wrong even if it sounds right.
+  THE OFFSHORE FIGURE IS ARITHMETIC, NOT A SECOND GUESS. Do not estimate it, and do not subtract a percentage in your head. Multiply.
+  Low end = the local figure times ${payLow}. High end = the local figure times ${payHigh}. Round both to the nearest thousand and say them low to high. That is a saving of ${midpoint} to ${deepest}%, which sits inside ${SAVINGS_CLAIM}.
+  WORKED, SO THERE IS NOTHING TO INTERPRET. Local 80,000 gives "more like ${example(80000)}". Local 60,000 gives "more like ${example(60000)}". Local 120,000 gives "more like ${example(120000)}".
+  "30 to 35,000" against a local 80,000 is WRONG. It is a saving of 56 to 62%, it is the number this beat kept producing, and it is shallower than every figure we publish. If your offshore range is more than ${payHigh} of your local figure, you have guessed instead of multiplying.
 
   WE ARE NOT IN THIS BEAT. The subject is them, the seat, or the money. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us.
   No promises about quality, no pitching us, and no third number.
