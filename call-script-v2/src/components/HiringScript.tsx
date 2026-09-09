@@ -7,7 +7,12 @@
  * is its own generator rather than a mode on the other one: nearly every beat is different.
  *
  * The rep pastes four things, in this order:
- *   Job Title, Industry, Hiring Position, Website URL
+ *   Job Title, Website URL, Industry, Hiring Positions
+ * That is the column order of the sheet reps actually work from, so a row copied out of it
+ * pastes straight in with nothing to rearrange. A copied spreadsheet row arrives tab
+ * separated, which is why the field split treats a tab like a comma.
+ * The OLD order still reads, and so does any order: the website is found by its shape
+ * wherever it sits, and what is left is sorted by what it looks like rather than by position.
  * Commas optional. Reps paste straight off the job ad, so a bare line reads too: the seat is
  * taken off the back, where a capitalised run ends as soon as lower case begins, and the
  * title off the front. "Executive Chairman civil engineering SENIOR PROJECT MANAGER" splits
@@ -389,7 +394,7 @@ export default function HiringScript() {
               if (e.key === 'Enter') generate()
               if (e.key === 'Escape') reset()
             }}
-            placeholder="Job title, industry, the seats they are hiring for, website"
+            placeholder="Job title, website, industry, the seats they are hiring for"
           />
           <div
             style={{
@@ -400,7 +405,7 @@ export default function HiringScript() {
               color: '#b6bdc9',
             }}
           >
-            THEIR JOB TITLE &nbsp;·&nbsp; INDUSTRY &nbsp;·&nbsp; THE SEATS THEY ARE HIRING FOR &nbsp;·&nbsp; WEBSITE
+            THEIR JOB TITLE &nbsp;·&nbsp; WEBSITE &nbsp;·&nbsp; INDUSTRY &nbsp;·&nbsp; THE SEATS THEY ARE HIRING FOR
           </div>
           {leadLine.trim() && (
             <div

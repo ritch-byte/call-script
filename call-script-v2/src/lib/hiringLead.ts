@@ -31,11 +31,29 @@ export const ROLE_NOUN =
 const SENIORITY =
   /^(senior|snr|sr|junior|jnr|jr|lead|head of|chief|principal|assistant|associate|trainee|graduate|entry level|experienced)\s+/i
 
-/** A phrase reads as a job if it ends in a role noun or opens on a title word. */
+/*
+ * A phrase that OPENS on one of these is somebody's job whatever follows it, because the word
+ * describes a person and not a thing: "Apprentice For Credit Control Department" is a real
+ * advertised seat that ends in "Department" and contains no title word, so the two tests
+ * below both miss it and it was refused as not reading like a job.
+ *
+ * Deliberately NOT folded into SENIORITY, which looks almost identical. SENIORITY is used to
+ * STRIP words off the front when building the v2 opener's "who's in charge of ___", and
+ * stripping "Apprentice" off this one leaves "for credit control department", which the rep
+ * would read aloud. One list decides what a job is, the other decides what to remove, and
+ * they only look like the same list.
+ */
+const ENTRY_ROLE = /^(apprentice|trainee|graduate|intern|cadet|deputy)\b/i
+
+/** A phrase reads as a job if it ends in a role noun, opens on a title word, or is an entry seat. */
 export function looksLikeARole(s: string): boolean {
   const t = (s || '').trim()
   if (!t) return false
-  return ROLE_NOUN.test(' ' + t) || t.split(/\s+/).some(w => TITLE_WORD.test(w))
+  return (
+    ROLE_NOUN.test(' ' + t) ||
+    ENTRY_ROLE.test(t) ||
+    t.split(/\s+/).some(w => TITLE_WORD.test(w))
+  )
 }
 
 export interface HiringLead {
@@ -44,13 +62,30 @@ export interface HiringLead {
   /** Every seat the paste appears to advertise, in the order they appeared. */
   seats: string[]
   url: string
+  /**
+   * How many leads the paste appears to hold, counted as lines carrying a website.
+   *
+   * Reps work off a spreadsheet with a row per lead, and selecting several rows is one drag.
+   * A multi-row paste used to read as ONE lead: the second row's title, website and industry
+   * landed in the seat list of the first, so the picker offered "financial services" and a
+   * URL as seats to price, and the currency came from row one while the rep might be calling
+   * row two. Nothing on screen said so. That is the invisible wrong guess this whole file is
+   * written to avoid, so it is counted here and refused in hiringLeadIssue.
+   */
+  pastedRows: number
 }
 
 const LABEL =
   /^(job\s*title|title|role|position|industry|sector|hiring(\s*(for|position|role))?|they'?re hiring|open roles?|vacancies)\s*[:=-]\s*/i
 
 export function parseHiringLead(line: string): HiringLead {
-  const out: HiringLead = { jobTitle: '', industry: '', seats: [], url: '' }
+  const out: HiringLead = { jobTitle: '', industry: '', seats: [], url: '', pastedRows: 0 }
+
+  /* Count the leads before anything is merged. A row without a website is a wrapped line of
+     the row above it, not a lead, so only lines carrying one are counted. */
+  out.pastedRows = (line || '')
+    .split(/[\n\r]+/)
+    .filter(l => l.split(/[\s,\t|;]+/).some(t => URL_RE.test(t))).length
 
   const rest: string[] = []
   for (const part of (line || '').split(/[,\t|;\n]+/).map(s => s.trim()).filter(Boolean)) {
@@ -173,6 +208,8 @@ function splitFreeform(text: string) {
  * Only the SEAT THEY PICKED is judged: the other chips can be noise without blocking.
  */
 export function hiringLeadIssue(lead: HiringLead, seat: string): string {
+  if (lead.pastedRows > 1)
+    return `That paste holds ${lead.pastedRows} leads. Paste one row at a time, or the seats and the website end up coming from different companies.`
   if (!lead.jobTitle.trim())
     return 'Could not find the job title of the person being called. It goes first.'
   if (!lead.seats.length)
