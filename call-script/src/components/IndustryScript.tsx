@@ -136,11 +136,11 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
 
   It is one continuous read. Beats 1 to 3 carry no ask. The ask lives in beat 4 and nowhere else.
 
-  1. THE INDUSTRY, NOT US. 30 WORDS MAX. Open word for word: "So the reason for my call is what we're seeing across ${industry || 'firms like yours'} at the moment..." then ONE thing that is true of that sector right now and that a person inside it would recognise.
+  1. THE INDUSTRY, NOT US. 30 WORDS MAX. Open word for word: "so yeah, we're just reaching out because what we're seeing across ${industry || 'firms like yours'} at the moment..." then ONE thing that is true of that sector right now and that a person inside it would recognise.
   IT IS A CLAIM ABOUT THE SECTOR, NEVER ABOUT THIS FIRM. "Dental practices are losing reception hours to health-fund claims" is a market observation and a rep can defend it. "Your clinic is drowning in claims" is invented, and the lead knows it is invented because we have never spoken to them. Say what is true of the industry and let them apply it to themselves.
   IT NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing the work is actually made of: health-fund claims, shop drawings, carrier contracts, reservation inventory, freight documentation, specimen batches, retainer scopes, variation claims. That noun is what makes the sentence land in one industry and nowhere else.
   BANNED, because every one of them is true of every industry and says nothing: "rising costs", "doing more with less", "the talent shortage", "a tight labour market", "increased competition", "margin pressure", "in today's market", "post-pandemic", "digital transformation", "growing pains".
-  No mention of us, no mention of offshore, no mention of hiring. Not yet.
+  Past those opening words, do not say who we are, what we sell, the word offshore, or anything about hiring. Not yet. The locked words say the rep is reaching out; they do not say who is reaching out, and beat 3 is where that lands.
 
   2. THEIR DESK. 26 WORDS MAX. Open word for word: "and for ${plural} like you that usually lands on..." then the part of that sector pressure THIS title actually carries.
   Say the title back exactly as given, plural and unchanged. It has to be work that belongs to this exact job, not to the industry in general and not to their boss. If you could swap in a different job title and the sentence still made sense, rewrite it.
@@ -156,7 +156,8 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
   "I know ${plural} like you [HESITATION], but would you be opposed to carving out ${MEETING_ONE} for a coffee break style chat, just to see if this could work or not, I'm thinking ${offer}? If not maybe ${fallback}?"
   The hesitation completes "I know ${plural} like you ___", reads straight on from it, and is 10 WORDS MAX with no full stop inside it. It is the one thing that would make THIS person pause before saying yes, given their seat and their sector. Their words, not ours. Never a generic objection like being busy or not having budget.
 
-  WE ARE NOT IN BEATS 1 AND 2. The subject is them, their sector, or their desk. BANNED there outright: "we help", "we work with", "our partners", "our clients", "what we do is", "we provide", and any sentence whose subject is we, our or us. If a sentence could be moved onto our website unchanged, it belongs in beat 3 or nowhere.
+  WE ARE NOT IN BEATS 1 AND 2. The subject is them, their sector, or their desk. BANNED there outright: "we help", "we work with", "our partners", "our clients", "what we do is", "we provide", and any sentence whose subject is we, our or us.
+  THE LOCKED OPENING WORDS OF BEAT 1 ARE THE ONE EXCEPTION, and they are written for you. "so yeah, we're just reaching out because" is the rep saying why they picked up the phone, which is not a claim about us and carries nothing to sell. It does not license a second one: every word you write yourself obeys the ban. If a sentence could be moved onto our website unchanged, it belongs in beat 3 or nowhere.
 
   VOICE: spoken, short clauses, contractions, ellipses as pacing marks but at most ONE per beat. No em dashes, no corporate filler, no feature lists, no percentages beyond the one figure above. Curiosity, not authority. Sell the meeting, not the service.
 
