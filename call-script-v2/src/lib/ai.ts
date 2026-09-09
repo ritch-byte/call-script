@@ -5,6 +5,9 @@
 export const AI_RELAY_URL =
   'https://script.google.com/macros/s/AKfycby2akMg_lgj-eKdRsmylzVCnzPG_GOFrW1992Xb7rQNkQESzu7F_I2WY4CFk4jPPAoY/exec'
 
+/** How long one relay attempt may take before it is treated as stuck. Two attempts happen. */
+export const RELAY_TIMEOUT_MS = 45000
+
 interface CallAIOptions {
   prompt: string
   model?: string
@@ -78,14 +81,33 @@ async function postRelay(payload: Record<string, unknown>): Promise<AIResponse> 
   // slower build rather than a failed one the rep has to notice and repeat by hand.
   const attempt = async () => {
     let res: Response
+    /*
+     * A DEADLINE, because without one a stall is indistinguishable from slow.
+     *
+     * fetch has no default timeout. When Apps Script accepted the request and then hung, this
+     * promise never settled: the button sat on WRITING for as long as the rep was willing to
+     * look at it, with no error, nothing in the console, and no way to tell whether pressing
+     * it again would help. On a live call that is worse than a failure, because a failure at
+     * least tells you to move on.
+     *
+     * 45 seconds is chosen against what the round trip actually is: browser to Apps Script, a
+     * cold start there, Apps Script to Anthropic, ~2,700 prompt tokens in and up to 800 out,
+     * and back. A healthy build lands well inside that. Anything past it is not slow, it is
+     * stuck.
+     */
+    const ctl = new AbortController()
+    const timer = setTimeout(() => ctl.abort(), RELAY_TIMEOUT_MS)
     try {
       res = await fetch(AI_RELAY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload),
+        signal: ctl.signal,
       })
-    } catch {
-      return { unreachable: true as const }
+    } catch (e) {
+      return { unreachable: true as const, timedOut: (e as Error | undefined)?.name === 'AbortError' }
+    } finally {
+      clearTimeout(timer)
     }
     const body = await res.text()
     return { body, notServed: /^\s*</.test(body) || !body.trim() }
@@ -98,7 +120,11 @@ async function postRelay(payload: Record<string, unknown>): Promise<AIResponse> 
   }
 
   if ('unreachable' in out) {
-    throw new Error('Could not reach the AI relay. Check your connection and try again.')
+    throw new Error(
+      out.timedOut
+        ? `The AI relay did not answer within ${Math.round(RELAY_TIMEOUT_MS / 1000)} seconds, twice. It is stuck rather than slow, so press the button again — and if it keeps happening, say so, because it means the relay needs looking at rather than retrying.`
+        : 'Could not reach the AI relay. Check your connection and try again.',
+    )
   }
   if (out.notServed) {
     throw new Error(

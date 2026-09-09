@@ -184,11 +184,37 @@ function splitFreeform(text: string) {
   if (first === -1) return empty
   let start = first
   while (start > 0 && isCapped(head[start - 1])) start--
+
+  /*
+   * Walk the title forward, over capitalised words AND over joiner-plus-capitalised pairs,
+   * alternating until neither applies.
+   *
+   * It used to be two loops in sequence, capitalised words first and then joiners, with the
+   * joiner list "of|for|at". That gets "Head of Partnerships" right and "VP of Growth and
+   * Marketing" wrong: the second loop stopped dead at "and", so the title came out as "VP of
+   * Growth" and the industry as "and Marketing information technology & services", which is
+   * then what the model is told the company does.
+   *
+   * Sequential loops cannot fix it by extending the list either, because a title alternates:
+   * word, joiner, word, joiner, word. One loop that tries both moves each time handles any
+   * order. "and" and "&" are in the list because a remit is routinely two things joined -
+   * Growth and Marketing, Compliance & Risk.
+   */
+  const TITLE_JOINER = /^(of|for|at|and|&)$/i
   let end = first
-  while (end + 1 < head.length && isCapped(head[end + 1])) end++
-  /* "Head of Partnerships" keeps its joiner */
-  while (end + 2 < head.length && /^(of|for|at)$/i.test(head[end + 1]) && isCapped(head[end + 2]))
-    end += 2
+  for (;;) {
+    if (end + 1 < head.length && isCapped(head[end + 1])) {
+      end++
+      continue
+    }
+    if (end + 2 < head.length && TITLE_JOINER.test(head[end + 1]) && isCapped(head[end + 2])) {
+      end += 2
+      continue
+    }
+    break
+  }
+  /* Never finish on the joiner itself: "VP Growth &" was a title this produced. */
+  while (end > first && TITLE_JOINER.test(head[end])) end--
 
   /*
    * Only trust this when lower case actually separated the two halves, and when what it
