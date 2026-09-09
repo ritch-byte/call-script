@@ -116,7 +116,7 @@ const LABELS: Record<string, RegExp> = {
   contact: /^(contact|lead|name|first ?name|prospect|person)$/i,
 }
 
-interface Lead {
+export interface Lead {
   title: string
   company: string
   industry: string

@@ -1,0 +1,355 @@
+/*
+ * Personalised script, aligned to the job title and industry of the lead.
+ *
+ * The third generator, and the one that inverts the order of the call.
+ *
+ * The Spiel Builder opens on us: "quick thumbnail on us, we're the leading marketplace
+ * for..." and only reaches the lead's world in beat 2. That is the shape Weinberg calls the
+ * blunt weapon, a company-features monologue, and Stefanie's script review reached the same
+ * conclusion from a recording: cold calls die in monologues. Both say the same thing, which
+ * is to lead with the customer's problem rather than the product.
+ *
+ * So this one opens on their INDUSTRY and does not mention Outsource Accelerator until beat
+ * 3, by which point the lead has heard two sentences about their own world and is nodding.
+ * The greeting drops the company name for the same reason: the Spiel Builder's opener says
+ * "over at Outsource Accelerator" twice before the pitch starts, which gives the whole thing
+ * away before there is any reason to care.
+ *
+ * WHERE THE HONESTY LINE SITS, and it is the guard that matters most here. Beat 1 is a claim
+ * about a SECTOR, never about this firm. "Dental practices are losing reception hours to
+ * health-fund claims" is a market observation a rep can defend. "Your clinic is drowning in
+ * claims" is invented, and the lead knows it is invented because we have never spoken to
+ * them. The prompt draws that line explicitly, because a generator that opens on the lead's
+ * problem is under constant pressure to cross it.
+ *
+ * The rest of the guards are carried over rather than rediscovered. Both suggested roles must
+ * pass the laptop test, after two reps caught the Spiel Builder naming seats that cannot be
+ * done from another country. Beat 1 and 2 ban us as a subject. The industry-noun requirement
+ * and the ban list of true-but-empty phrases come from the same feedback that fixed the
+ * Spiel Builder's homework beat.
+ *
+ * The savings figure and the meeting length are imported from data/flow, so this cannot drift
+ * from the call script the way two hardcoded copies of a number always eventually do.
+ */
+
+import { useMemo, useState } from 'react'
+import { callAI } from '../lib/ai'
+import { MEETING_ONE, SAVINGS_CLAIM } from '../data/flow'
+import { ScriptLine, offerWindow, parseLead, pluralTitle, type Lead } from './SpielBuilder'
+
+/** Same model and the same one-call-per-click shape as the other two generators. */
+const MODEL = 'claude-haiku-4-5-20251001'
+
+const NAVY = '#0f1729'
+const MAGENTA = '#d6006e'
+const PAPER = '#f7f8fb'
+const LINE = '#dfe3ec'
+const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
+const SANS = '"Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans-serif'
+
+/**
+ * The greeting, fixed and local so the model can never reword it. It deliberately does NOT
+ * name the company: the whole design is that the lead hears about their own world first.
+ */
+export function buildIndustryIntro(): string[] {
+  return [
+    `Hey [Lead Name]? (Pause)`,
+    `Oh hey [Lead Name], it's [Your Name] here. I know I've caught you out of the blue, mind if I grab half a minute? Then you can tell me if it's relevant or not (pause)`,
+  ]
+}
+
+/* ------------------------------- the prompt ------------------------------- */
+
+export function buildIndustryPrompt({ title, company, industry, url }: Lead): string {
+  const plural = pluralTitle(title)
+  const { offer, fallback } = offerWindow()
+  return `Write a cold call opener for an SDR at Outsource Accelerator, an outsourcing marketplace. The lead has NOT heard of us and the script must not mention us until beat 3.
+
+  LEAD: ${title}, ${company}${industry ? `, ${industry}` : ''}${url ? `, ${url}` : ''}
+
+  NO RESEARCH AND NO WEB ACCESS. You know nothing checkable about this company. The website address is there for the kind of firm it signals, nothing more. Never say the company's name: the rep says "your company" or nothing at all.
+
+  4 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble. Keep every phrase marked word for word exactly as written. One or two short sentences per beat, never three.
+
+  THE REP HAS SAID ONE LINE ALREADY: they greeted the lead by name, gave their own name, said they had caught them out of the blue and asked for half a minute, and got it. They did NOT say the company name. So do not greet, do not introduce yourself, and do not ask for permission or for time. Start cold on beat 1.
+
+  It is one continuous read. Beats 1 to 3 carry no ask. The ask lives in beat 4 and nowhere else.
+
+  1. THE INDUSTRY, NOT US. 30 WORDS MAX. Open word for word: "So the reason for my call is what we're seeing across ${industry || 'firms like yours'} at the moment..." then ONE thing that is true of that sector right now and that a person inside it would recognise.
+  IT IS A CLAIM ABOUT THE SECTOR, NEVER ABOUT THIS FIRM. "Dental practices are losing reception hours to health-fund claims" is a market observation and a rep can defend it. "Your clinic is drowning in claims" is invented, and the lead knows it is invented because we have never spoken to them. Say what is true of the industry and let them apply it to themselves.
+  IT NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing the work is actually made of: health-fund claims, shop drawings, carrier contracts, reservation inventory, freight documentation, specimen batches, retainer scopes, variation claims. That noun is what makes the sentence land in one industry and nowhere else.
+  BANNED, because every one of them is true of every industry and says nothing: "rising costs", "doing more with less", "the talent shortage", "a tight labour market", "increased competition", "margin pressure", "in today's market", "post-pandemic", "digital transformation", "growing pains".
+  No mention of us, no mention of offshore, no mention of hiring. Not yet.
+
+  2. THEIR DESK. 26 WORDS MAX. Open word for word: "and for ${plural} like you that usually lands on..." then the part of that sector pressure THIS title actually carries.
+  Say the title back exactly as given, plural and unchanged. It has to be work that belongs to this exact job, not to the industry in general and not to their boss. If you could swap in a different job title and the sentence still made sense, rewrite it.
+  Still nothing about us, and still nothing about offshore. The subject of both sentences so far is them.
+
+  3. US, ONCE, AND BRIEFLY. 26 WORDS MAX. Word for word: "and that's where we come in. We're Outsource Accelerator, an outsourcing marketplace, we match you to the vetted BPO partners that already do this work." Then word for word: "and the roles come in at ${SAVINGS_CLAIM}."
+  This is the first time the lead hears who we are. Write it as an introduction, not a reminder. Nothing after it.
+
+  4. TWO ROLES, THEN THE ASK. Word for word: "so yeah I think a great starting point is" + an offshore role + "to" + what it takes off the work you named in beat 2, then "or a" + a second role + "to" + what that one takes off them.
+  BOTH ROLES MUST BE DOABLE FROM ANOTHER COUNTRY. The test, before you name either: could this person do the whole job on a laptop, with nobody needing them in the building? A warehouse manager, a site foreman, a front office manager, a housekeeping lead, kitchen staff, floor managers all fail it, because the job is where the work is. The back office behind them passes: claims and billing administrators, purchasing and inventory coordinators, order processing, freight and customs documentation, dispatch scheduling, bookkeeping, payroll, customer support. Where the operation is physical, the offshorable seats are the ones behind it and never the ones on it.
+  Real job titles a lead would recognise on an org chart. The work each one takes has to be work beat 2 already named, not new work you invented.
+  Then the ask, word for word, and the only thing you write in it is the hesitation:
+  "I know ${plural} like you [HESITATION], but would you be opposed to carving out ${MEETING_ONE} for a coffee break style chat, just to see if this could work or not, I'm thinking ${offer}? If not maybe ${fallback}?"
+  The hesitation completes "I know ${plural} like you ___", reads straight on from it, and is 10 WORDS MAX with no full stop inside it. It is the one thing that would make THIS person pause before saying yes, given their seat and their sector. Their words, not ours. Never a generic objection like being busy or not having budget.
+
+  WE ARE NOT IN BEATS 1 AND 2. The subject is them, their sector, or their desk. BANNED there outright: "we help", "we work with", "our partners", "our clients", "what we do is", "we provide", and any sentence whose subject is we, our or us. If a sentence could be moved onto our website unchanged, it belongs in beat 3 or nowhere.
+
+  VOICE: spoken, short clauses, contractions, ellipses as pacing marks but at most ONE per beat. No em dashes, no corporate filler, no feature lists, no percentages beyond the one figure above. Curiosity, not authority. Sell the meeting, not the service.
+
+  DELIVERY MARKS. Write it the way a screenplay is written, so the rep can see the pacing.
+  Put [PAUSE] on its own after beat 1 and again before the ask in beat 4. Two, no more.
+  Put one direction in round brackets before the phrase it governs, one word: (slow), (deliberate), (softer). At most one across the whole script, and never inside beat 4.
+  Drop in a spoken filler where a person actually would, like y'know or uh. At most one per beat, and never in beat 4.
+  Marks, directions and fillers are breath, not content. They do NOT count toward the word caps.
+
+  SAY IT ALOUD. A rep reads this at pace on a live call. Short, common, spoken words. Nothing anyone could trip over: not "operationalised", "consolidation", "methodologies", "infrastructure", "bandwidth", "streamline", "leverage".`
+}
+
+/* --------------------------------- app --------------------------------- */
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '11px 12px',
+  border: `1px solid ${LINE}`,
+  borderRadius: 4,
+  fontFamily: SANS,
+  fontSize: 15,
+  color: NAVY,
+  outline: 'none',
+  boxSizing: 'border-box',
+  background: '#fff',
+}
+
+const ghostBtn: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  fontFamily: MONO,
+  fontSize: 11,
+  letterSpacing: '0.04em',
+  color: '#6b7280',
+  cursor: 'pointer',
+  textDecoration: 'underline',
+  textUnderlineOffset: 3,
+}
+
+export default function IndustryScript() {
+  const [leadLine, setLeadLine] = useState('')
+  const [script, setScript] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const lead = useMemo(() => parseLead(leadLine), [leadLine])
+  /*
+   * The industry is required here, unlike the Spiel Builder where it is optional. Beat 1 IS
+   * the industry: without it the model has to guess a sector from a domain name, and a
+   * confident sentence about the wrong industry is worse than no script at all.
+   */
+  const ready = Boolean(lead.title.trim() && lead.industry.trim())
+  const intro = useMemo(() => buildIndustryIntro(), [])
+  const onScreen = script.length ? [...intro, ...script] : intro
+
+  async function generate() {
+    if (!ready || loading || script.length) return
+    setLoading(true)
+    setError('')
+    try {
+      const text = await callAI({
+        prompt: buildIndustryPrompt(lead),
+        model: MODEL,
+        maxTokens: 800,
+      })
+      const parts = text
+        .split(/\n\s*\n/)
+        .map(p =>
+          p
+            .replace(/^\s*\d+[.)]\s*/, '')
+            .replace(/^\s*[A-E][.)]\s+/, '')
+            .replace(/\s*[—–]\s*/g, ', ')
+            .replace(/\s+/g, ' ')
+            .trim(),
+        )
+        .filter(Boolean)
+      if (!parts.length) throw new Error('empty')
+      setScript(parts)
+    } catch {
+      setError('That did not come back clean. Run it again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function reset() {
+    setLeadLine('')
+    setScript([])
+    setError('')
+    setCopied(false)
+  }
+
+  function copy() {
+    navigator.clipboard?.writeText(onScreen.join('\n\n'))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1600)
+  }
+
+  const readBack = [
+    lead.title && `calling a ${lead.title}`,
+    lead.industry && `in ${lead.industry}`,
+    lead.company,
+    lead.url,
+  ].filter(Boolean)
+
+  return (
+    <div
+      style={{
+        fontFamily: SANS,
+        background: PAPER,
+        minHeight: '100%',
+        color: NAVY,
+        paddingBottom: 48,
+      }}
+    >
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '18px 24px 0' }}>
+        <div style={{ background: '#fff', border: `1px solid ${LINE}`, padding: 18 }}>
+          <input
+            style={inputStyle}
+            value={leadLine}
+            onChange={e => setLeadLine(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') generate()
+              if (e.key === 'Escape') reset()
+            }}
+            placeholder="Job title, industry, company, website. Any order."
+          />
+          <div
+            style={{
+              marginTop: 7,
+              fontFamily: MONO,
+              fontSize: 10,
+              letterSpacing: '0.06em',
+              color: '#b6bdc9',
+            }}
+          >
+            THE INDUSTRY IS THE FIRST LINE OF THE CALL, SO IT IS REQUIRED HERE
+          </div>
+          {leadLine.trim() && (
+            <div
+              style={{
+                marginTop: 9,
+                fontFamily: MONO,
+                fontSize: 11,
+                color: ready ? '#8b94a5' : MAGENTA,
+                letterSpacing: '0.02em',
+                lineHeight: 1.5,
+              }}
+            >
+              {ready
+                ? readBack.join('  ·  ')
+                : lead.title.trim()
+                  ? `Read the title as "${lead.title}" but found no industry. Add it, because the call opens on it.`
+                  : 'Could not read a job title. Try commas between the parts.'}
+            </div>
+          )}
+          <div
+            style={{
+              display: 'flex',
+              gap: 14,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              marginTop: 14,
+            }}
+          >
+            <button
+              onClick={script.length ? reset : generate}
+              disabled={loading || (!ready && !script.length)}
+              style={{
+                background: ready || script.length ? MAGENTA : '#c9cfda',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 4,
+                padding: '10px 20px',
+                fontFamily: MONO,
+                fontSize: 12,
+                letterSpacing: '0.08em',
+                cursor: ready || script.length ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {loading ? 'WRITING' : script.length ? 'NEXT LEAD' : 'WRITE THE SCRIPT'}
+            </button>
+            {script.length > 0 && !loading && (
+              <button onClick={copy} style={ghostBtn}>
+                {copied ? 'Copied' : 'Copy the script'}
+              </button>
+            )}
+            {leadLine && !script.length && !loading && (
+              <button onClick={reset} style={ghostBtn}>
+                Clear
+              </button>
+            )}
+          </div>
+          {error && <div style={{ marginTop: 10, fontSize: 12, color: MAGENTA }}>{error}</div>}
+        </div>
+
+        <div
+          style={{
+            background: '#fff',
+            border: `1px solid ${LINE}`,
+            borderTop: 'none',
+            padding: '26px 26px 22px',
+          }}
+        >
+          {onScreen.map((p, i) => (
+            <p
+              key={i}
+              style={{
+                margin: i ? '20px 0 0' : 0,
+                fontSize: 18,
+                lineHeight: 1.65,
+                letterSpacing: '-0.01em',
+                opacity: i < intro.length && !script.length ? 0.75 : 1,
+              }}
+            >
+              <ScriptLine text={p} size={18} />
+            </p>
+          ))}
+
+          {!script.length && (
+            <p
+              style={{
+                marginTop: 20,
+                fontFamily: MONO,
+                fontSize: 11,
+                color: '#b6bdc9',
+                letterSpacing: '0.06em',
+              }}
+            >
+              THE REST LANDS HERE
+            </p>
+          )}
+
+          {script.length > 0 && (
+            <p
+              style={{
+                marginTop: 22,
+                paddingTop: 12,
+                borderTop: `1px solid ${LINE}`,
+                fontSize: 12,
+                lineHeight: 1.55,
+                color: '#8b94a5',
+              }}
+            >
+              Read it before you say it. The first line is a claim about their industry, not
+              about their company &mdash; if it says anything about them specifically, do not
+              read it, because we have never spoken to them. Check the two roles could actually
+              be done from another country, and send anything that slips through to your TL.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
