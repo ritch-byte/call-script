@@ -93,7 +93,7 @@ const SANS = '"Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans
    Order does not matter. Each piece is classified on what it looks like.
 --------------------------------------------------------------------------- */
 
-const URL_RE =
+export const URL_RE =
   /^(https?:\/\/|www\.)|\.(com|net|org|io|co|ai|ph|au|uk|us|ca|nz|sg|de|fr|es|it|nl|se|dk|in|jp|biz|info|dev|app|xyz|group|build)\b/i
 
 const ROLE_RE =
@@ -315,11 +315,20 @@ export function parseLead(line: string): Lead {
   return found
 }
 
-/** "VP of Marketing" reads back as "VPs of Marketing" */
+/**
+ * "VP of Marketing" reads back as "VPs of Marketing".
+ *
+ * A comma in the title is the rank, then the remit: "VP, Growth & Performance". Pluralising
+ * the whole thing gives "VP, Growth & Performances", which is what a rep would trip over
+ * reading aloud. The rank alone is what people actually say back, so a comma title
+ * pluralises its head and drops the rest: "and for VPs like you..."
+ */
 export function pluralTitle(title: string): string {
   const t = title.trim()
   if (!t) return ''
   const add = (w: string) => (/s$/i.test(w) ? w : w + 's')
+  const comma = t.match(/^([^,]+),\s*.+$/)
+  if (comma) return add(comma[1].trim())
   const m = t.match(/^(.*?)(\s+(?:of|for|at)\s+.*)$/i)
   return m ? add(m[1]) + m[2] : add(t)
 }

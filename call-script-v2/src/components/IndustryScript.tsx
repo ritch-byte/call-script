@@ -35,7 +35,7 @@
 import { useMemo, useState } from 'react'
 import { callAI } from '../lib/ai'
 import { MEETING_ONE, SAVINGS_CLAIM } from '../data/flow'
-import { ScriptLine, offerWindow, parseLead, pluralTitle, type Lead } from './SpielBuilder'
+import { ScriptLine, URL_RE, offerWindow, pluralTitle } from './SpielBuilder'
 
 /** Same model and the same one-call-per-click shape as the other two generators. */
 const MODEL = 'claude-haiku-4-5-20251001'
@@ -46,6 +46,66 @@ const PAPER = '#f7f8fb'
 const LINE = '#dfe3ec'
 const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
 const SANS = '"Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans-serif'
+
+export interface IndustryLead {
+  title: string
+  industry: string
+  url: string
+}
+
+/*
+ * THE WEBSITE IS THE SEPARATOR: job title, website, industry.
+ *
+ * Comma-splitting cannot read this input, and the reason is worth writing down because it is
+ * not obvious. Job titles contain commas. "VP, Growth & Performance" is one title, and a
+ * comma-splitter reads it as two fields, hands "VP" to the title and drops the rest into
+ * whatever slot is next. That is exactly what happened: the industry came out empty and
+ * "Growth & Performance retail" ended up filed as the company name.
+ *
+ * A URL cannot appear inside a job title or inside an industry, which makes it the only
+ * unambiguous delimiter in the line. So everything before it is the title, commas and
+ * ampersands and all, and everything after it is the industry.
+ *
+ * The old order still works. If nothing follows the website, the part in front of it is
+ * comma-split the way it always was, so "Practice Manager, dental, ashfielddental.com.au"
+ * reads the same as it did before.
+ */
+const LABEL =
+  /^(job\s*)?(title|role|position|industry|sector|vertical|niche|website|site|url)\s*[:=-]\s*/i
+
+export function parseIndustryLead(line: string): IndustryLead {
+  const out: IndustryLead = { title: '', industry: '', url: '' }
+  const raw = (line || '').trim()
+  if (!raw) return out
+
+  const tokens = raw.split(/\s+/)
+  const at = tokens.findIndex(t => URL_RE.test(t))
+
+  const tidy = (x: string) => x.replace(/^[\s,;|]+|[\s,;|]+$/g, '').replace(LABEL, '').trim()
+
+  if (at !== -1) {
+    out.url = tokens[at]
+    const before = tidy(tokens.slice(0, at).join(' '))
+    const after = tidy(tokens.slice(at + 1).join(' '))
+    if (after) {
+      /* job title, website, industry - the order the line is meant to be in */
+      out.title = before
+      out.industry = after
+      return out
+    }
+    /* nothing after the website, so it is the older comma-separated order */
+    const parts = before.split(/\s*[,;|]\s*/).map(tidy).filter(Boolean)
+    out.title = parts[0] || ''
+    out.industry = parts.slice(1).join(', ')
+    return out
+  }
+
+  /* no website at all: first comma segment is the title, the rest is the industry */
+  const parts = raw.split(/\s*[,;|]\s*/).map(tidy).filter(Boolean)
+  out.title = parts[0] || ''
+  out.industry = parts.slice(1).join(', ')
+  return out
+}
 
 /**
  * The greeting, fixed and local so the model can never reword it. It deliberately does NOT
@@ -60,12 +120,12 @@ export function buildIndustryIntro(): string[] {
 
 /* ------------------------------- the prompt ------------------------------- */
 
-export function buildIndustryPrompt({ title, company, industry, url }: Lead): string {
+export function buildIndustryPrompt({ title, industry, url }: IndustryLead): string {
   const plural = pluralTitle(title)
   const { offer, fallback } = offerWindow()
   return `Write a cold call opener for an SDR at Outsource Accelerator, an outsourcing marketplace. The lead has NOT heard of us and the script must not mention us until beat 3.
 
-  LEAD: ${title}, ${company}${industry ? `, ${industry}` : ''}${url ? `, ${url}` : ''}
+  LEAD: ${title}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
 
   NO RESEARCH AND NO WEB ACCESS. You know nothing checkable about this company. The website address is there for the kind of firm it signals, nothing more. Never say the company's name: the rep says "your company" or nothing at all.
 
@@ -143,7 +203,7 @@ export default function IndustryScript() {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
 
-  const lead = useMemo(() => parseLead(leadLine), [leadLine])
+  const lead = useMemo(() => parseIndustryLead(leadLine), [leadLine])
   /*
    * The industry is required here, unlike the Spiel Builder where it is optional. Beat 1 IS
    * the industry: without it the model has to guess a sector from a domain name, and a
@@ -199,7 +259,6 @@ export default function IndustryScript() {
   const readBack = [
     lead.title && `calling a ${lead.title}`,
     lead.industry && `in ${lead.industry}`,
-    lead.company,
     lead.url,
   ].filter(Boolean)
 
@@ -223,7 +282,7 @@ export default function IndustryScript() {
               if (e.key === 'Enter') generate()
               if (e.key === 'Escape') reset()
             }}
-            placeholder="Job title, industry, company, website. Any order."
+            placeholder="Job title, then the website, then the industry"
           />
           <div
             style={{
@@ -234,7 +293,7 @@ export default function IndustryScript() {
               color: '#b6bdc9',
             }}
           >
-            THE INDUSTRY IS THE FIRST LINE OF THE CALL, SO IT IS REQUIRED HERE
+            JOB TITLE &nbsp;·&nbsp; WEBSITE &nbsp;·&nbsp; INDUSTRY &nbsp; &mdash; &nbsp; THE CALL OPENS ON THE INDUSTRY, SO IT IS REQUIRED
           </div>
           {leadLine.trim() && (
             <div
