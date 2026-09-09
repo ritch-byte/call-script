@@ -170,6 +170,55 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
   SAY IT ALOUD. A rep reads this at pace on a live call. Short, common, spoken words. Nothing anyone could trip over: not "operationalised", "consolidation", "methodologies", "infrastructure", "bandwidth", "streamline", "leverage".`
 }
 
+/* ---------------------- once they agree to the meeting ----------------------
+ *
+ * FIXED TEXT. The model never sees these and never writes them, which is deliberate: the
+ * opener is personalised because a cold lead needs a reason to keep listening, but a lead who
+ * has already said yes needs the same five answers every time. Five identical questions on
+ * every call is what makes the answers comparable, and what the partner on the other end is
+ * relying on. Nothing here is per-lead.
+ *
+ * The wording is the set that ran on the floor from 9 July to 19 August, restored on request.
+ *
+ * ONE THING TO KNOW ABOUT NUMBER 4. That timeline question offers two in-window options, and
+ * the SP review replaced it on 19 August with an open one - "what sort of timeframe would you
+ * be working to?" - on the grounds that a coached answer put soft leads in front of partners.
+ * It is here because it was asked for. The note under it says to log the words they actually
+ * use, which is what the analyzer credits and is the part that made the open version better.
+ */
+const QUALIFIERS: Array<{ n: string; label: string; ask: string; note: string }> = [
+  {
+    n: '1',
+    label: 'Role fit',
+    ask: 'Got it. So if you did add some support, what role would you want to fill first?',
+    note: 'Hypothetical on purpose — "if you did add support" reads as planning rather than pressure. Whatever they name is "that role" for the rest of the call.',
+  },
+  {
+    n: '2',
+    label: 'Full-time',
+    ask: "Makes sense. And I assume this'd be a full-time position, like thirty to forty hours a week, right?",
+    note: 'Assume full-time. Do not plant the part-time idea. If they pull it back to part-time, handle that before moving on.',
+  },
+  {
+    n: '3',
+    label: 'Volume',
+    ask: 'And how many are we talking, one to start with, or more of a small team?',
+    note: 'Sizing, kept light. One is plenty to book on; a team is a bonus. It tells the partners what to prepare.',
+  },
+  {
+    n: '4',
+    label: 'Timeline',
+    ask: 'And if the right person showed up, would you be looking to bring them on within a few weeks, or more like one to two months?',
+    note: 'Write down the timeframe in THEIR words, whatever they answer. An honest "after the new year" with a dated callback is worth more to the partner than a coached "one to two months" that books and does not show up.',
+  },
+  {
+    n: '5',
+    label: 'Decision-maker',
+    ask: "Perfect. And are you the one who'd sign off on this, or is there someone else involved in that call?",
+    note: 'A collaborative answer still qualifies, as long as they are in the room. If it is somebody else entirely, get the name before you hang up.',
+  },
+]
+
 /* --------------------------------- app --------------------------------- */
 
 const inputStyle: React.CSSProperties = {
@@ -408,6 +457,58 @@ export default function IndustryScript() {
               read it, because we have never spoken to them. Check the two roles could actually
               be done from another country, and send anything that slips through to your TL.
             </p>
+          )}
+
+          {script.length > 0 && (
+            <div style={{ marginTop: 26, paddingTop: 18, borderTop: `1px solid ${LINE}` }}>
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: '0.1em',
+                  color: '#6b7280',
+                }}
+              >
+                ONCE THEY AGREE TO THE MEETING &mdash; THE FIVE MUST-KNOWS
+              </div>
+              <div
+                style={{
+                  marginTop: 4,
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: '0.06em',
+                  color: '#b6bdc9',
+                }}
+              >
+                SAME FIVE ON EVERY CALL, WHOEVER THE LEAD IS
+              </div>
+              {QUALIFIERS.map(q => (
+                <div key={q.n} style={{ marginTop: 16 }}>
+                  <div
+                    style={{
+                      fontFamily: MONO,
+                      fontSize: 10,
+                      letterSpacing: '0.08em',
+                      color: MAGENTA,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {q.n} &nbsp;{q.label.toUpperCase()}
+                  </div>
+                  <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: NAVY }}>{q.ask}</p>
+                  <p
+                    style={{
+                      margin: '5px 0 0',
+                      fontSize: 12,
+                      lineHeight: 1.5,
+                      color: '#8b94a5',
+                    }}
+                  >
+                    {q.note}
+                  </p>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
