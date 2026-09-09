@@ -119,6 +119,14 @@ export function parseHiringLead(line: string): HiringLead {
 
   for (const field of fields.slice(1)) {
     if (looksLikeARole(field)) {
+      /* "Client Solutions financial services ETL Data Engineer" is two seats with the sector
+         stranded between them. Tried before the trailing case, which cannot see it. */
+      const mid = !out.industry ? splitInteriorSector(field) : null
+      if (mid) {
+        out.seats.push(...mid.seats)
+        out.industry = mid.sector
+        continue
+      }
       /* "Account Executive market research" is a seat with the sector stuck on the end. */
       const split = splitTrailingSector(field)
       if (split && !out.industry) {
@@ -134,6 +142,55 @@ export function parseHiringLead(line: string): HiringLead {
     }
   }
   return out
+}
+
+/*
+ * A SECTOR STRANDED IN THE MIDDLE of a field, with capitalised text either side of it.
+ *
+ * "Client Solutions financial services ETL Data Engineer" arrived as one field and went
+ * straight into the seat list, because it ends in "Engineer" and so reads as a role. The
+ * script then said "I saw your company's advertising a few roles, a Client Solutions
+ * financial services ETL Data Engineer was one of them", which a rep would have read aloud,
+ * and the industry was left empty so beat 2 had nothing to name.
+ *
+ * splitTrailingSector below only catches a sector at the END of a field. This catches it in
+ * the middle, and it splits the remainder into TWO seats rather than gluing them back
+ * together, because "Client Solutions" and "ETL Data Engineer" are two advertisements run
+ * together and there is no way to tell which one the call is about. Two seats means the picker
+ * appears and the rep chooses, which is the rule the rest of this file follows: do not guess
+ * which seat the call is about.
+ *
+ * THE JOINER GUARD IS WHY THIS IS SAFE. Without it, "Head of Sales" has an interior lower-case
+ * run of "of" and would split into seats "Head" and "Sales" with a sector of "of" - three
+ * wrong answers from one plausible rule, which is exactly what happened the first time this
+ * file tried to be clever. A sector has to contain at least one word that is not a
+ * preposition, so "of" and "and" are skipped and the field is left alone.
+ */
+function splitInteriorSector(field: string): { seats: string[]; sector: string } | null {
+  const toks = field.split(/\s+/).filter(Boolean)
+  const isCapped = (t: string) => /^[A-Z0-9&]/.test(t)
+  if (toks.length < 4) return null
+
+  let i = 1
+  while (i < toks.length) {
+    if (isCapped(toks[i])) {
+      i++
+      continue
+    }
+    let j = i
+    while (j < toks.length && !isCapped(toks[j])) j++
+    const run = toks.slice(i, j)
+    const realSector = run.some(w => !JOINER.test(w))
+    const cappedBefore = toks.slice(0, i).some(isCapped)
+    const cappedAfter = j < toks.length
+    if (realSector && cappedBefore && cappedAfter) {
+      const before = toks.slice(0, i).join(' ')
+      const after = toks.slice(j).join(' ')
+      return { seats: [before, after].filter(Boolean), sector: run.join(' ') }
+    }
+    i = j + 1
+  }
+  return null
 }
 
 /**
