@@ -313,20 +313,22 @@ Prospect: Honestly, two people are drowning...`,style:{width:"100%",boxSizing:"b
   BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 
   3. THE TURN, AND THE TWO NUMBERS. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the marketplace line so it lands as a turn in the conversation, not as a correction to something they said.
-  38 WORDS MAX. Then word for word: "${L} ${k} over there is going to run you somewhere around" + THE LOCAL FIGURE. Then that the same seat, filled through one of these firms, is "more like" + THE OFFSHORE FIGURE. Then that it is full-time and dedicated, on their hours.
+  46 WORDS MAX. Then word for word: "${L} ${k} over there is going to run you somewhere around" + THE LOCAL FIGURE. Then word for word: "but with one of our partners, they can give you an exceptional ${k} for only" + THE OFFSHORE FIGURE. Then word for word: "full-time, dedicated, on your hours."
+  THE SEAT IS NAMED TWICE AND THAT IS DELIBERATE, once on each side of the comparison. It is the thing they already want, so saying it again next to the smaller number is the whole point of the sentence. Do not shorten the second one to "one", "someone" or "that role".
 
   THE SAME SEAT IS ON BOTH SIDES OF THE COMPARISON, and this is the whole beat. What this role costs here, against what this role costs offshore. Do not swap in a different job. Do not offer the admin, the coordination or the back office behind it. Do not say the seat has to stay on site, and do not raise whether it can be done offshore at all. They advertised this role, so this role is the one being priced, and anything else answers a question they did not ask.
 
   THE TWO NUMBERS, and they are approximate market figures, not quotes.
-  SAY THEM AS APPROXIMATE, always: "somewhere around", "roughly", "more like". Never a precise number, never a rate per hour, never a price from a partner, never a total saving.
+  SAY THEM AS APPROXIMATE. The local figure carries "somewhere around" in its own locked words. The offshore figure is a RANGE, and the range is what keeps it approximate, so "for only 29 to 38,000" is right and "for only 33,000" is not. Never a single precise number on either side, never a rate per hour, never a total saving, and never a named partner or a quote attributed to one.
   THE LOCAL FIGURE is what that KIND of seat typically pays in this lead's own market, as a round annual number. It is their market, not ours, which is why the line says over there and not here.
   CURRENCY comes from the website address: .com.au is Australian dollars, .co.nz or .nz New Zealand dollars, .co.uk or .uk pounds, .ie euros, .ca Canadian dollars, .sg Singapore dollars, .ph pesos. Anything else, or no website, US dollars. Say the currency once, on the first figure only, and never name the country.
   THE OFFSHORE FIGURE IS ARITHMETIC, NOT A SECOND GUESS. Do not estimate it, and do not subtract a percentage in your head. Multiply.
   Low end = the local figure times ${J}. High end = the local figure times ${Q}. Round both to the nearest thousand and say them low to high. That is a saving of ${$} to ${K}%, which sits inside ${fi}.
-  WORKED, SO THERE IS NOTHING TO INTERPRET. Local 80,000 gives "more like ${re(8e4)}". Local 60,000 gives "more like ${re(6e4)}". Local 120,000 gives "more like ${re(12e4)}".
+  WORKED, SO THERE IS NOTHING TO INTERPRET. Local 80,000 gives "for only ${re(8e4)}". Local 60,000 gives "for only ${re(6e4)}". Local 120,000 gives "for only ${re(12e4)}".
   "30 to 35,000" against a local 80,000 is WRONG. It is a saving of 56 to 62%, it is the number this beat kept producing, and it is shallower than every figure we publish. If your offshore range is more than ${Q} of your local figure, you have guessed instead of multiplying.
 
-  WE ARE NOT IN THIS BEAT. The subject is them, the seat, or the money. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us.
+  WE ARE BARELY IN THIS BEAT, and only in the four locked words "with one of our partners". Past those the subject is them, the seat, or the money. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us.
+  THE LOCKED LINE IS THE ONE EXCEPTION AND IT IS WRITTEN FOR YOU, so do not treat the list above as a reason to reword it. It says "our partners" and it says "they can give you", which are a hair away from two of the banned phrases, and the difference is the whole point: the subject is THEY, the partner who would fill this seat, and never we. It does not license a second mention. Every word you write yourself obeys the list.
   No promises about quality, no pitching us, and no third number.
 
   4. THE ASK. Word for word, and the only thing you write is the hesitation:
