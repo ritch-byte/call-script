@@ -184,6 +184,7 @@ import {
   hiringFunction,
   hiringLeadIssue,
   parseHiringLead,
+  seatOwnership,
   type HiringLead,
 } from '../lib/hiringLead'
 
@@ -243,10 +244,13 @@ export function buildHiringPrompt(
   The rep has ALREADY opened the call: they greeted the lead by name, gave their own name, said they are from OA, asked for half a minute and got it. Do not greet, do not introduce yourself, do not ask for permission or for time. Start cold on the reason for the call.
   If the company is named again anywhere, it is OA, never Outsource Accelerator in full. The rep says OA on this call.
 
-  It is one continuous read. Beats 1 to 3 carry no ask and no meeting request. The ask lives in beat 4 and nowhere else.
+  It is one continuous read. Beats 1 to 3 carry no ask and no meeting request. The ask lives in beat 4 and nowhere else. The soft check closing beat 1 is not an ask and not a meeting request, and it does not move: it is the one question outside beat 4.
 
-  1. THE REASON FOR THE CALL, AND IT IS ASSUMPTIVE. 34 WORDS MAX.
-  Word for word: "So the reason for my call is I saw your company is looking for ${a} ${hiringPosition}..." then word for word: "and I know how important it is to" + the thing this person is already weighing over that hire.
+  1. THE REASON FOR THE CALL, ASSUMPTIVE ABOUT THE HIRE AND NOT ABOUT THEM. 44 WORDS MAX.
+  Word for word: "So the reason for my call is I saw your company's advertising a few roles at the moment, ${a} ${hiringPosition} was one of them..." then word for word: "and I know how important it is to" + the thing this person is already weighing over that hire.
+  Then end the beat on this, word for word and nothing after it: "[PAUSE] though I'm not sure if that side of things sits with you?"
+  WHY THE ADVERTISEMENT IS CREDITED TO THE COMPANY AND NOT TO THIS PERSON. We know the company posted the role. We do NOT know it is theirs, and usually it is not: the list pairs whoever was findable at a company with whatever that company advertised, so the seat belongs to the person being called in roughly one pairing in three. "I saw YOU are looking for" is a claim about them that is wrong most of the time, and being corrected on their own job in the first ten seconds costs the call. "The company's advertising a few roles, this was one of them" is a fact we can defend, and it stays true whoever picks up.
+  THE SOFT CHECK AT THE END IS NOT A HEDGE, IT IS THE ROUTING QUESTION ASKED EARLY. If the seat is theirs they say so and the rep carries straight on, and the beat has cost one short sentence. If it is not, they say so HERE, in answer to a question we asked, instead of interrupting to correct us. That turns the single most common derailment on these calls into an expected answer. Never sharpen it into "are you the person who handles this?", which is a qualifying question and reads like one. It stays casual and slightly apologetic.
   THE TENSION, NOT THE DUTIES. They wrote the advertisement, so telling them what the seat does teaches them nothing and reads as filler. Say instead the thing they are already holding in their head: getting someone genuinely good in that chair while the number stays where it has to sit. State it as something you assume is true of them, never as a question, and they are agreeing with you before they have decided to.
   MAKE IT THIS SEAT, NOT ANY SEAT. One concrete thing from their world has to be in it, the thing that makes this particular hire hard: the scale of what they are running, the standard the work has to meet, or what goes wrong if the person turns out not to be right.
   BANNED, because every one of them is true of every hire and says nothing: "finding the right person", "getting the right fit", "hiring the right talent", "keeping costs down", "managing the budget", "balancing cost and quality", "in today's market", "it's a competitive market", "attracting top talent".
@@ -334,6 +338,13 @@ export default function HiringScript() {
   const seat = lead.seats.includes(picked) ? picked : lead.seats.length === 1 ? lead.seats[0] : ''
   const issue = useMemo(() => hiringLeadIssue(lead, seat), [lead, seat])
   const ready = Boolean(seat) && !issue
+  /*
+   * Whether the advertised seat plausibly belongs to this person, shown BEFORE the rep dials.
+   * Four reps reported leads saying the advertised role has nothing to do with them, which is
+   * the lead list rather than the script: it pairs whoever was findable with whatever the
+   * company posted. A warning costs nothing, and a rep who expects the correction handles it.
+   */
+  const owns = useMemo(() => seatOwnership(lead.jobTitle, seat), [lead.jobTitle, seat])
   const intro = useMemo(() => buildHiringIntro(), [])
   const onScreen = script.length ? [...intro, ...script] : intro
 
@@ -472,6 +483,42 @@ export default function HiringScript() {
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+          {ready && owns.note && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: '9px 12px',
+                borderLeft: `2px solid ${
+                  owns.verdict === 'unlikely'
+                    ? MAGENTA
+                    : owns.verdict === 'exec'
+                      ? '#c98a00'
+                      : '#3f9c5a'
+                }`,
+                background: PAPER,
+                fontFamily: SANS,
+                fontSize: 12.5,
+                lineHeight: 1.5,
+                color: '#4b5563',
+              }}
+            >
+              <span
+                style={{
+                  display: 'block',
+                  marginBottom: 3,
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: '0.1em',
+                  color: '#6b7280',
+                }}
+              >
+                {owns.verdict === 'unlikely' || owns.verdict === 'exec'
+                  ? 'BEFORE YOU DIAL'
+                  : 'SAFE TO OPEN ASSUMPTIVELY'}
+              </span>
+              {owns.note}
             </div>
           )}
           <div

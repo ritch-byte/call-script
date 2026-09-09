@@ -275,6 +275,22 @@ export const flow: Record<string, FlowNode> = {
     ],
   },
 
+  obj_not_my_role: {
+    id: 'obj_not_my_role',
+    title: "Objection: That Advertised Role Isn't Mine",
+    isObjection: true,
+    script:
+      "Ah that's my mistake, thanks for putting me straight.\n\nWho'd be the right person for that one?\n\n(then, once they've answered) And the ad was just what made me pick up the phone, it wasn't really the reason I called. We get roles filled at {SAVINGS_CLAIM}, whichever side of the business they sit on. So while I've got you, what does your team actually look after?",
+    tip:
+      "NOT THE SAME AS 'not the decision-maker', and picking the wrong one of the two reads badly. That one is about who signs off on outsourcing, and it assumes the pitch landed. This one is the premise of the call being wrong about THEM: we said they were hiring something they have nothing to do with. Own it in three words and move. Arguing the advertisement, or explaining how we found it, is fatal — you cannot win a disagreement about their own job.\n\nGET THE NAME BEFORE ANYTHING ELSE. A warm referral out of a call that opened wrong still converts better than a cold dial, and it is the only thing here that is worth something even if they hang up straight after.\n\nDO NOT STACK THE TWO QUESTIONS. Ask who owns it, stop, let them answer. The pivot is the third paragraph for a reason.\n\nWHY THERE IS A PIVOT AT ALL: the ad was the trigger, never the reason. Roles coming in at {SAVINGS_PCT} less is true whatever seat this person owns, so re-pitching the advertised role to someone who does not own it is the one thing that cannot work. Drop the ad and ask what IS theirs.\n\nEXPECT THIS OFTEN, AND IT IS NOT THE REP. On the current lead lists the advertised seat belongs to the lead's own function in roughly one pairing in three: the list pairs whoever was findable at a company with whatever that company posted, and the two frequently have nothing to do with each other. A lead correcting you is engagement, not rejection.",
+    options: [
+      { label: 'Gives a name for the right person', next: 'end_callback', type: 'positive', banks: ['authority'] },
+      { label: 'Tells you what their side DOES own', next: 'pitch_q1', type: 'positive', banks: ['company'], elaborated: true },
+      { label: 'Turns out they do own it after all', next: 'qualify_role', type: 'positive' },
+      { label: 'Hard no', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
   // ── NO ROLE — VALUE PITCH + RESEARCH ─────────────────────────────────────
 
   obj_no_role: {
@@ -825,6 +841,7 @@ export const flow: Record<string, FlowNode> = {
 export const QUICK_OBJECTIONS: FlowOption[] = [
   { label: 'Not interested', next: 'obj_not_interested_opening', type: 'objection' },
   { label: 'Not my decision / wrong person', next: 'obj_wrong_person', type: 'objection' },
+  { label: "That advertised role isn't mine", next: 'obj_not_my_role', type: 'objection' },
   { label: 'Who are you? / why are you calling?', next: 'obj_who_are_you', type: 'objection' },
   { label: "I'm busy right now", next: 'obj_timing', type: 'objection' },
   { label: 'Just send me an email', next: 'obj_send_email', type: 'objection' },

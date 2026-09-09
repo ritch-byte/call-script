@@ -184,6 +184,7 @@ import {
   hiringFunction,
   hiringLeadIssue,
   parseHiringLead,
+  seatOwnership,
   type HiringLead,
 } from '../lib/hiringLead'
 
@@ -198,9 +199,17 @@ const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospac
 const SANS = '"Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans-serif'
 
 /** The opener is fixed and local. It is never sent to the model, so it cannot get reworded. */
+/*
+ * v2 asks who owns the function BEFORE the script starts, so unlike v1 it never has to
+ * assert that the advertised seat is theirs. What it was missing is the other half: a written
+ * line for when the answer is somebody else. Four reps reported that exact moment, and an
+ * opener that asks a routing question without a routing line puts the rep on the spot for
+ * having asked it.
+ */
 export function buildHiringIntro(hiringPosition: string): string[] {
   return [
     `Hi [Lead Name], it's [Your Name] here. (pause) Just curious, who's in charge of ${hiringFunction(hiringPosition)} over there?`,
+    `[IF IT IS NOT THEM] Ah got it, who would that be? (pause) Any chance you could point me their way, or is there a better time to catch them?`,
   ]
 }
 
@@ -320,6 +329,13 @@ export default function HiringScript() {
   const seat = lead.seats.includes(picked) ? picked : lead.seats.length === 1 ? lead.seats[0] : ''
   const issue = useMemo(() => hiringLeadIssue(lead, seat), [lead, seat])
   const ready = Boolean(seat) && !issue
+  /*
+   * Whether the advertised seat plausibly belongs to this person, shown BEFORE the rep dials.
+   * Four reps reported leads saying the advertised role has nothing to do with them, which is
+   * the lead list rather than the script: it pairs whoever was findable with whatever the
+   * company posted. A warning costs nothing, and a rep who expects the correction handles it.
+   */
+  const owns = useMemo(() => seatOwnership(lead.jobTitle, seat), [lead.jobTitle, seat])
   const intro = useMemo(() => buildHiringIntro(seat), [seat])
   const onScreen = script.length ? [...intro, ...script] : intro
 
@@ -458,6 +474,42 @@ export default function HiringScript() {
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+          {ready && owns.note && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: '9px 12px',
+                borderLeft: `2px solid ${
+                  owns.verdict === 'unlikely'
+                    ? MAGENTA
+                    : owns.verdict === 'exec'
+                      ? '#c98a00'
+                      : '#3f9c5a'
+                }`,
+                background: PAPER,
+                fontFamily: SANS,
+                fontSize: 12.5,
+                lineHeight: 1.5,
+                color: '#4b5563',
+              }}
+            >
+              <span
+                style={{
+                  display: 'block',
+                  marginBottom: 3,
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: '0.1em',
+                  color: '#6b7280',
+                }}
+              >
+                {owns.verdict === 'unlikely' || owns.verdict === 'exec'
+                  ? 'BEFORE YOU DIAL'
+                  : 'SAFE TO OPEN ASSUMPTIVELY'}
+              </span>
+              {owns.note}
             </div>
           )}
           <div

@@ -238,6 +238,133 @@ export function article(title: string): string {
   return /^[aeiou]/i.test(first) ? 'an' : 'a'
 }
 
+/* ------------------- does this seat belong to this person? -------------------
+ *
+ * The complaint this answers, raised by four reps: the lead says the advertised role has
+ * nothing to do with them. It is not a scripting failure, it is the lead list. The list pairs
+ * whoever was FINDABLE at a company with whatever that company POSTED, and the two often have
+ * nothing to do with each other: a Channel Partner Success Manager called about an Office
+ * Manager opening, a Chief Investment Officer called about a Paralegal.
+ *
+ * Scored on the thirteen title/seat pairs of one real list: four safe, five unknowable, four
+ * plainly wrong. So the rep is walking into a correction on most calls with no warning, and a
+ * warning is cheap. Shown before they dial, not after.
+ *
+ * THREE WAYS A SEAT CAN BE THEIRS, and they are different claims:
+ *   1. HIRING IS THEIR JOB. An HR, People or Talent title owns the requisition for every
+ *      function in the company. This is the one the first draft of this missed, and it is the
+ *      only reason any pairing in that real list was safe.
+ *   2. SAME FUNCTION. A payroll seat under a finance head.
+ *   3. EXEC. A founder owns every hire at twenty staff and none at two thousand, and a lead
+ *      list cannot see headcount, so this is its own answer rather than a yes.
+ * Anything else and the opener is asserting a link nothing supports.
+ */
+
+type Fn =
+  | 'finance' | 'people' | 'sales' | 'marketing' | 'ops' | 'it' | 'legal'
+  | 'admin' | 'success' | 'procurement' | 'product' | 'unknown'
+
+/*
+ * EVERY SUFFIX IS SPELLED OUT, and that is not verbosity. Written the obvious way, as
+ * /\b(financ|account|...)\b/, the trailing \b means a prefix can only match as a whole word:
+ * "financ" never matches "Finance" and "account" never matches "Accounts", so most of this
+ * table was dead and a Finance Director called about an Accounts Payable Clerk came back as
+ * "probably not theirs". Two invented rows caught it; the eight real ones never touched those
+ * branches. If you add a term here, spell its endings out.
+ *
+ * ORDER IS THE TIE-BREAK, and two orderings are load-bearing:
+ *   people before finance, because payroll sits under HR as often as under finance, so an
+ *     "HR & Payroll Coordinator" is an HR seat.
+ *   success before finance, because "Account Manager" is a customer-facing seat and not an
+ *     accounting one. Finance also requires a suffix on account (accounts, accounting,
+ *     accountant) so that bare "Account" falls through to it.
+ */
+const FUNCTIONS: Array<[Fn, RegExp]> = [
+  ['people', /\b(hr|human resources?|people|talent|recruit(ing|ment|er)?|l&d|employee relations)\b/i],
+  ['success', /\b(client success|customer success|customer support|client servi(ce|ces)|customer servi(ce|ces)|account manage(r|ment))\b/i],
+  ['finance', /\b(financ(e|ial)|account(s|ing|ant)|payroll|bookkeep(er|ing)?|credit control|audit(or|ing)?|treasur(y|er)|controller|comptroller|billing|invoic(e|ing))\b/i],
+  ['legal', /\b(legal|paralegal|counsel|attorney|compliance|contracts?)\b/i],
+  ['procurement', /\b(procure(ment)?|purchas(e|ing)|vendor|supplier|sourcing|buyer)\b/i],
+  ['sales', /\b(sales|business development|bdr|sdr|revenue|commercial|channel)\b/i],
+  ['marketing', /\b(marketing|brand(ing)?|growth|content|seo|advertis(ing|ement)?|communications?)\b/i],
+  ['product', /\b(product|ux|designer)\b/i],
+  ['it', /\b(software|developer|engineer(ing)?|data|technolog(y|ies)|systems?|devops|security)\b/i],
+  ['ops', /\b(operations?|logistics|supply chain|warehouse|dispatch|project manager|scheduling|facilit(y|ies))\b/i],
+  ['admin', /\b(executive assistant|office manager|administrat(or|ion)|receptionist|secretar(y|ial)|apprentice)\b/i],
+]
+
+/* Said out loud to the rep, so it has to read as English. "an it seat" does not. */
+const SPOKEN: Record<Fn, string> = {
+  finance: 'a finance',
+  people: 'an HR',
+  sales: 'a sales',
+  marketing: 'a marketing',
+  ops: 'an operations',
+  it: 'a technical',
+  legal: 'a legal',
+  admin: 'an office-admin',
+  success: 'a customer-facing',
+  procurement: 'a purchasing',
+  product: 'a product',
+  unknown: '',
+}
+
+function functionOf(s: string): Fn {
+  const t = ' ' + (s || '').toLowerCase() + ' '
+  for (const [f, re] of FUNCTIONS) if (re.test(t)) return f
+  return 'unknown'
+}
+
+/** Owns the requisition for every function, because hiring IS the function. */
+const OWNS_HIRING = /\b(hr|human resource|people|talent|recruit|chro|chief people)\b/i
+
+/*
+ * True C-suite and ownership only. "Partner" is deliberately absent: in "People Partner" and
+ * "HR Business Partner" it means a business partner and not an equity holder, and counting it
+ * as exec swallowed every HR title on the list, which is exactly the group the opener is safe
+ * for. The list is short on purpose.
+ */
+const EXEC_TITLE =
+  /\b(chief|ceo|cfo|coo|cto|cio|cmo|cro|managing director|founder|owner|president|chairman|chairwoman)\b/i
+
+export type Ownership = 'hires' | 'sameFunction' | 'exec' | 'unlikely'
+
+export interface SeatOwnership {
+  verdict: Ownership
+  /** Said to the rep, not to the lead. One line, before they dial. */
+  note: string
+}
+
+export function seatOwnership(jobTitle: string, seat: string): SeatOwnership {
+  const title = (jobTitle || '').trim()
+  const s = (seat || '').trim()
+  if (!title || !s) return { verdict: 'unlikely', note: '' }
+
+  if (OWNS_HIRING.test(title))
+    return { verdict: 'hires', note: 'Hiring is their job, so any seat is theirs. Open assumptively.' }
+
+  const a = functionOf(title)
+  const b = functionOf(s)
+  if (a === b && a !== 'unknown')
+    return {
+      verdict: 'sameFunction',
+      note: `The seat and their own title are both on the ${SPOKEN[a].replace(/^an? /, '')} side. Open assumptively.`,
+    }
+
+  if (EXEC_TITLE.test(title))
+    return {
+      verdict: 'exec',
+      note: 'Senior enough to own every hire at a small firm and none at a large one. Read the soft check at the end of beat 1 rather than skipping it.',
+    }
+
+  const seatSide = SPOKEN[b] ? `${SPOKEN[b]} seat` : 'a seat'
+  const theirSide = SPOKEN[a] ? `, and they run ${SPOKEN[a].replace(/^an? /, '')}` : ''
+  return {
+    verdict: 'unlikely',
+    note: `This is ${seatSide}${theirSide}, so it probably is not theirs. Expect the correction, and have the routing line ready.`,
+  }
+}
+
 /*
  * The v2 opener asks who owns the function, so it needs the FUNCTION, not the job title.
  * Nobody is in charge of a Customer Support Specialist. Strip the seniority off the front and
