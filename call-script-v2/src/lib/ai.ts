@@ -5,8 +5,29 @@
 export const AI_RELAY_URL =
   'https://script.google.com/macros/s/AKfycby2akMg_lgj-eKdRsmylzVCnzPG_GOFrW1992Xb7rQNkQESzu7F_I2WY4CFk4jPPAoY/exec'
 
-/** How long one relay attempt may take before it is treated as stuck. */
-export const RELAY_TIMEOUT_MS = 45000
+/*
+ * How long ONE attempt may take before it is abandoned and retried.
+ *
+ * MEASURED, five real generations of the Personalised Script prompt, timed in two legs:
+ *
+ *                    healthy        degraded
+ *   POST leg          ~5.9s         up to 14.6s     Apps Script running the AI call
+ *   result fetch      ~1.1s         8.3 / 18.4 / 27.0s, then an EMPTY body
+ *   total             ~7s           14s / 24s / 42s
+ *
+ * Three of the five came back clean in about seven seconds. Two returned zero bytes after
+ * eighteen and twenty-seven seconds of waiting. So the variance is not the prompt and not the
+ * model - it is Google's serving of the result, and when it goes wrong it goes wrong slowly.
+ *
+ * 45 seconds was six times the healthy time, which meant a degraded attempt sat there burning
+ * the deadline when a retry would very likely have landed in seven. 25 is still three and a
+ * half times healthy, and above the worst POST leg observed on a run that did succeed, so it
+ * abandons the stuck ones without cutting off the merely slow ones.
+ *
+ * The point is to fail fast and retry, not to wait longer. Worst case across all attempts is
+ * now about 79 seconds rather than 139.
+ */
+export const RELAY_TIMEOUT_MS = 25000
 
 /** How many times to try a request that Google failed to serve or that timed out. */
 export const RELAY_ATTEMPTS = 3
@@ -93,10 +114,8 @@ async function postRelay(payload: Record<string, unknown>): Promise<AIResponse> 
      * it again would help. On a live call that is worse than a failure, because a failure at
      * least tells you to move on.
      *
-     * 45 seconds is chosen against what the round trip actually is: browser to Apps Script, a
-     * cold start there, Apps Script to Anthropic, ~2,700 prompt tokens in and up to 800 out,
-     * and back. A healthy build lands well inside that. Anything past it is not slow, it is
-     * stuck.
+     * The deadline itself is set from measurement, at RELAY_TIMEOUT_MS above. A healthy build
+     * is about seven seconds, so anything near the deadline is stuck rather than slow.
      */
     const ctl = new AbortController()
     const timer = setTimeout(() => ctl.abort(), RELAY_TIMEOUT_MS)
