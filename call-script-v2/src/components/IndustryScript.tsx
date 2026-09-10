@@ -9,11 +9,28 @@
  * conclusion from a recording: cold calls die in monologues. Both say the same thing, which
  * is to lead with the customer's problem rather than the product.
  *
- * So this one opens on their INDUSTRY and does not mention Outsource Accelerator until beat
- * 3, by which point the lead has heard two sentences about their own world and is nodding.
- * The greeting drops the company name for the same reason: the Spiel Builder's opener says
- * "over at Outsource Accelerator" twice before the pitch starts, which gives the whole thing
- * away before there is any reason to care.
+ * So beats 2 to 4 are entirely about them, and the greeting still drops the company name: the
+ * Spiel Builder's opener said "over at Outsource Accelerator" twice before the pitch started,
+ * which gives the whole thing away before there is any reason to care.
+ *
+ * V2 ONLY, FROM 2026-09-11: WE GO FIRST, IN ONE BREATH. This originally opened on the lead's
+ * INDUSTRY and did not name Outsource Accelerator until beat 3, on the reasoning above. It now
+ * opens with a short background on us - "quick background on us... we're Outsource Accelerator,
+ * the marketplace [industry] firms use..." - and the industry line becomes beat 2.
+ *
+ * That reverses the founding decision of this generator, so it is worth writing down what
+ * protects the original reasoning. The monologue problem was never that we get named early; it
+ * was that the caller talks about themselves for several sentences before the lead hears a
+ * problem of their own. Beat 1 is capped at 32 words, is a single locked sentence with nothing
+ * added, and is the ONLY place we appear - beats 2 and 3 ban us as a subject outright. So the
+ * lead knows who is calling in one breath and is back in their own world by the second.
+ *
+ * The savings figure moved with it, but not to beat 1. It now hangs off the two roles in beat
+ * 4 rather than off the company, where it is a fact about their seats rather than about our
+ * business.
+ *
+ * v1 keeps the original shape. components/IndustryScript.tsx is on the DIVERGED list in
+ * tools/sync-from-v2.sh, so the two do not sync.
  *
  * WHERE THE HONESTY LINE SITS, and it is the guard that matters most here. Beat 1 is a claim
  * about a SECTOR, never about this firm. "Dental practices are losing reception hours to
@@ -124,7 +141,7 @@ export function buildIndustryIntro(): string[] {
 export function buildIndustryPrompt({ title, industry, url }: IndustryLead): string {
   const plural = pluralTitle(title)
   const { offer, fallback } = offerWindow()
-  return `Write a cold call opener for an SDR at Outsource Accelerator, an outsourcing marketplace. The lead has NOT heard of us and the script must not mention us until beat 3.
+  return `Write a cold call opener for an SDR at Outsource Accelerator, an outsourcing marketplace. The lead has NOT heard of us, so beat 1 says who we are in one breath and every beat after it is about them.
 
   LEAD: ${title}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
 
@@ -132,29 +149,30 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
 
   4 short paragraphs, one blank line between each. No labels, numbering, JSON or preamble. Keep every phrase marked word for word exactly as written. One or two short sentences per beat, never three.
 
-  THE REP HAS SAID ONE LINE ALREADY: they greeted the lead by name, gave their own name, said they had caught them out of the blue and asked for half a minute, and got it. They did NOT say the company name. So do not greet, do not introduce yourself, and do not ask for permission or for time. Start cold on beat 1.
+  THE REP HAS SAID ONE LINE ALREADY: they greeted the lead by name, gave their own name, said they had caught them out of the blue and asked for half a minute, and got it. They did NOT say the company name. So do not greet, do not say the rep's own name again, and do not ask for permission or for time. They know a person is calling. What they do not know is who from, and that is exactly what beat 1 answers.
 
   It is one continuous read until beat 4. Beats 1 to 3 carry no ask and no question at all. Beat 4 carries two questions, in a fixed order: which role could go offshore, then the meeting.
 
-  1. THE INDUSTRY, NOT US. 30 WORDS MAX. Open word for word: "so yeah, we're just reaching out because what we're seeing across ${industry || 'firms like yours'} at the moment..." then ONE thing that is true of that sector right now and that a person inside it would recognise.
-  IT IS A CLAIM ABOUT THE SECTOR, NEVER ABOUT THIS FIRM. "Dental practices are losing reception hours to health-fund claims" is a market observation and a rep can defend it. "Your clinic is drowning in claims" is invented, and the lead knows it is invented because we have never spoken to them. Say what is true of the industry and let them apply it to themselves.
-  IT NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing the work is actually made of: health-fund claims, shop drawings, carrier contracts, reservation inventory, freight documentation, specimen batches, retainer scopes, variation claims. That noun is what makes the sentence land in one industry and nowhere else.
-  BANNED, because every one of them is true of every industry and says nothing: "rising costs", "doing more with less", "the talent shortage", "a tight labour market", "increased competition", "margin pressure", "in today's market", "post-pandemic", "digital transformation", "growing pains", "moves the needle", "doesn't move the needle", "in your space", "firms like yours", "a ton of time getting eaten up", "time gets eaten up".
-  Past those opening words, do not say who we are, what we sell, the word offshore, or anything about hiring. Not yet. The locked words say the rep is reaching out; they do not say who is reaching out, and beat 3 is where that lands.
-
-  2. THEIR DESK. 26 WORDS MAX. Open word for word: "and for ${plural} like you that usually lands on..." then the part of that sector pressure THIS title actually carries.
-  Say the title back exactly as given, plural and unchanged. It has to be work that belongs to this exact job, not to the industry in general and not to their boss. If you could swap in a different job title and the sentence still made sense, rewrite it.
-  Still nothing about us, and still nothing about offshore. The subject of both sentences so far is them.
-
-  3. US, PROPERLY, ONCE. 40 WORDS MAX. Word for word: "so yeah, quick background on us... (deliberate) we're Outsource Accelerator, the marketplace ${industry || 'firms like theirs'} firms use to get this kind of work done offshore, without going near a recruitment agency." Then word for word: "and the roles come in at ${SAVINGS_CLAIM}."
-  This is the first time the lead hears who we are, and it is the only time. Write it as an introduction, not a reminder. Nothing after the savings figure.
-  THE PROOF IS THE CATEGORY, AND THE CATEGORY IS THEIRS. "The marketplace ${industry || 'firms like theirs'} firms use" is doing the work of a reference without being one: it says people in their world already do this, which is what a lead actually wants to know before agreeing to anything.
+  1. QUICK BACKGROUND ON US, AND IT IS THE ONLY TIME. 32 WORDS MAX. Word for word, nothing added: "so yeah, quick background on us... (deliberate) we're Outsource Accelerator, the marketplace ${industry || 'firms like theirs'} firms use to get this kind of work done offshore, without going near a recruitment agency."
+  THAT IS THE WHOLE BEAT. Do not explain the marketplace, do not say what we charge, do not mention roles or savings or hiring, and do not add a sentence of your own. The lead has just been told who is calling; everything after that is about them.
+  THE PROOF IS THE CATEGORY, AND THE CATEGORY IS THEIRS. "The marketplace ${industry || 'firms like theirs'} firms use" does a reference's job without being one: it says people in their world already do this, which is what a lead wants to know before agreeing to anything.
   NEVER NAME A COMPANY. Not a client, not a customer, not a competitor, not a well-known firm in their sector, and never "companies like X and Y". This prompt has no client list and no web access, so any name you write is INVENTED - and an invented client is a false claim about a real business, said on a recorded call to someone who can pick up the phone and check it. There is no version of that which is worth a booked meeting. If approved names are ever added, they will appear above under LEAD; until they do, the proof is the category and nothing else.
   "WITHOUT GOING NEAR A RECRUITMENT AGENCY" IS LOAD-BEARING and is not a swipe at anyone. It answers the question a lead asks out loud at exactly this point - Stefanie has a recording of one cutting in mid-sentence to ask whether we are an agency - and answering it before it is asked is cheaper than answering it after.
 
-  4. TWO ROLES, THEN THE ASK. Word for word: "so yeah I think a great starting point is" + an offshore role + "to" + what it takes off the work you named in beat 2, then "or a" + a second role + "to" + what that one takes off them.
+  2. THE REASON FOR THE CALL, AND IT IS THEIR INDUSTRY. 30 WORDS MAX. Open word for word: "and we're just reaching out because what we're seeing across ${industry || 'firms like yours'} at the moment..." then ONE thing that is true of that sector right now and that a person inside it would recognise.
+  IT IS A CLAIM ABOUT THE SECTOR, NEVER ABOUT THIS FIRM. "Dental practices are losing reception hours to health-fund claims" is a market observation and a rep can defend it. "Your clinic is drowning in claims" is invented, and the lead knows it is invented because we have never spoken to them. Say what is true of the industry and let them apply it to themselves.
+  IT NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing the work is actually made of: health-fund claims, shop drawings, carrier contracts, reservation inventory, freight documentation, specimen batches, retainer scopes, variation claims. That noun is what makes the sentence land in one industry and nowhere else.
+  BANNED, because every one of them is true of every industry and says nothing: "rising costs", "doing more with less", "the talent shortage", "a tight labour market", "increased competition", "margin pressure", "in today's market", "post-pandemic", "digital transformation", "growing pains", "moves the needle", "doesn't move the needle", "in your space", "firms like yours", "a ton of time getting eaten up", "time gets eaten up".
+  BEAT 1 ALREADY SAID WHO WE ARE, so do not say it again. No second description of us, nothing about what we sell, no offshore, nothing about hiring. From here to the end of beat 3 the subject is them.
+
+  3. THEIR DESK. 26 WORDS MAX. Open word for word: "and for ${plural} like you that usually lands on..." then the part of that sector pressure THIS title actually carries.
+  Say the title back exactly as given, plural and unchanged. It has to be work that belongs to this exact job, not to the industry in general and not to their boss. If you could swap in a different job title and the sentence still made sense, rewrite it.
+  Still nothing about us, and still nothing about offshore. Beats 2 and 3 are theirs.
+
+  4. TWO ROLES, THEN THE ASK. Word for word: "so yeah I think a great starting point is" + an offshore role + "to" + what it takes off the work you named in beat 3, then "or a" + a second role + "to" + what that one takes off them. Then word for word: "and those come in at ${SAVINGS_CLAIM}."
+  THE SAVINGS FIGURE SITS HERE, ON THE ROLES, and not on the company. It used to hang off the end of the beat that introduced us, where it was a fact about our business. Attached to the two seats just named it is a fact about theirs, which is the only version of it a lead has a reason to care about. Nothing after it except the question.
   BOTH ROLES MUST BE DOABLE FROM ANOTHER COUNTRY. The test, before you name either: could this person do the whole job on a laptop, with nobody needing them in the building? A warehouse manager, a site foreman, a front office manager, a housekeeping lead, kitchen staff, floor managers all fail it, because the job is where the work is. The back office behind them passes: claims and billing administrators, purchasing and inventory coordinators, order processing, freight and customs documentation, dispatch scheduling, bookkeeping, payroll, customer support. Where the operation is physical, the offshorable seats are the ones behind it and never the ones on it.
-  Real job titles a lead would recognise on an org chart. The work each one takes has to be work beat 2 already named, not new work you invented.
+  Real job titles a lead would recognise on an org chart. The work each one takes has to be work beat 3 already named, not new work you invented.
   THEN ASK THEM WHICH ROLE, word for word and nothing added to it: "and aside from the roles I mentioned, what type of role do you think would also be suitable for offshore?"
   IT IS A REAL QUESTION AND THE REP STOPS TALKING AFTER IT. Put [PAUSE] on its own line straight after it. That mark is the only one in the script that is not breath: it is the rep waiting for an answer, and the beat is worthless without the wait. Everything up to here has been the rep talking, and this is the one place the lead gets to describe their own world.
   IT COMES BEFORE THE ASK AND NEVER INSTEAD OF IT. Both get said, in this order. The question earns the ask: after it, the meeting is about a role THEY named rather than the two we guessed, and what they say is the most useful thing the call produces even if they never book.
@@ -163,13 +181,13 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
   "I know ${plural} like you [HESITATION], but would you be opposed to carving out ${MEETING_ONE} for a coffee break style chat, just to see if this could work or not, I'm thinking ${offer}? If not maybe ${fallback}?"
   The hesitation completes "I know ${plural} like you ___", reads straight on from it, and is 10 WORDS MAX with no full stop inside it. It is the one thing that would make THIS person pause before saying yes, given their seat and their sector. Their words, not ours. Never a generic objection like being busy or not having budget.
 
-  WE ARE NOT IN BEATS 1 AND 2. The subject is them, their sector, or their desk. BANNED there outright: "we help", "we work with", "our partners", "our clients", "what we do is", "we provide", and any sentence whose subject is we, our or us.
-  THE LOCKED OPENING WORDS OF BEAT 1 ARE THE ONE EXCEPTION, and they are written for you. "so yeah, we're just reaching out because" is the rep saying why they picked up the phone, which is not a claim about us and carries nothing to sell. It does not license a second one: every word you write yourself obeys the ban. If a sentence could be moved onto our website unchanged, it belongs in beat 3 or nowhere.
+  WE ARE NOT IN BEATS 2 AND 3. Beat 1 is our whole allowance and it is spent. The subject from there is them, their sector, or their desk. BANNED outright in beats 2 and 3: "we help", "we work with", "our partners", "our clients", "what we do is", "we provide", and any sentence whose subject is we, our or us.
+  THE LOCKED OPENING WORDS OF BEAT 2 ARE THE ONE EXCEPTION, and they are written for you. "and we're just reaching out because" is the rep saying why they picked up the phone, which is not a claim about us and carries nothing to sell. It does not license a second one: every word you write yourself obeys the ban. If a sentence could be moved onto our website unchanged, it belonged in beat 1 and that moment has passed.
 
   VOICE: spoken, short clauses, contractions, ellipses as pacing marks but at most ONE per beat. No em dashes, no corporate filler, no feature lists, no percentages beyond the one figure above. Curiosity, not authority. Sell the meeting, not the service.
 
   DELIVERY MARKS. Write it the way a screenplay is written, so the rep can see the pacing.
-  Put [PAUSE] on its own after beat 1, and again in beat 4 straight after the question about which role. Two, no more, and the second one is a wait for an answer rather than a breath.
+  Put [PAUSE] on its own after beat 2, and again in beat 4 straight after the question about which role. Two, no more, and the second one is a wait for an answer rather than a breath.
   Put one direction in round brackets before the phrase it governs, one word: (slow), (deliberate), (softer). At most one across the whole script, and never inside beat 4.
   Drop in a spoken filler where a person actually would, like y'know or uh. At most one per beat, and never in beat 4.
   Marks, directions and fillers are breath, not content, and they do NOT count toward the word caps. The one exception is the [PAUSE] after the question in beat 4, which is the rep actually waiting.
