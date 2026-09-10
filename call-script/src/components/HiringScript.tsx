@@ -256,8 +256,8 @@ export function buildHiringPrompt(
   /* What the lead PAYS, as a share of local: 100 minus the saving. */
   const payLow = (100 - deepest) / 100
   const payHigh = (100 - midpoint) / 100
-  const example = (local: number) =>
-    `${Math.round((local * payLow) / 1000)} to ${Math.round((local * payHigh) / 1000)},000`
+  const example = (hourly: number) =>
+    `${Math.round(hourly * payLow)} to ${Math.round(hourly * payHigh)} an hour`
   return `Write a cold call script for an SDR at Outsource Accelerator, the world's leading outsourcing marketplace, calling someone who is currently hiring.
 
   WHO IS BEING CALLED: ${jobTitle}${industry ? `, in ${industry}` : ''}${url ? `, ${url}` : ''}
@@ -302,19 +302,21 @@ export function buildHiringPrompt(
   BANNED AS THE OPENING WORDS of this beat: we, our, us, I, "the reason that's relevant is", and any description of what we are or what we do. If your first sentence could be moved onto our website unchanged, you have written the monologue.
 
   3. THE TURN, AND THE TWO NUMBERS. Open word for word, always this exact line, never a variation of it: "And here's where it gets interesting..." It comes straight off the marketplace line so it lands as a turn in the conversation, not as a correction to something they said.
-  46 WORDS MAX. Then word for word: "${a} ${hiringPosition} over there is going to run you somewhere around" + THE LOCAL FIGURE. Then word for word: "but with one of our partners, they can give you an exceptional ${hiringPosition} for only" + THE OFFSHORE FIGURE. Then word for word: "full-time, dedicated, on your hours."
+  46 WORDS MAX. Then word for word: "${a} ${hiringPosition} over there is going to run you somewhere around" + THE LOCAL RATE + "an hour". Then word for word: "but with one of our partners, they can give you an exceptional ${hiringPosition} for only" + THE OFFSHORE RATE + "an hour". Then word for word: "full-time, dedicated, on your hours."
+  BOTH FIGURES SAY "AN HOUR", even though it puts the word three times in one sentence with "on your hours" at the end. Money read aloud on a live call has to be unambiguous: "for only 14 to 18" on its own gets heard as thousands, and a lead who mishears the cheap number in our favour finds out on the discovery call.
   THE SEAT IS NAMED TWICE AND THAT IS DELIBERATE, once on each side of the comparison. It is the thing they already want, so saying it again next to the smaller number is the whole point of the sentence. Do not shorten the second one to "one", "someone" or "that role".
 
   THE SAME SEAT IS ON BOTH SIDES OF THE COMPARISON, and this is the whole beat. What this role costs here, against what this role costs offshore. Do not swap in a different job. Do not offer the admin, the coordination or the back office behind it. Do not say the seat has to stay on site, and do not raise whether it can be done offshore at all. They advertised this role, so this role is the one being priced, and anything else answers a question they did not ask.
 
   THE TWO NUMBERS, and they are approximate market figures, not quotes.
-  SAY THEM AS APPROXIMATE. The local figure carries "somewhere around" in its own locked words. The offshore figure is a RANGE, and the range is what keeps it approximate, so "for only 29 to 38,000" is right and "for only 33,000" is not. Never a single precise number on either side, never a rate per hour, never a total saving, and never a named partner or a quote attributed to one.
-  THE LOCAL FIGURE is what that KIND of seat typically pays in this lead's own market, as a round annual number. It is their market, not ours, which is why the line says over there and not here.
+  SAY THEM AS APPROXIMATE. The local rate carries "somewhere around" in its own locked words. The offshore rate is a RANGE, and the range is what keeps it approximate, so "for only 14 to 18 an hour" is right and "for only 16 an hour" is not. Never a single precise number on either side, never a total saving, never an annual figure, and never a named partner or a quote attributed to one.
+  THE LOCAL RATE is what that KIND of seat typically costs per hour in this lead's own market, as a round whole number. It is their market, not ours, which is why the line says over there and not here.
+  QUOTE THE RATE, DO NOT DIVIDE A SALARY. Give the hourly market rate directly. Never show the working, never mention an annual figure, and never name the number of hours in a year: the divisor is the one part of this a lead can argue with, and 2,080 against 1,872 changes the answer.
   CURRENCY comes from the website address: .com.au is Australian dollars, .co.nz or .nz New Zealand dollars, .co.uk or .uk pounds, .ie euros, .ca Canadian dollars, .sg Singapore dollars, .ph pesos. Anything else, or no website, US dollars. Say the currency once, on the first figure only, and never name the country.
   THE OFFSHORE FIGURE IS ARITHMETIC, NOT A SECOND GUESS. Do not estimate it, and do not subtract a percentage in your head. Multiply.
-  Low end = the local figure times ${payLow}. High end = the local figure times ${payHigh}. Round both to the nearest thousand and say them low to high. That is a saving of ${midpoint} to ${deepest}%, which sits inside ${SAVINGS_CLAIM}.
-  WORKED, SO THERE IS NOTHING TO INTERPRET. Local 80,000 gives "for only ${example(80000)}". Local 60,000 gives "for only ${example(60000)}". Local 120,000 gives "for only ${example(120000)}".
-  "30 to 35,000" against a local 80,000 is WRONG. It is a saving of 56 to 62%, it is the number this beat kept producing, and it is shallower than every figure we publish. If your offshore range is more than ${payHigh} of your local figure, you have guessed instead of multiplying.
+  Low end = the local rate times ${payLow}. High end = the local rate times ${payHigh}. Round both to the nearest whole number and say them low to high. That is a saving of ${midpoint} to ${deepest}%, which sits inside ${SAVINGS_CLAIM}.
+  WORKED, SO THERE IS NOTHING TO INTERPRET. A local 45 gives "for only ${example(45)}". A local 30 gives "for only ${example(30)}". A local 65 gives "for only ${example(65)}".
+  If your offshore range is more than ${payHigh} of your local rate, you have guessed instead of multiplying. This beat has drifted shallow before - it produced a 56 to 62% saving when the rule said 60 to 70 - so do the multiplication rather than reaching for a number that looks about right.
 
   WE ARE BARELY IN THIS BEAT, and only in the four locked words "with one of our partners". Past those the subject is them, the seat, or the money. Never us, never what we do or do not do. BANNED outright: "our partners fill", "we place", "we provide", "we can give you", "we work with", "we help", "what we do is", "our clients", and any sentence at all whose subject is we, our or us.
   THE LOCKED LINE IS THE ONE EXCEPTION AND IT IS WRITTEN FOR YOU, so do not treat the list above as a reason to reword it. It says "our partners" and it says "they can give you", which are a hair away from two of the banned phrases, and the difference is the whole point: the subject is THEY, the partner who would fill this seat, and never we. It does not license a second mention. Every word you write yourself obeys the list.
