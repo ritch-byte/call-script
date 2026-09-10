@@ -139,7 +139,7 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
   1. THE INDUSTRY, NOT US. 30 WORDS MAX. Open word for word: "so yeah, we're just reaching out because what we're seeing across ${industry || 'firms like yours'} at the moment..." then ONE thing that is true of that sector right now and that a person inside it would recognise.
   IT IS A CLAIM ABOUT THE SECTOR, NEVER ABOUT THIS FIRM. "Dental practices are losing reception hours to health-fund claims" is a market observation and a rep can defend it. "Your clinic is drowning in claims" is invented, and the lead knows it is invented because we have never spoken to them. Say what is true of the industry and let them apply it to themselves.
   IT NEEDS A NOUN ONLY THIS INDUSTRY WOULD USE, the thing the work is actually made of: health-fund claims, shop drawings, carrier contracts, reservation inventory, freight documentation, specimen batches, retainer scopes, variation claims. That noun is what makes the sentence land in one industry and nowhere else.
-  BANNED, because every one of them is true of every industry and says nothing: "rising costs", "doing more with less", "the talent shortage", "a tight labour market", "increased competition", "margin pressure", "in today's market", "post-pandemic", "digital transformation", "growing pains".
+  BANNED, because every one of them is true of every industry and says nothing: "rising costs", "doing more with less", "the talent shortage", "a tight labour market", "increased competition", "margin pressure", "in today's market", "post-pandemic", "digital transformation", "growing pains", "moves the needle", "doesn't move the needle", "in your space", "firms like yours", "a ton of time getting eaten up", "time gets eaten up".
   Past those opening words, do not say who we are, what we sell, the word offshore, or anything about hiring. Not yet. The locked words say the rep is reaching out; they do not say who is reaching out, and beat 3 is where that lands.
 
   2. THEIR DESK. 26 WORDS MAX. Open word for word: "and for ${plural} like you that usually lands on..." then the part of that sector pressure THIS title actually carries.
@@ -314,8 +314,24 @@ export default function IndustryScript() {
         .filter(Boolean)
       if (!parts.length) throw new Error('empty')
       setScript(parts)
-    } catch {
-      setError('That did not come back clean. Run it again.')
+    } catch (e) {
+      /*
+       * SAY WHAT ACTUALLY WENT WRONG. This used to swallow every error and print "that did
+       * not come back clean, run it again" for all of them, which is advice rather than
+       * information - and it is wrong advice whenever retrying cannot help.
+       *
+       * lib/ai.ts already throws messages worth reading: the relay timed out at 45 seconds
+       * twice, Google failed to serve the script, the reply was unreadable, or an error came
+       * back from the model itself. All of those were being replaced with the same sentence,
+       * so a rep retried a dead key forever and a transient blip looked identical to a
+       * broken tool. Measured while chasing one of these: the relay answers the real prompt
+       * in about 6 seconds, so a failure is a failure and not slowness.
+       *
+       * The generic line survives for the one case that has no message: the model returned
+       * nothing usable, where running it again genuinely is the answer.
+       */
+      const msg = (e as Error | undefined)?.message || ''
+      setError(!msg || msg === 'empty' ? 'That did not come back clean. Run it again.' : msg)
     } finally {
       setLoading(false)
     }

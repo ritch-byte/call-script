@@ -5,8 +5,11 @@
 export const AI_RELAY_URL =
   'https://script.google.com/macros/s/AKfycby2akMg_lgj-eKdRsmylzVCnzPG_GOFrW1992Xb7rQNkQESzu7F_I2WY4CFk4jPPAoY/exec'
 
-/** How long one relay attempt may take before it is treated as stuck. Two attempts happen. */
+/** How long one relay attempt may take before it is treated as stuck. */
 export const RELAY_TIMEOUT_MS = 45000
+
+/** How many times to try a request that Google failed to serve or that timed out. */
+export const RELAY_ATTEMPTS = 3
 
 interface CallAIOptions {
   prompt: string
@@ -113,22 +116,29 @@ async function postRelay(payload: Record<string, unknown>): Promise<AIResponse> 
     return { body, notServed: /^\s*</.test(body) || !body.trim() }
   }
 
+  /*
+   * THREE ATTEMPTS, NOT TWO. Apps Script fails to serve the script roughly one request in
+   * six, which with a single retry leaves about one build in thirty-six failing in front of
+   * a rep - a few times a day across the floor. A third attempt takes that under one in two
+   * hundred. A bad serve is detected from the body rather than by waiting, so the retries
+   * are cheap: the expensive case is a timeout, and that is capped separately.
+   */
   let out = await attempt()
-  if ('unreachable' in out || out.notServed) {
-    await new Promise(r => setTimeout(r, 1500))
+  for (let tries = 1; tries < RELAY_ATTEMPTS && ('unreachable' in out || out.notServed); tries++) {
+    await new Promise(r => setTimeout(r, 1200 * tries))
     out = await attempt()
   }
 
   if ('unreachable' in out) {
     throw new Error(
       out.timedOut
-        ? `The AI relay did not answer within ${Math.round(RELAY_TIMEOUT_MS / 1000)} seconds, twice. It is stuck rather than slow, so press the button again — and if it keeps happening, say so, because it means the relay needs looking at rather than retrying.`
+        ? `The AI relay did not answer within ${Math.round(RELAY_TIMEOUT_MS / 1000)} seconds, ${RELAY_ATTEMPTS} times over. It is stuck rather than slow: a healthy build takes about 6 seconds. Press the button again, and if it keeps happening say so, because that means the relay needs looking at rather than retrying.`
         : 'Could not reach the AI relay. Check your connection and try again.',
     )
   }
   if (out.notServed) {
     throw new Error(
-      'The AI relay did not answer, twice in a row. Google sometimes drops these for a few seconds. Press Build spiel again.',
+      `Google did not serve the relay, ${RELAY_ATTEMPTS} times in a row. It drops these for a few seconds at a time, so press the button again.`,
     )
   }
   const body = out.body as string

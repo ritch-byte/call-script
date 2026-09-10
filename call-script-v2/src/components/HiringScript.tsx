@@ -424,8 +424,24 @@ export default function HiringScript() {
         .filter(Boolean)
       if (!parts.length) throw new Error('empty')
       setScript(parts)
-    } catch {
-      setError('That did not come back clean. Run it again.')
+    } catch (e) {
+      /*
+       * SAY WHAT ACTUALLY WENT WRONG. This used to swallow every error and print "that did
+       * not come back clean, run it again" for all of them, which is advice rather than
+       * information - and it is wrong advice whenever retrying cannot help.
+       *
+       * lib/ai.ts already throws messages worth reading: the relay timed out at 45 seconds
+       * twice, Google failed to serve the script, the reply was unreadable, or an error came
+       * back from the model itself. All of those were being replaced with the same sentence,
+       * so a rep retried a dead key forever and a transient blip looked identical to a
+       * broken tool. Measured while chasing one of these: the relay answers the real prompt
+       * in about 6 seconds, so a failure is a failure and not slowness.
+       *
+       * The generic line survives for the one case that has no message: the model returned
+       * nothing usable, where running it again genuinely is the answer.
+       */
+      const msg = (e as Error | undefined)?.message || ''
+      setError(!msg || msg === 'empty' ? 'That did not come back clean. Run it again.' : msg)
     } finally {
       setLoading(false)
     }
