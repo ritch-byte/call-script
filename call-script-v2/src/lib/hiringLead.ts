@@ -343,7 +343,14 @@ export function hiringLeadIssue(lead: HiringLead, seat: string): string {
 export function seatWarning(seat: string): string {
   const s = (seat || '').trim()
   if (!s) return ''
-  if (s.split(/\s+/).length >= 3 && !looksLikeARole(s))
+  /*
+   * TWO WORDS IS ENOUGH TO BE WRONG. This was three, and "Business Development" slipped
+   * through: two words, no role noun, so the script read "a Business Development was one of
+   * them" out loud. A real two-word seat almost always ends in a role noun - Executive
+   * Assistant, Office Manager, Data Analyst - so it passes looksLikeARole and never reaches
+   * this line. What gets caught is a department pasted where a job should be.
+   */
+  if (s.split(/\s+/).length >= 2 && !looksLikeARole(s))
     return `"${s}" does not read like a job title. Check the company or the contact name has not ended up in the seat — if it is right, carry on.`
   return ''
 }
