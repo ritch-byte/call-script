@@ -19,18 +19,35 @@ export const AI_RELAY_URL =
  * eighteen and twenty-seven seconds of waiting. So the variance is not the prompt and not the
  * model - it is Google's serving of the result, and when it goes wrong it goes wrong slowly.
  *
- * 45 seconds was six times the healthy time, which meant a degraded attempt sat there burning
- * the deadline when a retry would very likely have landed in seven. 25 is still three and a
- * half times healthy, and above the worst POST leg observed on a run that did succeed, so it
- * abandons the stuck ones without cutting off the merely slow ones.
- *
- * The point is to fail fast and retry, not to wait longer. Worst case across all attempts is
- * now about 79 seconds rather than 139.
+ * The five totals were 6.9, 7.0, 14.4 seconds for the runs that SUCCEEDED, and 24.2 and 41.6
+ * for the two that failed. 18 seconds sits above every observed success and below every
+ * observed failure, which is the only defensible place to put it: it abandons the stuck ones
+ * and never cuts off a slow one that was going to work.
  */
-export const RELAY_TIMEOUT_MS = 25000
+export const RELAY_TIMEOUT_MS = 18000
 
-/** How many times to try a request that Google failed to serve or that timed out. */
-export const RELAY_ATTEMPTS = 3
+/*
+ * TWO REQUESTS AT ONCE, and this is the change that actually shortens the wait.
+ *
+ * Retrying in sequence makes a rep wait for the failure BEFORE the attempt that works: a dead
+ * request costs the full deadline and only then does the good one start. So the wait is
+ * timeout + success, and a rep watching the counter sees 27 seconds on a call.
+ *
+ * Firing two together makes the wait min(a, b) instead. The failures are Google dropping the
+ * result of one request, and that is independent per request, so two draws from the same
+ * sample land ~7 seconds far more often than one does. On the measured five, the pair would
+ * almost always have returned in about seven. It also squares the chance of a round failing
+ * outright: roughly two in five became roughly one in six.
+ *
+ * THE COST IS DELIBERATE AND SMALL. Every generation now spends two model calls instead of
+ * one - about 2,100 tokens in and 270 out each, on Haiku, so fractions of a cent per build.
+ * Doubling that is worth twenty seconds of a rep's live call. If spend ever needs pulling
+ * back, this is the first knob: set it to 1 and the behaviour returns to plain retries.
+ */
+export const RELAY_PARALLEL = 2
+
+/** How many rounds of RELAY_PARALLEL requests before giving up. */
+export const RELAY_ROUNDS = 2
 
 interface CallAIOptions {
   prompt: string
@@ -135,29 +152,54 @@ async function postRelay(payload: Record<string, unknown>): Promise<AIResponse> 
     return { body, notServed: /^\s*</.test(body) || !body.trim() }
   }
 
+  type Attempt = Awaited<ReturnType<typeof attempt>>
+  const usable = (o: Attempt) => !('unreachable' in o) && !o.notServed
+
   /*
-   * THREE ATTEMPTS, NOT TWO. Apps Script fails to serve the script roughly one request in
-   * six, which with a single retry leaves about one build in thirty-six failing in front of
-   * a rep - a few times a day across the floor. A third attempt takes that under one in two
-   * hundred. A bad serve is detected from the body rather than by waiting, so the retries
-   * are cheap: the expensive case is a timeout, and that is capped separately.
+   * Resolve on the FIRST request that came back usable, rather than waiting for all of them.
+   * If every one failed, hand back the last failure so the caller can say which kind it was.
    */
-  let out = await attempt()
-  for (let tries = 1; tries < RELAY_ATTEMPTS && ('unreachable' in out || out.notServed); tries++) {
-    await new Promise(r => setTimeout(r, 1200 * tries))
-    out = await attempt()
+  const firstUsable = (runs: Array<Promise<Attempt>>) =>
+    new Promise<Attempt>(resolve => {
+      let outstanding = runs.length
+      let settled = false
+      for (const run of runs) {
+        void run.then(o => {
+          if (settled) return
+          if (usable(o)) {
+            settled = true
+            resolve(o)
+            return
+          }
+          outstanding -= 1
+          if (outstanding === 0) {
+            settled = true
+            resolve(o)
+          }
+        })
+      }
+    })
+
+  const round = () => firstUsable(Array.from({ length: RELAY_PARALLEL }, () => attempt()))
+
+  let out = await round()
+  for (let n = 1; n < RELAY_ROUNDS && !usable(out); n++) {
+    await new Promise(r => setTimeout(r, 1000))
+    out = await round()
   }
+
+  const sent = RELAY_PARALLEL * RELAY_ROUNDS
 
   if ('unreachable' in out) {
     throw new Error(
       out.timedOut
-        ? `The AI relay did not answer within ${Math.round(RELAY_TIMEOUT_MS / 1000)} seconds, ${RELAY_ATTEMPTS} times over. It is stuck rather than slow: a healthy build takes about 6 seconds. Press the button again, and if it keeps happening say so, because that means the relay needs looking at rather than retrying.`
+        ? `The AI relay did not answer within ${Math.round(RELAY_TIMEOUT_MS / 1000)} seconds, across ${sent} requests. It is stuck rather than slow: a healthy build takes about 7 seconds. Press the button again, and if it keeps happening say so, because that means the relay needs looking at rather than retrying.`
         : 'Could not reach the AI relay. Check your connection and try again.',
     )
   }
   if (out.notServed) {
     throw new Error(
-      `Google did not serve the relay, ${RELAY_ATTEMPTS} times in a row. It drops these for a few seconds at a time, so press the button again.`,
+      `Google did not serve the relay, across ${sent} requests. It drops these for a few seconds at a time, so press the button again.`,
     )
   }
   const body = out.body as string
