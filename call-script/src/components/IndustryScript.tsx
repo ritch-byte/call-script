@@ -32,7 +32,7 @@
  * from the call script the way two hardcoded copies of a number always eventually do.
  */
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { callAI } from '../lib/ai'
 import { MEETING_ONE, SAVINGS_CLAIM } from '../data/flow'
 import { ScriptLine } from './ScriptLine'
@@ -251,6 +251,29 @@ export default function IndustryScript() {
   const [leadLine, setLeadLine] = useState('')
   const [script, setScript] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
+
+  /*
+   * A SECOND COUNTER ON THE BUTTON, because "WRITING" alone is unfalsifiable.
+   *
+   * Measured on the live relay: Apps Script itself serves in about 1.2 seconds, five times out
+   * of five, so the endpoint is healthy. The wait is the AI call behind it, and that ran to
+   * roughly 20 seconds even for a sixteen-token reply. A real script is longer, and the client
+   * retries once, so a normal build can legitimately sit there for most of a minute.
+   *
+   * None of that is visible to a rep. A frozen-looking word and no number is the difference
+   * between waiting and giving up, and giving up mid-generation is how the same lead gets
+   * built three times. The count does not make it faster. It makes it honest.
+   */
+  const [elapsed, setElapsed] = useState(0)
+  useEffect(() => {
+    if (!loading) {
+      setElapsed(0)
+      return
+    }
+    const started = Date.now()
+    const id = setInterval(() => setElapsed(Math.round((Date.now() - started) / 1000)), 250)
+    return () => clearInterval(id)
+  }, [loading])
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
 
@@ -388,7 +411,7 @@ export default function IndustryScript() {
                 cursor: ready || script.length ? 'pointer' : 'not-allowed',
               }}
             >
-              {loading ? 'WRITING' : script.length ? 'NEXT LEAD' : 'WRITE THE SCRIPT'}
+              {loading ? `WRITING ${elapsed}s` : script.length ? 'NEXT LEAD' : 'WRITE THE SCRIPT'}
             </button>
             {script.length > 0 && !loading && (
               <button onClick={copy} style={ghostBtn}>
