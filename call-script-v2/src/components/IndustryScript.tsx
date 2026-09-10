@@ -134,7 +134,7 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
 
   THE REP HAS SAID ONE LINE ALREADY: they greeted the lead by name, gave their own name, said they had caught them out of the blue and asked for half a minute, and got it. They did NOT say the company name. So do not greet, do not introduce yourself, and do not ask for permission or for time. Start cold on beat 1.
 
-  It is one continuous read. Beats 1 to 3 carry no ask. The ask lives in beat 4 and nowhere else.
+  It is one continuous read until beat 4. Beats 1 to 3 carry no ask and no question at all. Beat 4 carries two questions, in a fixed order: which role could go offshore, then the meeting.
 
   1. THE INDUSTRY, NOT US. 30 WORDS MAX. Open word for word: "so yeah, we're just reaching out because what we're seeing across ${industry || 'firms like yours'} at the moment..." then ONE thing that is true of that sector right now and that a person inside it would recognise.
   IT IS A CLAIM ABOUT THE SECTOR, NEVER ABOUT THIS FIRM. "Dental practices are losing reception hours to health-fund claims" is a market observation and a rep can defend it. "Your clinic is drowning in claims" is invented, and the lead knows it is invented because we have never spoken to them. Say what is true of the industry and let them apply it to themselves.
@@ -152,6 +152,10 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
   4. TWO ROLES, THEN THE ASK. Word for word: "so yeah I think a great starting point is" + an offshore role + "to" + what it takes off the work you named in beat 2, then "or a" + a second role + "to" + what that one takes off them.
   BOTH ROLES MUST BE DOABLE FROM ANOTHER COUNTRY. The test, before you name either: could this person do the whole job on a laptop, with nobody needing them in the building? A warehouse manager, a site foreman, a front office manager, a housekeeping lead, kitchen staff, floor managers all fail it, because the job is where the work is. The back office behind them passes: claims and billing administrators, purchasing and inventory coordinators, order processing, freight and customs documentation, dispatch scheduling, bookkeeping, payroll, customer support. Where the operation is physical, the offshorable seats are the ones behind it and never the ones on it.
   Real job titles a lead would recognise on an org chart. The work each one takes has to be work beat 2 already named, not new work you invented.
+  THEN ASK THEM WHICH ROLE, word for word and nothing added to it: "and aside from the roles I mentioned, what type of role do you think would also be suitable for offshore?"
+  IT IS A REAL QUESTION AND THE REP STOPS TALKING AFTER IT. Put [PAUSE] on its own line straight after it. That mark is the only one in the script that is not breath: it is the rep waiting for an answer, and the beat is worthless without the wait. Everything up to here has been the rep talking, and this is the one place the lead gets to describe their own world.
+  IT COMES BEFORE THE ASK AND NEVER INSTEAD OF IT. Both get said, in this order. The question earns the ask: after it, the meeting is about a role THEY named rather than the two we guessed, and what they say is the most useful thing the call produces even if they never book.
+  DO NOT MERGE THE TWO QUESTIONS into one sentence, and do not put the meeting ask before it. Two questions in one breath and the lead answers only the last one.
   Then the ask, word for word, and the only thing you write in it is the hesitation:
   "I know ${plural} like you [HESITATION], but would you be opposed to carving out ${MEETING_ONE} for a coffee break style chat, just to see if this could work or not, I'm thinking ${offer}? If not maybe ${fallback}?"
   The hesitation completes "I know ${plural} like you ___", reads straight on from it, and is 10 WORDS MAX with no full stop inside it. It is the one thing that would make THIS person pause before saying yes, given their seat and their sector. Their words, not ours. Never a generic objection like being busy or not having budget.
@@ -162,10 +166,10 @@ export function buildIndustryPrompt({ title, industry, url }: IndustryLead): str
   VOICE: spoken, short clauses, contractions, ellipses as pacing marks but at most ONE per beat. No em dashes, no corporate filler, no feature lists, no percentages beyond the one figure above. Curiosity, not authority. Sell the meeting, not the service.
 
   DELIVERY MARKS. Write it the way a screenplay is written, so the rep can see the pacing.
-  Put [PAUSE] on its own after beat 1 and again before the ask in beat 4. Two, no more.
+  Put [PAUSE] on its own after beat 1, and again in beat 4 straight after the question about which role. Two, no more, and the second one is a wait for an answer rather than a breath.
   Put one direction in round brackets before the phrase it governs, one word: (slow), (deliberate), (softer). At most one across the whole script, and never inside beat 4.
   Drop in a spoken filler where a person actually would, like y'know or uh. At most one per beat, and never in beat 4.
-  Marks, directions and fillers are breath, not content. They do NOT count toward the word caps.
+  Marks, directions and fillers are breath, not content, and they do NOT count toward the word caps. The one exception is the [PAUSE] after the question in beat 4, which is the rep actually waiting.
 
   SAY IT ALOUD. A rep reads this at pace on a live call. Short, common, spoken words. Nothing anyone could trip over: not "operationalised", "consolidation", "methodologies", "infrastructure", "bandwidth", "streamline", "leverage".`
 }
