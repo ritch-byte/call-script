@@ -55,3 +55,73 @@ export function offerWindow(now = new Date()) {
       thisWeek(a) && thisWeek(b) ? `${fallbackDay} next week` : `${fallbackDay} the week after`,
   }
 }
+
+/* ------------------- the three-field paste, shared -------------------
+ *
+ * Job title, website, industry. Lived in components/IndustryScript.tsx until 2026-09-11,
+ * when a second screen needed the same paste. That file is on the DIVERGED list, so a
+ * helper reachable only through it is a helper that can be edited on one version and not
+ * the other - the exact trap this lib was created to close when the Spiel Builder was
+ * removed and took ScriptLine with it.
+ *
+ * Reading a lead is shared. Only the spiel diverges.
+ */
+export interface IndustryLead {
+  title: string
+  industry: string
+  url: string
+}
+
+/*
+ * THE WEBSITE IS THE SEPARATOR: job title, website, industry.
+ *
+ * Comma-splitting cannot read this input, and the reason is worth writing down because it is
+ * not obvious. Job titles contain commas. "VP, Growth & Performance" is one title, and a
+ * comma-splitter reads it as two fields, hands "VP" to the title and drops the rest into
+ * whatever slot is next. That is exactly what happened: the industry came out empty and
+ * "Growth & Performance retail" ended up filed as the company name.
+ *
+ * A URL cannot appear inside a job title or inside an industry, which makes it the only
+ * unambiguous delimiter in the line. So everything before it is the title, commas and
+ * ampersands and all, and everything after it is the industry.
+ *
+ * The old order still works. If nothing follows the website, the part in front of it is
+ * comma-split the way it always was, so "Practice Manager, dental, ashfielddental.com.au"
+ * reads the same as it did before.
+ */
+const LABEL =
+  /^(job\s*)?(title|role|position|industry|sector|vertical|niche|website|site|url)\s*[:=-]\s*/i
+
+export function parseIndustryLead(line: string): IndustryLead {
+  const out: IndustryLead = { title: '', industry: '', url: '' }
+  const raw = (line || '').trim()
+  if (!raw) return out
+
+  const tokens = raw.split(/\s+/)
+  const at = tokens.findIndex(t => URL_RE.test(t))
+
+  const tidy = (x: string) => x.replace(/^[\s,;|]+|[\s,;|]+$/g, '').replace(LABEL, '').trim()
+
+  if (at !== -1) {
+    out.url = tokens[at]
+    const before = tidy(tokens.slice(0, at).join(' '))
+    const after = tidy(tokens.slice(at + 1).join(' '))
+    if (after) {
+      /* job title, website, industry - the order the line is meant to be in */
+      out.title = before
+      out.industry = after
+      return out
+    }
+    /* nothing after the website, so it is the older comma-separated order */
+    const parts = before.split(/\s*[,;|]\s*/).map(tidy).filter(Boolean)
+    out.title = parts[0] || ''
+    out.industry = parts.slice(1).join(', ')
+    return out
+  }
+
+  /* no website at all: first comma segment is the title, the rest is the industry */
+  const parts = raw.split(/\s*[,;|]\s*/).map(tidy).filter(Boolean)
+  out.title = parts[0] || ''
+  out.industry = parts.slice(1).join(', ')
+  return out
+}

@@ -53,7 +53,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { callAI } from '../lib/ai'
 import { MEETING_ONE, SAVINGS_CLAIM } from '../data/flow'
 import { ScriptLine } from './ScriptLine'
-import { URL_RE, offerWindow, pluralTitle } from '../lib/leadText'
+import { offerWindow, parseIndustryLead, pluralTitle, type IndustryLead } from '../lib/leadText'
+export type { IndustryLead } from '../lib/leadText'
+export { parseIndustryLead } from '../lib/leadText'
 
 /** Same model and the same one-call-per-click shape as the other two generators. */
 const MODEL = 'claude-haiku-4-5-20251001'
@@ -64,66 +66,6 @@ const PAPER = '#f7f8fb'
 const LINE = '#dfe3ec'
 const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
 const SANS = '"Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans-serif'
-
-export interface IndustryLead {
-  title: string
-  industry: string
-  url: string
-}
-
-/*
- * THE WEBSITE IS THE SEPARATOR: job title, website, industry.
- *
- * Comma-splitting cannot read this input, and the reason is worth writing down because it is
- * not obvious. Job titles contain commas. "VP, Growth & Performance" is one title, and a
- * comma-splitter reads it as two fields, hands "VP" to the title and drops the rest into
- * whatever slot is next. That is exactly what happened: the industry came out empty and
- * "Growth & Performance retail" ended up filed as the company name.
- *
- * A URL cannot appear inside a job title or inside an industry, which makes it the only
- * unambiguous delimiter in the line. So everything before it is the title, commas and
- * ampersands and all, and everything after it is the industry.
- *
- * The old order still works. If nothing follows the website, the part in front of it is
- * comma-split the way it always was, so "Practice Manager, dental, ashfielddental.com.au"
- * reads the same as it did before.
- */
-const LABEL =
-  /^(job\s*)?(title|role|position|industry|sector|vertical|niche|website|site|url)\s*[:=-]\s*/i
-
-export function parseIndustryLead(line: string): IndustryLead {
-  const out: IndustryLead = { title: '', industry: '', url: '' }
-  const raw = (line || '').trim()
-  if (!raw) return out
-
-  const tokens = raw.split(/\s+/)
-  const at = tokens.findIndex(t => URL_RE.test(t))
-
-  const tidy = (x: string) => x.replace(/^[\s,;|]+|[\s,;|]+$/g, '').replace(LABEL, '').trim()
-
-  if (at !== -1) {
-    out.url = tokens[at]
-    const before = tidy(tokens.slice(0, at).join(' '))
-    const after = tidy(tokens.slice(at + 1).join(' '))
-    if (after) {
-      /* job title, website, industry - the order the line is meant to be in */
-      out.title = before
-      out.industry = after
-      return out
-    }
-    /* nothing after the website, so it is the older comma-separated order */
-    const parts = before.split(/\s*[,;|]\s*/).map(tidy).filter(Boolean)
-    out.title = parts[0] || ''
-    out.industry = parts.slice(1).join(', ')
-    return out
-  }
-
-  /* no website at all: first comma segment is the title, the rest is the industry */
-  const parts = raw.split(/\s*[,;|]\s*/).map(tidy).filter(Boolean)
-  out.title = parts[0] || ''
-  out.industry = parts.slice(1).join(', ')
-  return out
-}
 
 /**
  * The greeting, fixed and local so the model can never reword it. It deliberately does NOT
