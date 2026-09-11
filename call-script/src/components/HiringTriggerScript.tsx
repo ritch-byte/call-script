@@ -5,7 +5,7 @@
  *
  *   1. callModel() now goes through lib/ai.ts, the app's single relay path. See the seam below.
  *   2. Tailwind classes became inline style objects, because this app has no Tailwind and every
- *      other generator is styled this way. Layout and colours follow the Personalised Script.
+ *      other generator is styled this way. Layout and colours follow the Hiring Script.
  *   3. .jsx became .tsx with types, because the build runs `tsc && vite build` under strict and
  *      there is no allowJs.
  *

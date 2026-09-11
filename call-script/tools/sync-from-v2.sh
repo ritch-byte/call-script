@@ -23,16 +23,6 @@ DIVERGED=(
   # If a change is about how a lead is read rather than what the rep says, it belongs in the
   # lib, and then this list does not need touching at all.
   "components/HiringScript.tsx"
-
-  # 2026-09-11. The Personalised Script's beat 3 is being reworked for v2 only: a proper
-  # introduction to Outsource Accelerator rather than one clause of one sentence. v1 keeps the
-  # short version. Delete this line to put the two back in step.
-  #
-  # SECOND FILE ON THIS LIST, and that is the cost worth noticing. Every entry here is a place
-  # the two versions can drift without the diff showing it, which is the exact failure this
-  # script exists to prevent. Anything that is not the SPIEL - reading a lead, the parser, the
-  # shared text helpers - still belongs in src/lib and must not come here.
-  "components/IndustryScript.tsx"
 )
 
 [ -d "$SRC" ] || { echo "run me from the repo root" >&2; exit 1; }

@@ -5,7 +5,6 @@ import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
 import { callAI, buildResearchPrompt } from '../lib/ai'
 import HiringScript from './HiringScript'
-import IndustryScript from './IndustryScript'
 import HiringTriggerScript from './HiringTriggerScript'
 import Scorecard from './Scorecard'
 import { newState, applyAnswer } from '../lib/score'
@@ -71,7 +70,6 @@ export default function CallScreen({ onReset }: Props) {
   const [showGates, setShowGates] = useState(false)
   const [emailPageOpen, setEmailPageOpen] = useState(false)
   const [hiringPageOpen, setHiringPageOpen] = useState(false)
-  const [industryPageOpen, setIndustryPageOpen] = useState(false)
   const [triggerPageOpen, setTriggerPageOpen] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
@@ -149,11 +147,10 @@ export default function CallScreen({ onReset }: Props) {
 
   // Reserve space for the fixed scorecard so it never overlaps the cards.
   useEffect(() => {
-    const on =
-      showScore && !emailPageOpen && !hiringPageOpen && !industryPageOpen && !triggerPageOpen
+    const on = showScore && !emailPageOpen && !hiringPageOpen && !triggerPageOpen
     document.body.classList.toggle('scorecard-open', on)
     return () => document.body.classList.remove('scorecard-open')
-  }, [showScore, emailPageOpen, hiringPageOpen, industryPageOpen, triggerPageOpen])
+  }, [showScore, emailPageOpen, hiringPageOpen, triggerPageOpen])
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
@@ -207,25 +204,6 @@ export default function CallScreen({ onReset }: Props) {
         </div>
         <div className="email-page-body">
           <HiringTriggerScript />
-        </div>
-      </div>
-    )
-  }
-
-  // ── Personalised Script full-page view ────────────────────────
-  if (industryPageOpen) {
-    return (
-      <div className="call-screen">
-        <div className="email-page-header">
-          <button className="email-page-back" onClick={() => setIndustryPageOpen(false)}>
-            ← Back to Call
-          </button>
-          <span className="email-page-title">
-            Personalised Script &mdash; aligned to their job title and industry
-          </span>
-        </div>
-        <div className="email-page-body">
-          <IndustryScript />
         </div>
       </div>
     )
@@ -320,12 +298,6 @@ export default function CallScreen({ onReset }: Props) {
             onClick={() => setShowScore(v => !v)}
           >
             Scorecard
-          </button>
-          <button
-            className="btn-header-ghost"
-            onClick={() => setIndustryPageOpen(true)}
-          >
-            Personalised Script
           </button>
           <button
             className="btn-header-ghost"
