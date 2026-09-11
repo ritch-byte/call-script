@@ -6,6 +6,7 @@ import EmailComposer from './EmailComposer'
 import { callAI, buildResearchPrompt } from '../lib/ai'
 import HiringScript from './HiringScript'
 import IndustryScript from './IndustryScript'
+import HiringTriggerScript from './HiringTriggerScript'
 import Scorecard from './Scorecard'
 import { newState, applyAnswer } from '../lib/score'
 import type { ScoreState } from '../lib/score'
@@ -71,6 +72,7 @@ export default function CallScreen({ onReset }: Props) {
   const [emailPageOpen, setEmailPageOpen] = useState(false)
   const [hiringPageOpen, setHiringPageOpen] = useState(false)
   const [industryPageOpen, setIndustryPageOpen] = useState(false)
+  const [triggerPageOpen, setTriggerPageOpen] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
@@ -147,10 +149,11 @@ export default function CallScreen({ onReset }: Props) {
 
   // Reserve space for the fixed scorecard so it never overlaps the cards.
   useEffect(() => {
-    const on = showScore && !emailPageOpen && !hiringPageOpen && !industryPageOpen
+    const on =
+      showScore && !emailPageOpen && !hiringPageOpen && !industryPageOpen && !triggerPageOpen
     document.body.classList.toggle('scorecard-open', on)
     return () => document.body.classList.remove('scorecard-open')
-  }, [showScore, emailPageOpen, hiringPageOpen, industryPageOpen])
+  }, [showScore, emailPageOpen, hiringPageOpen, industryPageOpen, triggerPageOpen])
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
@@ -189,6 +192,25 @@ export default function CallScreen({ onReset }: Props) {
 
   const sp1Prefill = mkPrefill(sharedDate, sharedTime, sharedLink)
   const sp2Prefill = mkPrefill(sharedDate2 || sharedDate, sharedTime2 || sharedTime, sharedLink2)
+
+  // ── Hiring Trigger Script full-page view ─────────────────────
+  if (triggerPageOpen) {
+    return (
+      <div className="call-screen">
+        <div className="email-page-header">
+          <button className="email-page-back" onClick={() => setTriggerPageOpen(false)}>
+            ← Back to Call
+          </button>
+          <span className="email-page-title">
+            Hiring Trigger Script &mdash; the rate gap on a seat they have posted
+          </span>
+        </div>
+        <div className="email-page-body">
+          <HiringTriggerScript />
+        </div>
+      </div>
+    )
+  }
 
   // ── Personalised Script full-page view ────────────────────────
   if (industryPageOpen) {
@@ -310,6 +332,12 @@ export default function CallScreen({ onReset }: Props) {
             onClick={() => setHiringPageOpen(true)}
           >
             Hiring Script
+          </button>
+          <button
+            className="btn-header-ghost"
+            onClick={() => setTriggerPageOpen(true)}
+          >
+            Hiring Trigger
           </button>
           <button
             className="btn-header-ghost"
