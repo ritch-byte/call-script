@@ -6,7 +6,6 @@ import EmailComposer from './EmailComposer'
 import { callAI, buildResearchPrompt } from '../lib/ai'
 import HiringScript from './HiringScript'
 import IndustryScript from './IndustryScript'
-import InsightScript from './InsightScript'
 import Scorecard from './Scorecard'
 import { newState, applyAnswer } from '../lib/score'
 import type { ScoreState } from '../lib/score'
@@ -58,19 +57,6 @@ function interpolate(text: string, leadName: string, yourName: string, geminiRes
     .trimEnd()
 }
 
-/*
- * The Insight Script is a v1-only capability, gated here rather than by diverging this file.
- *
- * Vite stamps BASE_URL from the build config: '/call-script/' for v1 and '/call-script/v2/'
- * for v2. So one constant decides whether the button renders, the component stays in both
- * bundles, and CallScreen.tsx keeps syncing normally.
- *
- * The alternative was adding CallScreen.tsx to the DIVERGED list in tools/sync-from-v2.sh,
- * which would put the busiest file in the app on the list of things that can drift between
- * the two versions without the diff showing it. A hidden button is much the cheaper cost.
- */
-const V1_ONLY = !import.meta.env.BASE_URL.includes('/v2/')
-
 export default function CallScreen({ onReset }: Props) {
   const [steps, setSteps] = useState<StepEntry[]>(
     MAIN_FLOW.map(id => ({ nodeId: id }))
@@ -85,7 +71,6 @@ export default function CallScreen({ onReset }: Props) {
   const [emailPageOpen, setEmailPageOpen] = useState(false)
   const [hiringPageOpen, setHiringPageOpen] = useState(false)
   const [industryPageOpen, setIndustryPageOpen] = useState(false)
-  const [insightPageOpen, setInsightPageOpen] = useState(false)
   const [leadName, setLeadName] = useState('')
   const [yourName, setYourName] = useState('')
   const [geminiResearch, setGeminiResearch] = useState('')
@@ -162,11 +147,10 @@ export default function CallScreen({ onReset }: Props) {
 
   // Reserve space for the fixed scorecard so it never overlaps the cards.
   useEffect(() => {
-    const on =
-      showScore && !emailPageOpen && !hiringPageOpen && !industryPageOpen && !insightPageOpen
+    const on = showScore && !emailPageOpen && !hiringPageOpen && !industryPageOpen
     document.body.classList.toggle('scorecard-open', on)
     return () => document.body.classList.remove('scorecard-open')
-  }, [showScore, emailPageOpen, hiringPageOpen, industryPageOpen, insightPageOpen])
+  }, [showScore, emailPageOpen, hiringPageOpen, industryPageOpen])
 
   const currentNode = flow[steps[activeIdx]?.nodeId ?? 'opening']
 
@@ -205,25 +189,6 @@ export default function CallScreen({ onReset }: Props) {
 
   const sp1Prefill = mkPrefill(sharedDate, sharedTime, sharedLink)
   const sp2Prefill = mkPrefill(sharedDate2 || sharedDate, sharedTime2 || sharedTime, sharedLink2)
-
-  // ── Insight Script full-page view, v1 only ──────────────────────────────
-  if (insightPageOpen) {
-    return (
-      <div className="call-screen">
-        <div className="email-page-header">
-          <button className="email-page-back" onClick={() => setInsightPageOpen(false)}>
-            ← Back to Call
-          </button>
-          <span className="email-page-title">
-            Insight Script &mdash; one reframe, one question, one time slot
-          </span>
-        </div>
-        <div className="email-page-body">
-          <InsightScript />
-        </div>
-      </div>
-    )
-  }
 
   // ── Personalised Script full-page view ────────────────────────
   if (industryPageOpen) {
@@ -340,14 +305,6 @@ export default function CallScreen({ onReset }: Props) {
           >
             Personalised Script
           </button>
-          {V1_ONLY && (
-            <button
-              className="btn-header-ghost"
-              onClick={() => setInsightPageOpen(true)}
-            >
-              Insight Script
-            </button>
-          )}
           <button
             className="btn-header-ghost"
             onClick={() => setHiringPageOpen(true)}

@@ -59,10 +59,11 @@ export function offerWindow(now = new Date()) {
 /* ------------------- the three-field paste, shared -------------------
  *
  * Job title, website, industry. Lived in components/IndustryScript.tsx until 2026-09-11,
- * when a second screen needed the same paste. That file is on the DIVERGED list, so a
- * helper reachable only through it is a helper that can be edited on one version and not
- * the other - the exact trap this lib was created to close when the Spiel Builder was
- * removed and took ScriptLine with it.
+ * when a second screen needed the same paste. That screen has since been removed and this
+ * STAYS here anyway: IndustryScript.tsx is on the DIVERGED list, so a parser inside it is a
+ * parser that can be fixed on one version and not the other. That is the trap this lib was
+ * created to close when the Spiel Builder was removed and took ScriptLine with it, and it
+ * does not stop being a trap because there is one caller again.
  *
  * Reading a lead is shared. Only the spiel diverges.
  */
