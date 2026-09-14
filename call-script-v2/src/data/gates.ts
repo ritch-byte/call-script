@@ -38,8 +38,8 @@ export const GATE_COPY: Record<string, GateCopy> = {
   },
   offshore: {
     label: 'Open to offshore',
-    ask: "And you're open to an offshore setup, talent typically based in the Philippines, right?",
-    say: ['“yes, open to that”', '“the Philippines is fine”', '“we already use offshore”'],
+    ask: "And you're open to an offshore setup, right? Could be the Philippines, India, Eastern Europe, wherever the right team for that role actually is.",
+    say: ['“yes, open to that”', '“offshore is fine”', '“we already use offshore”'],
     not: ['“must be local”', '“on-site only”'],
     banks: ['offshore'],
     node: 'qualify_offshore',

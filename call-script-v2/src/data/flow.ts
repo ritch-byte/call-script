@@ -189,7 +189,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'qualify_offshore',
     topic: 'offshore',
     title: 'Qualify · Open to Offshore',
-    script: "And, you're open to an offshore setup, talent typically based in the Philippines, right?",
+    script: "And, you're open to an offshore setup, right? Could be the Philippines, India, Eastern Europe, wherever the right team for that role actually is.",
     waitForAnswer: true,
     tip: "The offshore gate (Gate 2). Ask it directly and get a spoken 'yes' — the analyzer credits it in the buyer's own voice. A clear yes qualifies. If they lean local or on-site only, handle it; don't just roll past it.",
     options: [
@@ -326,9 +326,9 @@ export const flow: Record<string, FlowNode> = {
     id: 'obj_offshore',
     title: 'Objection: Prefers Local / Unsure on Offshore',
     isObjection: true,
-    script: "Totally fair, honestly most people feel that way until they actually see it. Every partner we work with is already vetted, and you'd get to look through real profiles before committing to anyone, so you're never going in blind. And on the language side, English is an official business language in the Philippines, and a lot of these partners work almost entirely with US, UK and Aussie companies, so it's genuinely built for your market. Would it be worth just seeing a few profiles and the pricing side by side before you make any call on it?",
+    script: "Totally fair, honestly most people feel that way until they actually see it. Every partner we work with is already vetted, and you'd get to look through real profiles before committing to anyone, so you're never going in blind. And on the language side, every partner we'd put in front of you works in English day to day, and a lot of them work almost entirely with US, UK and Aussie companies, so it's genuinely built for your market. Would it be worth just seeing a few profiles and the pricing side by side before you make any call on it?",
     waitForAnswer: true,
-    tip: "Offshore is raised on 93% of calls — handle it as a normal step, not a crisis. Lead with the profile preview (they're not hiring blind) and the English / market-fit proof. Your goal is just to get a yes to SEE the comparison. ANALYZER: Gate 2 needs a spoken 'yes, open to offshore' / 'the Philippines is fine.' A hard 'must be local / on-site only' kills it — if the role is genuinely physically on-site, disqualify honestly rather than force it.",
+    tip: "Offshore is raised on 93% of calls — handle it as a normal step, not a crisis. Lead with the profile preview (they're not hiring blind) and the English / market-fit proof. Your goal is just to get a yes to SEE the comparison. ANALYZER: Gate 2 needs a spoken 'yes, open to offshore' / 'offshore is fine.' Naming a country is not what the gate credits, and on a cold call you do not yet know which partner the lead will be matched to. A hard 'must be local / on-site only' kills it — if the role is genuinely physically on-site, disqualify honestly rather than force it.",
     options: [
       { label: 'Open to seeing it', next: 'qualify_timeline', type: 'positive', banks: ['offshore'] },
       { label: 'Genuinely needs someone on-site', next: 'obj_need_inoffice', type: 'objection' },
@@ -654,9 +654,9 @@ export const flow: Record<string, FlowNode> = {
   obj_language: {
     id: 'obj_language',
     title: 'Objection: Language / Communication Barrier',
-    script: "Yeah, really common assumption, and honestly it surprises most people once they see it firsthand.\n\nWe only put forward people who've already passed language and communication screening. The Philippines is actually the third-largest English-speaking country in the world, it's an official business language there, used every day, and a lot of our partners work almost exclusively with US, UK and Aussie clients.\n\nIs the worry more about internal team chat, or is this a customer-facing role? If it's customer-facing, we'd point you at partners who specialise in exactly that and have the track record to back it.",
+    script: "Yeah, really common assumption, and honestly it surprises most people once they see it firsthand.\n\nWe only put forward people who've already passed language and communication screening, and a lot of our partners work almost exclusively with US, UK and Aussie clients, so English at work is the norm rather than the exception.\n\nIs the worry more about internal team chat, or is this a customer-facing role? If it's customer-facing, we'd point you at partners who specialise in exactly that and have the track record to back it.",
     isObjection: true,
-    tip: "Answer with a fact that surprises — 'third-largest English-speaking country' lands because they didn't expect it. Pair it with a specific example: 'a lot of clients say their offshore team communicates better in writing than some local hires.' Then narrow the concern: internal vs customer-facing.",
+    tip: "Answer with a fact that surprises, then narrow the concern: internal chat or customer-facing. Pair it with a specific example: 'a lot of clients say their offshore team communicates better in writing than some local hires.'\n\nTHE COUNTRY FACT IS YOURS TO PICK, AND ONLY WHEN YOU KNOW IT. If you already know where the partner delivers from, use the one that fits: the Philippines is the third-largest English-speaking country in the world and English is an official business language there; India runs business in English; Poland and the rest of Eastern Europe screen hard for it. Do NOT default to the Philippines on a cold call. You do not yet know which partner this lead will be matched to, and a lead qualified on a Philippines offering was rejected in September by a partner who delivers from India and Poland.",
     options: [
       { label: "They're reassured / want to explore", next: 'close_recap', type: 'positive' },
       { label: 'Still a concern — not convinced', next: 'end_not_interested', type: 'end' },
