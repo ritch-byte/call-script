@@ -67,7 +67,7 @@ LOG IT AS THIS, NOT AS NOT-INTERESTED. 6 of the 20 went into the data as OBJ_NOT
 
 {geminiResearch}`,tip:"Gap Selling: even without a named role, lead with the cost problem — 'salary costs by {SAVINGS_PCT}' creates instant curiosity. The research insert lets you surface a role for them. A general direction is enough to keep going into the value and offer.",options:[{label:"Lead is engaged / curious",next:"value_offer",type:"positive"},{label:"Already outsourcing / need to think",next:"obj_already_outsourcing",type:"objection"},{label:"Not interested",next:"obj_not_interested_late",type:"objection"}]},value_offer:{id:"value_offer",title:"Value & Offer + CTA",script:`Perfect, that's exactly the kind of role they fill all the time, so I'll skip the sales pitch and get straight to it.
 
-Here's how it works. I connect you with the right BPO partners, we've got more than 80 BPO partners in our network, and based on what you've shared I'll pick the two that fit your industry and this role.
+Here's how it works. I connect you with the right BPO partners, we've got more than 80 BPO partners in our network, and based on what you've shared I'll match you with the two that fit your industry and this role.
 
 On the call they'll go through what this role actually costs offshore, how the team gets managed day to day, and who owns performance and retention. That's the part you can't get over email.
 
