@@ -151,7 +151,7 @@ export const flow: Record<string, FlowNode> = {
     id: 'qualify_size',
     topic: 'company',
     title: 'Qualify · Size of the Team',
-    script: "Got it. And how many people have you got over there at the moment, roughly?",
+    script: "Got it. And how many employees does your company have over there at the moment, roughly?",
     waitForAnswer: true,
     tip: "Asked as curiosity, used as qualification. A rough number is plenty - 'about thirty', 'twenty-odd' - and a dodge is not worth fighting over, so take whatever they give and move on.\n\nWHAT YOU ARE LISTENING FOR, AND YOU NEVER SAY IT OUT LOUD: whether there is a team here at all. If the answer is in the single figures, or it is them and a couple of others, there is no back office to take work off and the play changes - route to the small-team handler rather than running five more questions at someone who has nobody to free up.\n\nNEVER IMPLY A MINIMUM, and never ask how many they would need to have. There is no headcount a company has to hit, saying there is turns a workable small lead into a no, and the small-team handler's whole reframe is that smaller teams get the most out of it. Real win on this exact question: 'how many staff now?' - thirty - 'that's a fit, do you use external partners or all in-house?' - booked [Jezza Jaraula].\n\nANALYZER: this is not one of the gates and it is not scored as one. It banks the company as confirmed, which is the same credit a named back-office function gets.",
     options: [
