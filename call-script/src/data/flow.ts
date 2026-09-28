@@ -121,7 +121,7 @@ export const flow: Record<string, FlowNode> = {
     waitForAnswer: true,
     tip: "The 'feel free to cut me off' line (Schiffman) disarms resistance before it forms. Lead with the industry pain — rising local talent costs — before introducing OA. 'we don't supply the staff ourselves' is the line that does the work: it says what we are before they guess, and a marketplace is easier to say yes to than a vendor. The closing question is deliberately NOT binary: 'in-house or external partners' cannot be answered with a flat no, and both answers route somewhere. In-house goes to the role question; already using partners goes to the benchmark play, which is the easier booking of the two. Ask it and stop talking.",
     options: [
-      { label: 'All in-house', next: 'qualify_role', type: 'positive', banks: ['company'], elaborated: true },
+      { label: 'All in-house', next: 'qualify_size', type: 'positive', banks: ['company'], elaborated: true },
       { label: 'They already use external partners', next: 'obj_already_outsourcing', type: 'positive', banks: ['company'], elaborated: true },
       { label: 'Not interested', next: 'obj_pitch_recover', type: 'objection' },
       { label: 'Not hiring / budget concern', next: 'obj_not_hiring', type: 'objection' },
@@ -146,6 +146,21 @@ export const flow: Record<string, FlowNode> = {
 
 
   // ── QUALIFY — THE FIVE MUST-KNOWS (Move 4) ───────────────────────────────
+
+  qualify_size: {
+    id: 'qualify_size',
+    topic: 'company',
+    title: 'Qualify · Size of the Team',
+    script: "Got it. And how many people have you got over there at the moment, roughly?",
+    waitForAnswer: true,
+    tip: "Asked as curiosity, used as qualification. A rough number is plenty - 'about thirty', 'twenty-odd' - and a dodge is not worth fighting over, so take whatever they give and move on.\n\nWHAT YOU ARE LISTENING FOR, AND YOU NEVER SAY IT OUT LOUD: whether there is a team here at all. If the answer is in the single figures, or it is them and a couple of others, there is no back office to take work off and the play changes - route to the small-team handler rather than running five more questions at someone who has nobody to free up.\n\nNEVER IMPLY A MINIMUM, and never ask how many they would need to have. There is no headcount a company has to hit, saying there is turns a workable small lead into a no, and the small-team handler's whole reframe is that smaller teams get the most out of it. Real win on this exact question: 'how many staff now?' - thirty - 'that's a fit, do you use external partners or all in-house?' - booked [Jezza Jaraula].\n\nANALYZER: this is not one of the gates and it is not scored as one. It banks the company as confirmed, which is the same credit a named back-office function gets.",
+    options: [
+      { label: 'Gives a real number', next: 'qualify_role', type: 'positive', banks: ['company'], elaborated: true },
+      { label: 'Sounds like a very small team', next: 'obj_too_small', type: 'objection', banks: ['company'] },
+      { label: 'Just them / no staff at all', next: 'obj_solo_operator', type: 'objection', banks: ['company'] },
+      { label: 'Dodges it / would rather not say', next: 'qualify_role', type: 'positive', vague: true },
+    ],
+  },
 
   qualify_role: {
     id: 'qualify_role',
