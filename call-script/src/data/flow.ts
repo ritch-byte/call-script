@@ -82,6 +82,32 @@ export const MEETING_LENGTH = '30 minutes each'
  */
 export const MEETING_ONE = MEETING_LENGTH.replace(/\s+each$/i, '')
 
+/*
+ * Recruitment, staffing and labour-hire leads.
+ *
+ * These firms name roles they are filling for clients, and a client placement booked as a
+ * discovery call is a lead the partner cannot sell to. So when the rep ticks "Recruitment
+ * firm", CallScreen sends the first step past the role question (any of REC_GATED_STEPS)
+ * to qualify_recruitment instead, and only lets the call on once the rep has ticked a
+ * back-office function and confirmed the role is for the firm's own team.
+ *
+ * REC_RESUME is not a node. It is where the call was heading when the check cut in, which
+ * depends on the path, so CallScreen resolves it. REC_RESUME_STANDARD does the same and
+ * also switches the check off, for a lead who turns out not to be in recruitment after all.
+ */
+export const REC_RESUME = '@rec-resume'
+export const REC_RESUME_STANDARD = '@rec-resume-standard'
+export const REC_PASS_LABEL = 'All checks pass: own team, back-office function named'
+export const REC_GATED_STEPS = ['value_offer', 'qualify_fulltime', 'two_meeting', 'close_recap', 'end_booked']
+export const REC_FUNCTIONS = [
+  'Resume screening',
+  'First-round phone screens',
+  'Interview, induction or site-start scheduling',
+  'Reference and compliance checks',
+  'Payroll and timesheets for temps',
+  'Database upkeep and job-ad posting',
+]
+
 export const flow: Record<string, FlowNode> = {
 
   // ── OPENING (unchanged — intro stays intact) ─────────────────────────────
@@ -843,6 +869,52 @@ export const flow: Record<string, FlowNode> = {
     options: [
       { label: 'Curious about the human + AI mix', next: 'qualify_role', type: 'positive' },
       { label: 'Not interested', next: 'end_not_interested', type: 'end' },
+    ],
+  },
+
+  // ── RECRUITMENT / STAFFING / LABOUR-HIRE LEADS ONLY ──────────────────────
+  // Never in MAIN_FLOW and nothing else routes here. CallScreen injects the check when the
+  // rep has ticked "Recruitment firm" in the header, so every other lead runs as before.
+
+  qualify_recruitment: {
+    id: 'qualify_recruitment',
+    topic: 'recruitment_function',
+    title: 'Qualify · Recruitment Firm Check',
+    script: "Quick one so I've got my notes right: you're over at [Company] at the moment, yeah? (pause)\n\nAnd on your own side of the business, where does the back-office work pile up most? Screening resumes, the first-round phone screens, scheduling interviews, inductions and site starts, reference and compliance checks, payroll and timesheets for your temps, or keeping the database and job ads up to date?\n\n(if they name a job title rather than a task) And is that for your own internal team, or a role you're filling for one of your clients?",
+    waitForAnswer: true,
+    tip: "ONLY SHOWS FOR RECRUITMENT, STAFFING AND LABOUR-HIRE LEADS. These firms hire for a living, so the role they name is often one they are filling for a client, and that is not a lead for us. We help them offshore their OWN back office.\n\nCONFIRM THE CURRENT COMPANY FIRST. Recruiters move between agencies often and the lead list lags behind. If they have moved on, you are qualifying the wrong business.\n\nRED FLAG: a job title like Project Manager or Logistics Coordinator sounds like a client placement, not an in-house need. Ask whose team the role sits in before you go any further.\n\nBOOK ONLY WHEN CHECKS 2 AND 3 PASS: a named back-office function, and a clear yes that it is for their own team. The continue button stays locked until both are ticked.",
+    options: [
+      { label: REC_PASS_LABEL, next: REC_RESUME, type: 'positive', banks: ['company', 'offshorable'], elaborated: true },
+      { label: 'Sounds like a client placement', next: 'obj_rec_client_placement', type: 'objection' },
+      { label: "Can't name a back-office function", next: 'obj_rec_client_placement', type: 'objection', vague: true },
+      { label: 'Has moved to a different company', next: 'obj_rec_moved_company', type: 'objection' },
+    ],
+  },
+
+  obj_rec_client_placement: {
+    id: 'obj_rec_client_placement',
+    title: 'Recruitment: Not an In-House Need',
+    isObjection: true,
+    script: "(if it was a client role) Ah got it, so that one's for a client.\n\nJust so I'm clear on my side, we don't fill your clients' roles, we help recruitment firms like yours take the back-office work off the consultants: screening, scheduling, compliance checks, temp payroll, that kind of thing.\n\nOn your own team, is any of that eating into your consultants' time at the moment?",
+    waitForAnswer: true,
+    tip: "Do not book a client placement. It sounds qualified on the recording, then the partner turns up to quote for a role the lead is not hiring for, and it comes back as a no-show or a rejected lead. Say what we do in one line and ask once about their own back office. If they name a function, go back to the check and tick it. If it is only ever client roles, thank them and end the call.",
+    options: [
+      { label: 'Names an in-house back-office function', next: 'qualify_recruitment', type: 'positive', elaborated: true },
+      { label: 'Only client placements / nothing in-house', next: 'end_not_interested', type: 'end', refuses: ['offshorable'] },
+    ],
+  },
+
+  obj_rec_moved_company: {
+    id: 'obj_rec_moved_company',
+    title: 'Recruitment: No Longer at That Company',
+    isObjection: true,
+    script: "Ah, thanks for letting me know, my list must be a bit behind. Where are you now? (pause)\n\nAnd is that a recruitment or staffing business too?",
+    waitForAnswer: true,
+    tip: "The lead is only worth something at the company they are at today. Qualify the new business, not the one on the list, and update the record after the call. If the new company is not in recruitment or labour hire, the standard call applies: the middle button switches the recruitment check off and carries on where you were.",
+    options: [
+      { label: 'Still recruitment or staffing: re-run the check', next: 'qualify_recruitment', type: 'positive', banks: ['company'] },
+      { label: 'Different industry now: run the standard call', next: REC_RESUME_STANDARD, type: 'positive', banks: ['company'] },
+      { label: 'Wrong contact / will not engage', next: 'end_not_interested', type: 'end' },
     ],
   },
 }

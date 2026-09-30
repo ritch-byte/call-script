@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, DISPOSITIONS, SAVINGS_CLAIM, SAVINGS_PCT, MEETING_LENGTH, MEETING_ONE } from '../data/flow'
+import { flow, QUICK_OBJECTIONS, DEEP_OBJECTIONS, SALARY_TABLE, DISPOSITIONS, SAVINGS_CLAIM, SAVINGS_PCT, MEETING_LENGTH, MEETING_ONE,
+  REC_RESUME, REC_RESUME_STANDARD, REC_PASS_LABEL, REC_GATED_STEPS, REC_FUNCTIONS } from '../data/flow'
 import type { FlowOption } from '../data/flow'
 import type { CallData } from '../App'
 import EmailComposer from './EmailComposer'
@@ -89,6 +90,14 @@ export default function CallScreen({ onReset }: Props) {
   const activeRef = useRef<HTMLDivElement>(null)
   const [scoreStack, setScoreStack] = useState<ScoreState[]>(() => [newState()])
   const [showScore, setShowScore] = useState(true)
+  // Recruitment, staffing and labour-hire leads only. Off by default, so every other lead
+  // runs the flow exactly as it did before the check existed.
+  const [recruitmentLead, setRecruitmentLead] = useState(false)
+  const [recResume, setRecResume] = useState<string | null>(null)
+  const [recCompany, setRecCompany] = useState(false)
+  const [recFunctions, setRecFunctions] = useState<string[]>([])
+  const [recOwnTeam, setRecOwnTeam] = useState(false)
+  const recChecksPass = recFunctions.length > 0 && recOwnTeam
 
   const generateSpiel = async () => {
     setIsGenerating(true)
@@ -111,9 +120,21 @@ export default function CallScreen({ onReset }: Props) {
     const answeredNode = flow[steps[activeIdx]?.nodeId]
     setScoreStack(prev => [...prev, applyAnswer(prev[prev.length - 1], option, answeredNode?.topic, answeredNode?.isObjection)])
     if (option.capture) setContext(prev => ({ ...prev, ...option.capture }))
-    const nextId = option.next
+    let nextId = option.next
+    const standard = nextId === REC_RESUME_STANDARD
+    if (nextId === REC_RESUME || standard) nextId = recResume ?? 'value_offer'
+    if (standard) setRecruitmentLead(false)
     const updatedSteps = [...steps]
     updatedSteps[activeIdx] = { ...updatedSteps[activeIdx], chosenLabel: option.label }
+    // Whichever path the call takes past the role question, a recruitment lead meets the
+    // check before it gets there, and gets there only once the check has been passed.
+    const recPassed = updatedSteps
+      .slice(0, activeIdx + 1)
+      .some(s => s.nodeId === 'qualify_recruitment' && s.chosenLabel === REC_PASS_LABEL)
+    if (recruitmentLead && !standard && !recPassed && REC_GATED_STEPS.includes(nextId)) {
+      setRecResume(nextId)
+      nextId = 'qualify_recruitment'
+    }
     const aheadIdx = updatedSteps.findIndex((s, i) => i > activeIdx && s.nodeId === nextId)
     let nextActive: number
     if (aheadIdx !== -1) {
@@ -563,6 +584,48 @@ export default function CallScreen({ onReset }: Props) {
                 </div>
               )}
 
+              {step.nodeId === 'qualify_recruitment' && (
+                <div className="inline-research-form rec-check">
+                  <div className="inline-research-label">Recruitment firm check</div>
+                  <label className="rec-check-item">
+                    <input type="checkbox" checked={recCompany} onChange={e => setRecCompany(e.target.checked)} />
+                    <span><strong>1.</strong> Current company confirmed, not a previous employer</span>
+                  </label>
+                  <div className="rec-check-item rec-check-item--stack">
+                    <span><strong>2.</strong> Back-office function they need help with</span>
+                    <div className="rec-chips">
+                      {REC_FUNCTIONS.map(f => {
+                        const on = recFunctions.includes(f)
+                        return (
+                          <button
+                            key={f}
+                            type="button"
+                            className={`rec-chip${on ? ' rec-chip--on' : ''}`}
+                            aria-pressed={on}
+                            onClick={() => setRecFunctions(prev => on ? prev.filter(x => x !== f) : [...prev, f])}
+                          >
+                            {f}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <label className="rec-check-item">
+                    <input type="checkbox" checked={recOwnTeam} onChange={e => setRecOwnTeam(e.target.checked)} />
+                    <span><strong>3.</strong> The role is for the firm's own team, not a placement for a client</span>
+                  </label>
+                  <div className="rec-flag">
+                    Red flag: titles like <strong>Project Manager</strong> or <strong>Logistics Coordinator</strong> usually
+                    mean a client placement. Ask whose team the role sits in.
+                  </div>
+                  <div className={`rec-status${recChecksPass ? ' rec-status--ok' : ''}`}>
+                    {recChecksPass
+                      ? 'Checks 2 and 3 pass. OK to carry on and book.'
+                      : 'Do not book yet. Tick a function in 2 and confirm 3 to carry on.'}
+                  </div>
+                </div>
+              )}
+
               {node.tip && (
                 <div className="coach-tip">
                   <div className="coach-tip-label">Coach Tip</div>
@@ -580,11 +643,14 @@ export default function CallScreen({ onReset }: Props) {
                         : opt.type === 'objection' ? ' btn-option--warn'
                         : opt.type === 'positive'  ? ' btn-option--positive'
                         : ''
+                      const locked = opt.next === REC_RESUME && !recChecksPass
                       return (
                         <button
-                          key={opt.next}
+                          key={opt.next + opt.label}
                           className={`btn-option${cls}`}
                           onClick={() => goTo(opt)}
+                          disabled={locked}
+                          title={locked ? 'Tick a function in 2 and confirm 3 first' : undefined}
                         >
                           {opt.label}
                         </button>
@@ -625,6 +691,17 @@ export default function CallScreen({ onReset }: Props) {
             Objections
           </button>
         )}
+        <label
+          className={`rec-toggle${recruitmentLead ? ' rec-toggle--on' : ''}`}
+          title="Tick if the lead's company is a recruitment, staffing or labour-hire firm"
+        >
+          <input
+            type="checkbox"
+            checked={recruitmentLead}
+            onChange={e => setRecruitmentLead(e.target.checked)}
+          />
+          Recruitment firm
+        </label>
         <span className="step-counter">Step {activeIdx + 1} of {steps.length}</span>
       </div>
 
